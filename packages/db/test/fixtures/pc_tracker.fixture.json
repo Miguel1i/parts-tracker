@@ -1,0 +1,140 @@
+{
+  "merchants": {
+    "Worten": {
+      "shipping": 0,
+      "enabled": true,
+      "search": "https://www.worten.pt/search?query={q}&f.seller_id=Worten",
+      "currency": "EUR",
+      "own_only": true
+    },
+    "Amazon.es": {
+      "shipping": 0,
+      "enabled": true,
+      "search": "https://www.amazon.es/s?k={q}",
+      "currency": "EUR"
+    },
+    "PCDiga": {
+      "shipping": 17,
+      "enabled": true,
+      "search": "https://www.pcdiga.com/search?query={q}",
+      "currency": "EUR"
+    },
+    "Amazon.co.uk": {
+      "shipping": 0,
+      "enabled": false,
+      "search": "https://www.amazon.co.uk/s?k={q}",
+      "currency": "GBP"
+    }
+  },
+  "components": [
+    {
+      "name": "AMD Ryzen 7 9800X3D 4.7 GHz 8-Core Processor",
+      "query": "AMD Ryzen 7 9800X3D",
+      "ref": {
+        "url": "",
+        "name": "AMD Ryzen 7 9800X3D 4.7 GHz 8-Core Processor",
+        "brand": "AMD",
+        "mpn": "100-100001084WOF",
+        "gtin": "5606628885125",
+        "price": 399.9,
+        "typed": []
+      },
+      "urls": {
+        "PCDiga": "https://www.pcdiga.com/componentes/processadores/processador-amd-ryzen-7-9800x3d",
+        "Amazon.es": "https://www.amazon.es/dp/B0DKFMSMYK"
+      },
+      "auto": {
+        "Amazon.co.uk": "https://www.amazon.co.uk/dp/B0DKFMSMYK"
+      },
+      "prices": {
+        "PCDiga": {
+          "ts": "03/11 15:51",
+          "price": 457,
+          "status": "ok",
+          "name": "Processador AMD Ryzen 7 9800X3D",
+          "url": "https://www.pcdiga.com/componentes/processadores/processador-amd-ryzen-7-9800x3d"
+        },
+        "Worten": { "ts": "03/11 15:51", "status": "não encontrado" },
+        "Amazon.es": { "ts": "03/11 16:01", "status": "sem preço no URL fixo" },
+        "Amazon.co.uk": {
+          "ts": "03/11 13:28",
+          "price": 527.35,
+          "status": "ok",
+          "orig": 440.76,
+          "cur": "GBP"
+        }
+      },
+      "bought": null,
+      "bad": {},
+      "history": {
+        "PCDiga": [
+          {
+            "t": "2026-11-03T11:35",
+            "p": 399.9,
+            "u": "https://www.pcdiga.com/componentes/processadores/processador-amd-ryzen-7-9800x3d"
+          },
+          {
+            "t": "2026-11-03T15:51",
+            "p": 457,
+            "s": 17,
+            "u": "https://www.pcdiga.com/componentes/processadores/processador-amd-ryzen-7-9800x3d"
+          }
+        ],
+        "Worten": [{ "t": "2026-11-03T11:35", "p": 482.36, "u": null }],
+        "Amazon.co.uk": [
+          {
+            "t": "2026-11-03T12:33",
+            "p": 527.35,
+            "u": "https://www.amazon.co.uk/dp/B0DKFMSMYK",
+            "o": 440.76,
+            "cur": "GBP"
+          }
+        ]
+      },
+      "image": "https://example.com/9800x3d.jpg"
+    },
+    {
+      "name": "Fonte de Alimentação ATX Corsair HXi Series HX1200i (2025) 1200W ATX 3.1/PCIe 5.1 80 Plus Platinum Full Modular",
+      "query": "Corsair HX1200i",
+      "ref": {
+        "url": "https://www.pcdiga.com/fonte-corsair-hx1200i",
+        "brand": "Corsair",
+        "mpn": "CP-9020307-EU",
+        "gtin": "840440495161",
+        "price": null,
+        "typed": ["mpn", "gtin"]
+      },
+      "urls": {},
+      "auto": { "PCDiga": "https://www.pcdiga.com/fonte-corsair-hx1200i" },
+      "prices": {
+        "PCDiga": { "ts": "03/11 15:51", "price": 289.9, "status": "sem stock" },
+        "Amazon.es": { "ts": "03/11 15:51", "status": "erro: Failed to perform, curl: (6)" }
+      },
+      "bought": {
+        "shop": "PCDiga",
+        "price": 279.9,
+        "shipping": 0,
+        "date": "01/11/2026",
+        "list_price": 299.9,
+        "discount": 20,
+        "discount_type": "€",
+        "coupon": ""
+      },
+      "bad": {
+        "Worten": [
+          {
+            "url": "https://www.worten.pt/produtos/fonte-de-alimentacao-corsair-hx750-7377192",
+            "name": "Fonte de Alimentação CORSAIR HX750"
+          }
+        ],
+        "Amazon.es": [
+          { "url": "https://www.amazon.es/dp/B0D5HY3F9X", "name": "CORSAIR SF750 (2024)" }
+        ]
+      },
+      "history": {
+        "PCDiga": [{ "t": "2026-07-15T10:00", "p": 289.9, "s": 0, "u": null }]
+      }
+    }
+  ],
+  "v": 4
+}
