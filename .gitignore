@@ -1,0 +1,27 @@
+node_modules/
+.pnpm-store/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+.vercel/
+.turbo/
+
+# env
+.env
+.env.*
+!.env.example
+
+# local db
+*.db
+*.db-journal
+local.db*
+
+# scraper debug output
+debug/
+playwright-report/
+test-results/
+
+.DS_Store
+Thumbs.db

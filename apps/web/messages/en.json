@@ -1,0 +1,73 @@
+{
+  "Metadata": {
+    "title": "Parts Tracker",
+    "description": "Track PC part prices across the shops PCPartPicker doesn't cover."
+  },
+  "Nav": {
+    "dashboard": "Dashboard",
+    "compare": "Compare",
+    "builds": "Builds",
+    "admin": "Admin",
+    "toggleSidebar": "Toggle sidebar",
+    "main": "Main",
+    "skipToContent": "Skip to content"
+  },
+  "Theme": {
+    "change": "Change theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Account": {
+    "menu": "Account",
+    "signedOut": "You're not signed in",
+    "signIn": "Sign in",
+    "soon": "Soon"
+  },
+  "Locale": {
+    "change": "Change language"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "description": "Cheapest in-stock prices across your merchants, updated on a schedule.",
+    "kpi": {
+      "buildTotal": "Build total",
+      "savings": "Savings vs reference",
+      "merchants": "Merchants tracked",
+      "lastRun": "Last run"
+    },
+    "empty": {
+      "title": "No prices yet",
+      "body": "Prices appear here after the first scrape run. Merchants and products arrive with the database milestone."
+    }
+  },
+  "Compare": {
+    "title": "Compare",
+    "description": "Every product against every merchant.",
+    "empty": {
+      "title": "Nothing to compare yet",
+      "body": "The comparison grid and price-gap heatmap arrive with the views milestone."
+    }
+  },
+  "Builds": {
+    "title": "Builds",
+    "description": "Your part lists and their total over time.",
+    "empty": {
+      "title": "No builds yet",
+      "body": "Creating builds needs an account; sign-in arrives with the auth milestone."
+    }
+  },
+  "Admin": {
+    "title": "Admin",
+    "description": "Users, merchants, catalog and scrape runs.",
+    "empty": {
+      "title": "Admins only",
+      "body": "The admin area (users, merchant adapters, review queue, runs) arrives with the auth milestone."
+    }
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "body": "That page doesn't exist.",
+    "back": "Back to dashboard"
+  }
+}
