@@ -1,0 +1,73 @@
+{
+  "Metadata": {
+    "title": "Parts Tracker",
+    "description": "Acompanhe os preços de componentes de PC nas lojas que o PCPartPicker não cobre."
+  },
+  "Nav": {
+    "dashboard": "Painel",
+    "compare": "Comparar",
+    "builds": "Configurações",
+    "admin": "Administração",
+    "toggleSidebar": "Mostrar/ocultar barra lateral",
+    "main": "Principal",
+    "skipToContent": "Saltar para o conteúdo"
+  },
+  "Theme": {
+    "change": "Mudar tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  },
+  "Account": {
+    "menu": "Conta",
+    "signedOut": "Sem sessão iniciada",
+    "signIn": "Iniciar sessão",
+    "soon": "Em breve"
+  },
+  "Locale": {
+    "change": "Mudar idioma"
+  },
+  "Dashboard": {
+    "title": "Painel",
+    "description": "Os preços mais baixos com stock nas suas lojas, atualizados automaticamente.",
+    "kpi": {
+      "buildTotal": "Total da configuração",
+      "savings": "Poupança face à referência",
+      "merchants": "Lojas acompanhadas",
+      "lastRun": "Última verificação"
+    },
+    "empty": {
+      "title": "Ainda sem preços",
+      "body": "Os preços aparecem aqui depois da primeira verificação. As lojas e os produtos chegam com a etapa da base de dados."
+    }
+  },
+  "Compare": {
+    "title": "Comparar",
+    "description": "Cada produto em cada loja.",
+    "empty": {
+      "title": "Ainda nada para comparar",
+      "body": "A grelha de comparação e o mapa de diferenças de preço chegam com a etapa das vistas."
+    }
+  },
+  "Builds": {
+    "title": "Configurações",
+    "description": "As suas listas de componentes e o total ao longo do tempo.",
+    "empty": {
+      "title": "Ainda sem configurações",
+      "body": "Criar configurações requer uma conta; o início de sessão chega com a etapa de autenticação."
+    }
+  },
+  "Admin": {
+    "title": "Administração",
+    "description": "Utilizadores, lojas, catálogo e verificações.",
+    "empty": {
+      "title": "Apenas administradores",
+      "body": "A área de administração (utilizadores, adaptadores de lojas, fila de revisão, verificações) chega com a etapa de autenticação."
+    }
+  },
+  "NotFound": {
+    "title": "Página não encontrada",
+    "body": "Essa página não existe.",
+    "back": "Voltar ao painel"
+  }
+}
