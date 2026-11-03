@@ -12,7 +12,11 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:generate": "pnpm --filter @parts/db db:generate",
+    "db:migrate": "pnpm --filter @parts/db db:migrate",
+    "db:seed": "pnpm --filter @parts/db db:seed",
+    "db:import-legacy": "pnpm --filter @parts/db db:import-legacy"
   },
   "devDependencies": {
     "prettier": "^3",
