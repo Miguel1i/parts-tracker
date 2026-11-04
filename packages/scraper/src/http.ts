@@ -60,7 +60,11 @@ export interface PageFetcher {
 }
 
 const CHALLENGE_MARKERS: [RegExp, string][] = [
-  [/\/errors\/validateCaptcha|captcha-delivery\.com|px-captcha|g-recaptcha|h-captcha/i, "captcha"],
+  // Amazon: /errors/validateCaptcha, or /errors_page/validateCaptcha ("Haz clic en el botón…").
+  [
+    /\/errors(?:_page)?\/validateCaptcha|captcha-delivery\.com|px-captcha|g-recaptcha|h-captcha/i,
+    "captcha",
+  ],
   [/cf-chl-|challenge-platform|<title>\s*(just a moment|attention required)/i, "cloudflare"],
   [/<title>\s*(access denied|403 forbidden|request rejected)/i, "access denied"],
 ];
