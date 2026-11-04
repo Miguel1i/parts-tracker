@@ -221,7 +221,7 @@
       },
       "test": {
         "title": "Testar este comerciante",
-        "description": "Executa um produto no pipeline deste comerciante e mostra o que encontrou. Nada é aprovado automaticamente.",
+        "description": "Faz uma verificação real de um produto nesta loja e mostra o que encontrou. Tal como numa execução agendada, uma oferta aceite fica no histórico de preços e as incertas vão para a fila de revisão. Ligações de produto desativadas são ignoradas.",
         "product": "Produto",
         "choose": "Escolha um produto",
         "noProducts": "Não há produtos para testar.",
@@ -448,6 +448,21 @@
         "revoke": "Revogar o convite para {email}",
         "revoked": "Convite revogado"
       }
+    },
+    "errors": {
+      "generic": "Ocorreu um erro. Tente novamente.",
+      "invalid": "Alguns valores não são válidos.",
+      "notFound": "Já não existe. Recarregue a página.",
+      "self": "Não pode fazer isso à sua própria conta.",
+      "emailMismatch": "O email não corresponde.",
+      "userExists": "Já existe um utilizador com esse email.",
+      "slugTaken": "Esse slug já está a ser usado.",
+      "nameTaken": "Esse nome já está a ser usado.",
+      "duplicate": "Já existe uma loja com esse nome ou slug.",
+      "invalidAdapter": "As definições do adaptador não são válidas.",
+      "hasHistory": "Esta loja tem histórico de preços, que é guardado para sempre. Desative-a em vez disso.",
+      "alreadyDecided": "Alguém já decidiu sobre este candidato.",
+      "dispatchFailed": "O GitHub não aceitou a execução. Verifique GH_DISPATCH_TOKEN e GH_REPO."
     }
   },
   "NotFound": {

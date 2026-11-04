@@ -14,7 +14,7 @@ import { z } from "zod";
 import { mergeAdapterConfig } from "@/lib/admin/adapter-schema";
 import { changes, writeAudit } from "@/lib/admin/audit";
 import { dispatchScrape } from "@/lib/admin/github";
-import { adminAction } from "@/lib/auth/guard";
+import { ActionError, adminAction } from "@/lib/auth/guard";
 import { merchantValuesSchema } from "./schema";
 
 const idSchema = z.object({ id: z.string().min(1) });
@@ -33,15 +33,15 @@ function errorText(e: unknown): string {
 /** Turns a unique-index violation into a message the admin can act on. */
 function friendly(e: unknown): never {
   const text = errorText(e);
-  if (/merchants_slug_uq|merchants\.slug/.test(text)) throw new Error("That slug is already used.");
-  if (/merchants_name_uq|merchants\.name/.test(text)) throw new Error("That name is already used.");
-  if (/UNIQUE/i.test(text)) throw new Error("A merchant with that name or slug already exists.");
+  if (/merchants_slug_uq|merchants\.slug/.test(text)) throw new ActionError("slugTaken");
+  if (/merchants_name_uq|merchants\.name/.test(text)) throw new ActionError("nameTaken");
+  if (/UNIQUE/i.test(text)) throw new ActionError("duplicate");
   throw e;
 }
 
 function buildRow(input: z.output<typeof merchantValuesSchema>) {
   const merged = mergeAdapterConfig(input.adapter, input.overrides);
-  if (!merged.ok) throw new Error(merged.error);
+  if (!merged.ok) throw new ActionError("invalidAdapter");
   return {
     name: input.name,
     slug: input.slug,
@@ -100,7 +100,7 @@ export const updateMerchant = adminAction(
     try {
       await db.transaction(async (tx) => {
         const [before] = await tx.select().from(merchants).where(eq(merchants.id, id));
-        if (!before) throw new Error("Merchant not found.");
+        if (!before) throw new ActionError("notFound");
         await tx.update(merchants).set(row).where(eq(merchants.id, id));
         await writeAudit(tx, {
           actorUserId: actor.id,
@@ -121,12 +121,10 @@ export const deleteMerchant = adminAction(idSchema, async ({ id }, { actor }) =>
   const db = getDb();
   await db.transaction(async (tx) => {
     const [before] = await tx.select().from(merchants).where(eq(merchants.id, id));
-    if (!before) throw new Error("Merchant not found.");
+    if (!before) throw new ActionError("notFound");
     const history = await tx.$count(pricePoints, eq(pricePoints.merchantId, id));
     if (history > 0) {
-      throw new Error(
-        "This merchant has price history, which is kept for good. Disable it instead.",
-      );
+      throw new ActionError("hasHistory");
     }
     await tx.delete(merchants).where(eq(merchants.id, id));
     await writeAudit(tx, {
@@ -150,7 +148,7 @@ export const setMerchantFlag = adminAction(
     const db = getDb();
     await db.transaction(async (tx) => {
       const [before] = await tx.select().from(merchants).where(eq(merchants.id, id));
-      if (!before) throw new Error("Merchant not found.");
+      if (!before) throw new ActionError("notFound");
       if (before[flag] === value) return;
       await tx
         .update(merchants)
@@ -186,7 +184,7 @@ export const moveMerchant = adminAction(
         .from(merchants)
         .orderBy(asc(merchants.sortOrder), asc(merchants.name));
       const from = all.findIndex((m) => m.id === id);
-      if (from < 0) throw new Error("Merchant not found.");
+      if (from < 0) throw new ActionError("notFound");
       const to = direction === "up" ? from - 1 : from + 1;
       if (to < 0 || to >= all.length) return;
       const order = all.map((m) => m.id);
@@ -214,12 +212,12 @@ export const startTestRun = adminAction(
   async ({ merchantId, productId }, { actor }) => {
     const db = getDb();
     const [merchant] = await db.select().from(merchants).where(eq(merchants.id, merchantId));
-    if (!merchant) throw new Error("Merchant not found.");
+    if (!merchant) throw new ActionError("notFound");
     const [product] = await db
       .select({ id: products.id, name: products.name })
       .from(products)
       .where(and(eq(products.id, productId), eq(products.archived, false)));
-    if (!product) throw new Error("Product not found.");
+    if (!product) throw new ActionError("notFound");
 
     const run = await db.transaction(async (tx) => {
       const [created] = await tx
@@ -249,7 +247,8 @@ export const startTestRun = adminAction(
         .update(scrapeRuns)
         .set({ status: "failed", finishedAt: new Date() })
         .where(and(eq(scrapeRuns.id, run.id), ne(scrapeRuns.status, "succeeded")));
-      throw e;
+      console.error("[startTestRun]", e);
+      throw new ActionError("dispatchFailed");
     }
   },
 );
@@ -257,7 +256,7 @@ export const startTestRun = adminAction(
 export const getTestRun = adminAction(z.object({ runId: z.string().min(1) }), async ({ runId }) => {
   const db = getDb();
   const [run] = await db.select().from(scrapeRuns).where(eq(scrapeRuns.id, runId));
-  if (!run) throw new Error("Run not found.");
+  if (!run) throw new ActionError("notFound");
   const [logs, candidates, points] = await Promise.all([
     db
       .select({

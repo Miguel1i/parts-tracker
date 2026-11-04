@@ -64,11 +64,18 @@ export function SignInForm({ providers }: { providers: { github: boolean; google
   // Better Auth redirects back to these paths, so they carry the locale prefix.
   const callbackURL = getPathname({ href: next, locale });
   const errorCallbackURL = getPathname({ href: "/sign-in", locale });
+  // New accounts may need approval; /pending sends active ones straight to the dashboard.
+  const newUserCallbackURL = getPathname({ href: "/pending", locale });
 
   async function social(provider: "github" | "google") {
     setBusy(provider);
     setError(null);
-    const { error } = await signIn.social({ provider, callbackURL, errorCallbackURL });
+    const { error } = await signIn.social({
+      provider,
+      callbackURL,
+      errorCallbackURL,
+      newUserCallbackURL,
+    });
     if (error) {
       setError(t("errors.generic"));
       setBusy(null);
@@ -83,7 +90,7 @@ export function SignInForm({ providers }: { providers: { github: boolean; google
     const { error } = await signIn.magicLink({
       email: to,
       callbackURL,
-      newUserCallbackURL: callbackURL,
+      newUserCallbackURL,
       errorCallbackURL,
     });
     setBusy(null);

@@ -14,17 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { signOut, useSession } from "@/lib/auth/client";
-
-function initials(name: string) {
-  return (
-    name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]!.toUpperCase())
-      .join("") || "?"
-  );
-}
+import { initials } from "@/lib/initials";
 
 /**
  * Avatar menu: Profile & settings, Admin (active admins only) and Sign out; Sign in when

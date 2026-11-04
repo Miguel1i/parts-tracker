@@ -54,6 +54,7 @@ import {
   unbanUser,
   updateUserName,
 } from "./actions";
+import { initials } from "@/lib/initials";
 
 export type UserRow = {
   id: string;
@@ -76,17 +77,6 @@ type DialogState =
   | { kind: "delete"; user: UserRow }
   | { kind: "builds"; user: UserRow }
   | null;
-
-function initials(name: string) {
-  return (
-    name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0]!.toUpperCase())
-      .join("") || "?"
-  );
-}
 
 export function UsersTable({ users }: { users: UserRow[] }) {
   const t = useTranslations("Admin.users");

@@ -50,7 +50,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
       )!,
     );
   }
-  if (filter === "pending") where.push(eq(user.status, "pending"));
+  if (filter === "pending") where.push(and(eq(user.status, "pending"), eq(user.banned, false))!);
   if (filter === "active") where.push(and(eq(user.status, "active"), eq(user.banned, false))!);
   if (filter === "admins") where.push(eq(user.role, "admin"));
   if (filter === "banned") where.push(eq(user.banned, true));

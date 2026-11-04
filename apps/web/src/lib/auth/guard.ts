@@ -12,7 +12,12 @@ import { auth, type AuthSession, type SessionUser } from "./server";
 
 /** The current session (one lookup per request). */
 export const getSession = cache(async (): Promise<AuthSession | null> => {
-  return auth.api.getSession({ headers: await headers() });
+  // Skip the 60 s session cookie cache: role, status and bans must be current for the guards
+  // (a demoted or banned admin would otherwise keep admin rights until the cookie expires).
+  return auth.api.getSession({
+    headers: await headers(),
+    query: { disableCookieCache: true },
+  });
 });
 
 /**
@@ -50,7 +55,33 @@ export class ForbiddenError extends Error {
   }
 }
 
-export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
+/**
+ * An expected failure an admin can act on. `code` is a key under `Admin.errors` in the
+ * messages, so the client shows it translated; anything else becomes `generic`.
+ */
+export class ActionError extends Error {
+  constructor(readonly code: ActionErrorCode) {
+    super(code);
+    this.name = "ActionError";
+  }
+}
+
+export type ActionErrorCode =
+  | "generic"
+  | "invalid"
+  | "notFound"
+  | "self"
+  | "emailMismatch"
+  | "userExists"
+  | "slugTaken"
+  | "nameTaken"
+  | "duplicate"
+  | "invalidAdapter"
+  | "hasHistory"
+  | "alreadyDecided"
+  | "dispatchFailed";
+
+export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: ActionErrorCode };
 
 /**
  * The only way to build an admin Server Action. It re-checks the session on every call
@@ -66,15 +97,15 @@ export function adminAction<S extends z.ZodType, R>(
     const session = await getSession();
     if (evaluateAccess(session?.user, "admin") !== "ok") throw new ForbiddenError();
     const parsed = schema.safeParse(input);
-    if (!parsed.success) {
-      return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
-    }
+    if (!parsed.success) return { ok: false, error: "invalid" };
     try {
       return { ok: true, data: await handler(parsed.data, { actor: session!.user }) };
     } catch (e) {
       if (e instanceof ForbiddenError) throw e;
+      if (e instanceof ActionError) return { ok: false, error: e.code };
+      // Unexpected (DB, network...): log it, but keep internals out of the browser.
       console.error("[admin action]", e);
-      return { ok: false, error: e instanceof Error ? e.message : "Something went wrong" };
+      return { ok: false, error: "generic" };
     }
   };
 }

@@ -221,7 +221,7 @@
       },
       "test": {
         "title": "Test this merchant",
-        "description": "Runs one product through this merchant's pipeline and shows what it found. Nothing is approved automatically.",
+        "description": "Runs a real check of one product at this merchant and shows what it found. Like a scheduled run, an accepted offer is saved to the price history; uncertain ones go to the review queue. Disabled product links are skipped.",
         "product": "Product",
         "choose": "Choose a product",
         "noProducts": "There are no products to test with.",
@@ -448,6 +448,21 @@
         "revoke": "Revoke the invite for {email}",
         "revoked": "Invite revoked"
       }
+    },
+    "errors": {
+      "generic": "Something went wrong. Try again.",
+      "invalid": "Some values aren't valid.",
+      "notFound": "It no longer exists. Reload the page.",
+      "self": "You can't do that to your own account.",
+      "emailMismatch": "The email doesn't match.",
+      "userExists": "A user with that email already exists.",
+      "slugTaken": "That slug is already used.",
+      "nameTaken": "That name is already used.",
+      "duplicate": "A merchant with that name or slug already exists.",
+      "invalidAdapter": "The adapter settings aren't valid.",
+      "hasHistory": "This merchant has price history, which is kept for good. Disable it instead.",
+      "alreadyDecided": "Someone already decided on this candidate.",
+      "dispatchFailed": "GitHub didn't accept the run. Check GH_DISPATCH_TOKEN and GH_REPO."
     }
   },
   "NotFound": {

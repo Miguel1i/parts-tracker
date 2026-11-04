@@ -9,7 +9,7 @@ import { and, eq, isNull } from "@parts/db/orm";
 import { getPathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { writeAudit } from "@/lib/admin/audit";
-import { adminAction } from "@/lib/auth/guard";
+import { ActionError, adminAction } from "@/lib/auth/guard";
 import { auth } from "@/lib/auth/server";
 import { normalizeEmail } from "@/lib/auth/signup";
 import { linkEmail, sendEmail } from "@/lib/email";
@@ -25,13 +25,13 @@ const INVITE_DAYS = 7;
 
 async function target(id: string) {
   const [row] = await getDb().select().from(user).where(eq(user.id, id));
-  if (!row) throw new Error("User not found");
+  if (!row) throw new ActionError("notFound");
   return row;
 }
 
 /** Admins can't lock themselves out: no self-demotion, ban or delete. */
 function notSelf(actorId: string, id: string) {
-  if (actorId === id) throw new Error("You can't do that to your own account");
+  if (actorId === id) throw new ActionError("self");
 }
 
 export const approveUser = adminAction(userId, async ({ userId: id }, { actor }) => {
@@ -125,7 +125,7 @@ export const removeUser = adminAction(
     notSelf(actor.id, id);
     const before = await target(id);
     if (normalizeEmail(confirmEmail) !== normalizeEmail(before.email)) {
-      throw new Error("The email doesn't match");
+      throw new ActionError("emailMismatch");
     }
     await auth.api.removeUser({ body: { userId: id }, headers: await headers() });
     // After the delete, so the audit row's actor FK isn't the deleted user.
@@ -192,7 +192,7 @@ export const inviteUser = adminAction(
     const email = normalizeEmail(rawEmail);
     const db = getDb();
     const [existing] = await db.select({ id: user.id }).from(user).where(eq(user.email, email));
-    if (existing) throw new Error("A user with that email already exists");
+    if (existing) throw new ActionError("userExists");
 
     const token = randomBytes(24).toString("base64url");
     const expiresAt = new Date(Date.now() + INVITE_DAYS * 86_400_000);
@@ -235,7 +235,7 @@ export const revokeInvite = adminAction(
   async ({ inviteId }, { actor }) => {
     const db = getDb();
     const [row] = await db.select().from(invites).where(eq(invites.id, inviteId));
-    if (!row) throw new Error("Invite not found");
+    if (!row) throw new ActionError("notFound");
     await db.transaction(async (tx) => {
       await tx.delete(invites).where(eq(invites.id, inviteId));
       await writeAudit(tx, {

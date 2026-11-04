@@ -5,7 +5,7 @@ import { eq } from "@parts/db/orm";
 import { z } from "zod";
 import { writeAudit } from "@/lib/admin/audit";
 import { blocklistExternalId, identifiersToConfirm } from "@/lib/admin/review";
-import { adminAction } from "@/lib/auth/guard";
+import { ActionError, adminAction } from "@/lib/auth/guard";
 
 const idInput = z.object({ id: z.string().min(1) });
 
@@ -13,8 +13,8 @@ export const approveCandidate = adminAction(idInput, async ({ id }, { actor }) =
   const db = getDb();
   await db.transaction(async (tx) => {
     const [c] = await tx.select().from(matchCandidates).where(eq(matchCandidates.id, id));
-    if (!c) throw new Error("Candidate not found");
-    if (c.status !== "pending") throw new Error("This candidate was already decided");
+    if (!c) throw new ActionError("notFound");
+    if (c.status !== "pending") throw new ActionError("alreadyDecided");
 
     await tx
       .insert(productMerchant)
@@ -64,8 +64,8 @@ export const rejectCandidate = adminAction(idInput, async ({ id }, { actor }) =>
   const db = getDb();
   await db.transaction(async (tx) => {
     const [c] = await tx.select().from(matchCandidates).where(eq(matchCandidates.id, id));
-    if (!c) throw new Error("Candidate not found");
-    if (c.status !== "pending") throw new Error("This candidate was already decided");
+    if (!c) throw new ActionError("notFound");
+    if (c.status !== "pending") throw new ActionError("alreadyDecided");
 
     const externalId = blocklistExternalId(c.signals?.page);
     await tx.insert(blocklist).values({

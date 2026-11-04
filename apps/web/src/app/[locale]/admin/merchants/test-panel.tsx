@@ -4,6 +4,7 @@ import { Check, Copy, ExternalLink, Play } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { useActionErrorText } from "@/components/admin/use-admin-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,6 +43,7 @@ export function TestPanel({
   products: { id: string; name: string }[];
 }) {
   const t = useTranslations("Admin.merchants.test");
+  const errorText = useActionErrorText();
   const tc = useTranslations("Admin.common");
   const format = useFormatter();
   const selectId = useId();
@@ -88,7 +90,7 @@ export function TestPanel({
       try {
         const res = await startTestRun({ merchantId, productId });
         if (!res.ok) {
-          toast.error(res.error);
+          toast.error(errorText(res.error));
           return;
         }
         setData(null);

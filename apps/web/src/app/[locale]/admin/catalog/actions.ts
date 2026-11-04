@@ -4,7 +4,7 @@ import { getDb, productIdentifiers, products } from "@parts/db";
 import { eq } from "@parts/db/orm";
 import { z } from "zod";
 import { writeAudit } from "@/lib/admin/audit";
-import { adminAction } from "@/lib/auth/guard";
+import { ActionError, adminAction } from "@/lib/auth/guard";
 
 const idInput = z.object({ id: z.string().min(1) });
 
@@ -14,7 +14,7 @@ export const setProductArchived = adminAction(
     const db = getDb();
     await db.transaction(async (tx) => {
       const [product] = await tx.select().from(products).where(eq(products.id, id));
-      if (!product) throw new Error("Product not found");
+      if (!product) throw new ActionError("notFound");
       await tx.update(products).set({ archived }).where(eq(products.id, id));
       await writeAudit(tx, {
         actorUserId: actor.id,
@@ -31,7 +31,7 @@ export const confirmIdentifier = adminAction(idInput, async ({ id }, { actor }) 
   const db = getDb();
   await db.transaction(async (tx) => {
     const [row] = await tx.select().from(productIdentifiers).where(eq(productIdentifiers.id, id));
-    if (!row) throw new Error("Identifier not found");
+    if (!row) throw new ActionError("notFound");
     await tx
       .update(productIdentifiers)
       .set({ confirmed: true, confidence: 1 })
@@ -50,7 +50,7 @@ export const removeIdentifier = adminAction(idInput, async ({ id }, { actor }) =
   const db = getDb();
   await db.transaction(async (tx) => {
     const [row] = await tx.select().from(productIdentifiers).where(eq(productIdentifiers.id, id));
-    if (!row) throw new Error("Identifier not found");
+    if (!row) throw new ActionError("notFound");
     await tx.delete(productIdentifiers).where(eq(productIdentifiers.id, id));
     await writeAudit(tx, {
       actorUserId: actor.id,
