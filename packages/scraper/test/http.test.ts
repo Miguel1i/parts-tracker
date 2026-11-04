@@ -90,6 +90,10 @@ describe("blockReason", () => {
     expect(blockReason(403, "<html></html>")).toBe("HTTP 403");
     expect(blockReason(200, "<title>Just a moment...</title>")).toBe("cloudflare");
     expect(blockReason(200, '<form action="/errors/validateCaptcha">')).toBe("captcha");
+    // What Amazon.es served a GitHub runner, with HTTP 200 (2026-11-04).
+    expect(
+      blockReason(200, '<form method="get" action="/errors_page/validateCaptcha" name="">'),
+    ).toBe("captcha");
     expect(blockReason(200, "<title>AMD Ryzen 7 9800X3D</title>")).toBeNull();
     expect(blockReason(404, "not here")).toBeNull();
   });
