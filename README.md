@@ -127,7 +127,7 @@ pnpm seed:admin --email you@example.com
 
 **Test merchant** dispatches `scrape.yml` for one (product, merchant) pair with a fine-grained token (`GH_DISPATCH_TOKEN`: this repo only, **Actions: read and write**), then polls the run. Without the token the page shows the equivalent `pnpm scrape` command to run locally.
 
-Production secrets: paste them yourself into `vercel env add <NAME>` (`BETTER_AUTH_SECRET` from `openssl rand -base64 32`, `BETTER_AUTH_URL` = the site URL, the OAuth client ids/secrets, `RESEND_API_KEY`, `EMAIL_FROM`, `GH_DISPATCH_TOKEN`). OAuth callback URLs: `<BETTER_AUTH_URL>/api/auth/callback/github` and `/api/auth/callback/google`.
+Production secrets: run `bash scripts/setup-vercel-env.sh` from a checkout where `apps/web` is linked to Vercel. It generates the auth secret, walks through creating each OAuth app and key, sets everything on Vercel and redeploys (`--dry-run` to preview). Or paste them yourself into `vercel env add <NAME>` (`BETTER_AUTH_SECRET` from `openssl rand -base64 32`, `BETTER_AUTH_URL` = the site URL, the OAuth client ids/secrets, `RESEND_API_KEY`, `EMAIL_FROM`, `GH_DISPATCH_TOKEN`). OAuth callback URLs: `<BETTER_AUTH_URL>/api/auth/callback/github` and `/api/auth/callback/google`.
 
 ## Translations
 
