@@ -22,7 +22,11 @@
     "menu": "Account",
     "signedOut": "You're not signed in",
     "signIn": "Sign in",
-    "soon": "Soon"
+    "soon": "Soon",
+    "profile": "Profile & settings",
+    "admin": "Admin",
+    "signOut": "Sign out",
+    "pending": "Awaiting approval"
   },
   "Locale": {
     "change": "Change language"
@@ -59,15 +63,89 @@
   },
   "Admin": {
     "title": "Admin",
-    "description": "Users, merchants, catalog and scrape runs.",
-    "empty": {
-      "title": "Admins only",
-      "body": "The admin area (users, merchant adapters, review queue, runs) arrives with the auth milestone."
+    "description": "Users, merchants, catalog and the review queue.",
+    "nav": {
+      "label": "Admin sections",
+      "users": "Users",
+      "merchants": "Merchants",
+      "catalog": "Catalog",
+      "review": "Review queue",
+      "audit": "Audit log",
+      "pendingCount": "{count, plural, one {# pending} other {# pending}}"
+    },
+    "common": {
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "confirm": "Confirm",
+      "close": "Close",
+      "actions": "Actions",
+      "search": "Search",
+      "searchPlaceholder": "Search…",
+      "noResults": "Nothing matches.",
+      "loading": "Loading…",
+      "error": "Something went wrong.",
+      "yes": "Yes",
+      "no": "No",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {page}",
+      "never": "Never",
+      "all": "All"
     }
   },
   "NotFound": {
     "title": "Page not found",
     "body": "That page doesn't exist.",
     "back": "Back to dashboard"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Sign in",
+      "description": "Use GitHub, Google or a one-time link sent to your email.",
+      "github": "Continue with GitHub",
+      "google": "Continue with Google",
+      "or": "or",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "sendLink": "Email me a sign-in link",
+      "sending": "Sending…",
+      "sent": "Check your inbox: we sent a sign-in link to {email}. It expires in 15 minutes.",
+      "useAnother": "Use another email",
+      "invited": "You've been invited. Sign in with the email the invite was sent to.",
+      "noProviders": "GitHub and Google sign-in aren't configured on this server.",
+      "error": "Sign-in failed. Try again.",
+      "errors": {
+        "invite_required": "Sign-up is by invitation only. Ask an admin for an invite.",
+        "banned": "This account has been suspended.",
+        "generic": "Sign-in failed. Try again."
+      }
+    },
+    "pending": {
+      "title": "Waiting for approval",
+      "body": "Your account ({email}) was created. An admin needs to approve it before you can use Parts Tracker; you'll be able to sign in normally once that happens.",
+      "check": "Check again",
+      "signOut": "Sign out"
+    }
+  },
+  "Email": {
+    "magicLink": {
+      "subject": "Your Parts Tracker sign-in link",
+      "heading": "Sign in to Parts Tracker",
+      "body": "Click the button below to sign in. The link works once and expires in 15 minutes.",
+      "cta": "Sign in",
+      "footer": "If you didn't ask for this, you can ignore this email."
+    },
+    "invite": {
+      "subject": "You're invited to Parts Tracker",
+      "heading": "You're invited to Parts Tracker",
+      "body": "{inviter} invited you to track PC part prices with Parts Tracker. Sign in with this email address to accept; the invite expires in 7 days.",
+      "cta": "Accept the invite",
+      "footer": "If you weren't expecting this, you can ignore this email."
+    }
   }
 }

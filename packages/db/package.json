@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./schema": "./src/schema.ts",
-    "./migrate": "./src/migrate.ts"
+    "./migrate": "./src/migrate.ts",
+    "./orm": "./src/orm.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

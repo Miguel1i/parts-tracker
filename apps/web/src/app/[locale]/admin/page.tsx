@@ -1,12 +1,10 @@
-import { Shield } from "lucide-react";
-import { PlaceholderPage, placeholderMetadata } from "@/components/placeholder-page";
+import { redirect } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
+import { initLocale } from "@/i18n/server";
+import { requireAdmin } from "@/lib/auth/guard";
 
-// Not in the sidebar. In milestone 5 this moves behind a server-side role check
-// (non-admins get notFound()) and is reached from the account menu, for admins only.
-export async function generateMetadata() {
-  return { ...(await placeholderMetadata("Admin")), robots: { index: false } };
-}
-
-export default function AdminPage() {
-  return <PlaceholderPage section="Admin" icon={Shield} />;
+export default async function AdminIndex() {
+  const locale = (await initLocale()) ?? routing.defaultLocale;
+  await requireAdmin();
+  redirect({ href: "/admin/users", locale });
 }
