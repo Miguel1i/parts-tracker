@@ -47,6 +47,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
       or(
         sql`${user.name} like ${pattern} escape '\\'`,
         sql`${user.email} like ${pattern} escape '\\'`,
+        sql`${user.username} like ${pattern} escape '\\'`,
       )!,
     );
   }
@@ -92,6 +93,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
     id: r.id,
     name: r.name,
     email: r.email,
+    username: r.displayUsername ?? r.username,
     image: r.image?.startsWith("https://") ? r.image : null,
     role: r.role,
     status: r.status,

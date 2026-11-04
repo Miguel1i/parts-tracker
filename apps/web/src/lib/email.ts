@@ -3,9 +3,14 @@ import { Resend } from "resend";
 
 let client: Resend | undefined;
 
+/** Whether outgoing email (Resend) is configured. */
+export function emailEnabled() {
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
 /**
- * Sends a transactional email through Resend. Without RESEND_API_KEY (local dev) it logs the
- * message to the server console instead, so magic links still work.
+ * Sends a transactional email through Resend and returns true. Email is optional: without
+ * RESEND_API_KEY it returns false (and, outside production, logs the message to the console).
  */
 export async function sendEmail({
   to,
@@ -20,14 +25,16 @@ export async function sendEmail({
 }) {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
-    if (process.env.NODE_ENV === "production") throw new Error("RESEND_API_KEY is not set");
-    console.info(`[email] to=${to} subject=${JSON.stringify(subject)}\n${text}`);
-    return;
+    if (process.env.NODE_ENV !== "production") {
+      console.info(`[email] to=${to} subject=${JSON.stringify(subject)}\n${text}`);
+    }
+    return false;
   }
   client ??= new Resend(key);
   const from = process.env.EMAIL_FROM || "Parts Tracker <onboarding@resend.dev>";
   const { error } = await client.emails.send({ from, to, subject, html, text });
   if (error) throw new Error(`Email not sent: ${error.message}`);
+  return true;
 }
 
 export function escapeHtml(s: string) {

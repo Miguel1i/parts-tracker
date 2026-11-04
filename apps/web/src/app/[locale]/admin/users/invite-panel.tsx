@@ -1,12 +1,20 @@
 "use client";
 
-import { Mail, X } from "lucide-react";
+import { Copy, Link2, X } from "lucide-react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useAdminAction } from "@/components/admin/use-admin-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Locale } from "@/i18n/routing";
-import { inviteUser, revokeInvite } from "./actions";
+import { inviteLink, inviteUser, revokeInvite } from "./actions";
 
 type Invite = { id: string; email: string; role: "admin" | "user"; expiresAt: Date };
 
@@ -28,13 +36,33 @@ export function InvitePanel({ invites }: { invites: Invite[] }) {
   const { pending, run } = useAdminAction();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"user" | "admin">("user");
+  const [link, setLink] = useState<{ email: string; url: string } | null>(null);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    run(() => inviteUser({ email: email.trim(), role, locale }), {
-      success: t("sent", { email: email.trim() }),
-      onSuccess: () => setEmail(""),
+    const to = email.trim();
+    run(() => inviteUser({ email: to, role, locale }), {
+      onSuccess: (data) => {
+        setEmail("");
+        toast.success(data.emailed ? t("emailed", { email: to }) : t("sent", { email: to }));
+        setLink({ email: to, url: data.url });
+      },
     });
+  }
+
+  function showLink(invite: Invite) {
+    run(() => inviteLink({ inviteId: invite.id, locale }), {
+      onSuccess: (data) => setLink({ email: invite.email, url: data.url }),
+    });
+  }
+
+  async function copy(url: string) {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success(t("copied"));
+    } catch {
+      // Clipboard blocked: the link stays selectable in the dialog.
+    }
   }
 
   return (
@@ -69,7 +97,7 @@ export function InvitePanel({ invites }: { invites: Invite[] }) {
             </Select>
           </div>
           <Button type="submit" disabled={pending}>
-            <Mail className="size-4" />
+            <Link2 className="size-4" />
             {t("send")}
           </Button>
         </form>
@@ -89,6 +117,15 @@ export function InvitePanel({ invites }: { invites: Invite[] }) {
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label={t("copyLink", { email: i.email })}
+                    disabled={pending}
+                    onClick={() => showLink(i)}
+                  >
+                    <Link2 className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     aria-label={t("revoke", { email: i.email })}
                     disabled={pending}
                     onClick={() =>
@@ -103,6 +140,27 @@ export function InvitePanel({ invites }: { invites: Invite[] }) {
           </div>
         )}
       </CardContent>
+      <Dialog open={!!link} onOpenChange={(o) => !o && setLink(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("linkTitle", { email: link?.email ?? "" })}</DialogTitle>
+            <DialogDescription>{t("linkHelp")}</DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2">
+            <Input
+              readOnly
+              value={link?.url ?? ""}
+              aria-label={t("linkTitle", { email: link?.email ?? "" })}
+              onFocus={(e) => e.currentTarget.select()}
+              className="font-mono text-xs"
+            />
+            <Button type="button" onClick={() => link && copy(link.url)}>
+              <Copy className="size-4" />
+              {t("copy")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

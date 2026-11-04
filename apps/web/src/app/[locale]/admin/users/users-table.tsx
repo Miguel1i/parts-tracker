@@ -3,6 +3,7 @@
 import {
   Ban,
   Check,
+  KeyRound,
   LogOut,
   MoreHorizontal,
   Package,
@@ -50,6 +51,7 @@ import {
   banUser,
   removeUser,
   revokeUserSessions,
+  setUserPassword,
   setUserRole,
   unbanUser,
   updateUserName,
@@ -60,6 +62,7 @@ export type UserRow = {
   id: string;
   name: string;
   email: string;
+  username: string | null;
   image: string | null;
   role: "admin" | "user";
   status: "active" | "pending";
@@ -76,6 +79,7 @@ type DialogState =
   | { kind: "ban"; user: UserRow }
   | { kind: "delete"; user: UserRow }
   | { kind: "builds"; user: UserRow }
+  | { kind: "password"; user: UserRow }
   | null;
 
 export function UsersTable({ users }: { users: UserRow[] }) {
@@ -121,7 +125,9 @@ export function UsersTable({ users }: { users: UserRow[] }) {
                           <span className="text-muted-foreground ml-1 text-xs">({t("you")})</span>
                         )}
                       </div>
-                      <div className="text-muted-foreground truncate text-xs">{u.email}</div>
+                      <div className="text-muted-foreground truncate text-xs">
+                        {u.username ? `@${u.username} · ${u.email}` : u.email}
+                      </div>
                     </div>
                   </div>
                 </TableCell>
@@ -180,6 +186,10 @@ export function UsersTable({ users }: { users: UserRow[] }) {
                       <DropdownMenuItem onSelect={() => setDialog({ kind: "name", user: u })}>
                         <Pencil className="size-4" />
                         {t("actions.editName")}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setDialog({ kind: "password", user: u })}>
+                        <KeyRound className="size-4" />
+                        {t("actions.setPassword")}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="md:hidden"
@@ -262,6 +272,7 @@ export function UsersTable({ users }: { users: UserRow[] }) {
       <BanDialog state={dialog} onClose={() => setDialog(null)} />
       <DeleteDialog state={dialog} onClose={() => setDialog(null)} />
       <BuildsDialog state={dialog} onClose={() => setDialog(null)} />
+      <PasswordDialog state={dialog} onClose={() => setDialog(null)} />
     </>
   );
 }
@@ -451,6 +462,66 @@ function DeleteDialog({ state, onClose }: { state: DialogState; onClose: () => v
             </Button>
             <Button type="submit" variant="destructive" disabled={pending || !matches}>
               {t("actions.delete")}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PasswordDialog({ state, onClose }: { state: DialogState; onClose: () => void }) {
+  const t = useTranslations("Admin.users");
+  const tc = useTranslations("Admin.common");
+  const { pending, run } = useAdminAction();
+  const open = state?.kind === "password";
+  const [password, setPassword] = useState("");
+  const close = () => {
+    setPassword("");
+    onClose();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && close()}>
+      <DialogContent>
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!open) return;
+            run(() => setUserPassword({ userId: state.user.id, password }), {
+              success: t("done.password"),
+              onSuccess: close,
+            });
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>{t("password.title", { name: open ? state.user.name : "" })}</DialogTitle>
+            <DialogDescription>{t("password.description")}</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-1.5">
+            <Label htmlFor="new-password">{t("password.label")}</Label>
+            <Input
+              id="new-password"
+              type="password"
+              autoComplete="new-password"
+              required
+              minLength={8}
+              maxLength={128}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aria-describedby="new-password-help"
+            />
+            <p id="new-password-help" className="text-muted-foreground text-xs">
+              {t("password.help")}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={close}>
+              {tc("cancel")}
+            </Button>
+            <Button type="submit" disabled={pending || password.length < 8}>
+              {pending ? tc("saving") : t("actions.setPassword")}
             </Button>
           </DialogFooter>
         </form>

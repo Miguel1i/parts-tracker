@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
-import { enabledProviders } from "@/lib/auth/providers";
 import { SignInForm } from "./sign-in-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -17,7 +16,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SignInPage() {
   await initLocale();
   const t = await getTranslations("Auth.signIn");
-  const providers = enabledProviders();
 
   return (
     <div className="mx-auto w-full max-w-sm py-6 sm:py-12">
@@ -27,9 +25,9 @@ export default async function SignInPage() {
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* The form reads ?next, ?invite and ?error, so it streams in behind a boundary. */}
+          {/* The form reads ?next, ?invite and ?email, so it streams in behind a boundary. */}
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
-            <SignInForm providers={providers} />
+            <SignInForm />
           </Suspense>
         </CardContent>
       </Card>

@@ -13,6 +13,7 @@ import { ActionError, adminAction } from "@/lib/auth/guard";
 import { auth } from "@/lib/auth/server";
 import { normalizeEmail } from "@/lib/auth/signup";
 import { linkEmail, sendEmail } from "@/lib/email";
+import { siteUrl } from "@/lib/site-url";
 
 /*
  * Every export is built with adminAction (re-checks the session as an active admin on each
@@ -209,24 +210,66 @@ export const inviteUser = adminAction(
       });
     });
 
-    const base = (process.env.BETTER_AUTH_URL || "http://localhost:3000").replace(/\/$/, "");
+    const base = siteUrl();
     const path = getPathname({
       href: { pathname: "/sign-in", query: { invite: token, email } },
       locale,
     });
-    const t = await getTranslations({ locale, namespace: "Email.invite" });
-    await sendEmail({
-      to: email,
-      subject: t("subject"),
-      ...linkEmail({
-        heading: t("heading"),
-        body: t("body", { inviter: actor.name || actor.email }),
-        cta: t("cta"),
-        url: `${base}${path}`,
-        footer: t("footer"),
-      }),
+    const url = `${base}${path}`;
+    // The admin always gets the link to pass on; email is a bonus when Resend is configured.
+    let emailed = false;
+    try {
+      const t = await getTranslations({ locale, namespace: "Email.invite" });
+      emailed = await sendEmail({
+        to: email,
+        subject: t("subject"),
+        ...linkEmail({
+          heading: t("heading"),
+          body: t("body", { inviter: actor.name || actor.email }),
+          cta: t("cta"),
+          url,
+          footer: t("footer"),
+        }),
+      });
+    } catch (e) {
+      console.error("[invite email]", e);
+    }
+    return { email, expiresAt, url, emailed };
+  },
+);
+
+export const setUserPassword = adminAction(
+  userId.extend({ password: z.string().min(8).max(128) }),
+  async ({ userId: id, password }, { actor }) => {
+    await target(id);
+    await auth.api.setUserPassword({
+      body: { userId: id, newPassword: password },
+      headers: await headers(),
     });
-    return { email, expiresAt };
+    await writeAudit(getDb(), {
+      actorUserId: actor.id,
+      action: "user.password",
+      entity: "user",
+      entityId: id,
+    });
+    return null;
+  },
+);
+
+/** The sign-up link of an open invite, to copy again later. */
+export const inviteLink = adminAction(
+  z.object({
+    inviteId: z.string().min(1),
+    locale: z.enum(routing.locales).default(routing.defaultLocale),
+  }),
+  async ({ inviteId, locale }) => {
+    const [row] = await getDb().select().from(invites).where(eq(invites.id, inviteId));
+    if (!row || row.usedAt) throw new ActionError("notFound");
+    const path = getPathname({
+      href: { pathname: "/sign-in", query: { invite: row.token, email: row.email } },
+      locale,
+    });
+    return { url: `${siteUrl()}${path}` };
   },
 );
 

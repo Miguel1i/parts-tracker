@@ -291,9 +291,12 @@ importers:
       '@parts/core':
         specifier: workspace:*
         version: link:../core
+      better-auth:
+        specifier: 1.7.14
+        version: 1.7.14(drizzle-kit@0.31.11)(drizzle-orm@0.45.4(@libsql/client@0.18.0)(kysely@0.29.8))(next@16.4.4(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@22.20.5)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(vitest@3.2.7(@types/node@22.20.5)(jiti@2.7.0)(lightningcss@1.33.0)(supports-color@7.2.0)(tsx@4.23.15))
       drizzle-orm:
         specifier: ^0.45.4
-        version: 0.45.4(@libsql/client@0.18.0)
+        version: 0.45.4(@libsql/client@0.18.0)(kysely@0.29.8)
     devDependencies:
       '@types/node':
         specifier: ^22.20.5
@@ -321,7 +324,7 @@ importers:
         version: link:../db
       drizzle-orm:
         specifier: ^0.45.4
-        version: 0.45.4(@libsql/client@0.18.0)
+        version: 0.45.4(@libsql/client@0.18.0)(kysely@0.29.8)
       playwright:
         specifier: ^1.64.1
         version: 1.64.1
@@ -8012,10 +8015,6 @@ snapshots:
       '@esbuild-kit/esm-loader': 2.6.5
       esbuild: 0.25.12
       tsx: 4.23.15
-
-  drizzle-orm@0.45.4(@libsql/client@0.18.0):
-    optionalDependencies:
-      '@libsql/client': 0.18.0
 
   drizzle-orm@0.45.4(@libsql/client@0.18.0)(kysely@0.29.8):
     optionalDependencies:

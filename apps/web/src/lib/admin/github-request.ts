@@ -14,7 +14,12 @@ export function localScrapeCommand({ productId, merchantId, runId }: DispatchInp
 /** Null when dispatching isn't configured (token or repo missing). Throws on a malformed repo. */
 export function buildDispatchRequest(env: Env, inputs: DispatchInputs): DispatchRequest | null {
   const token = env.GH_DISPATCH_TOKEN?.trim();
-  const repo = env.GH_REPO?.trim();
+  // On Vercel the linked Git repo is known, so GH_REPO is only needed elsewhere.
+  const vercelRepo =
+    env.VERCEL_GIT_REPO_OWNER && env.VERCEL_GIT_REPO_SLUG
+      ? `${env.VERCEL_GIT_REPO_OWNER}/${env.VERCEL_GIT_REPO_SLUG}`
+      : undefined;
+  const repo = env.GH_REPO?.trim() || vercelRepo;
   if (!token || !repo) return null;
   if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) throw new Error("GH_REPO must look like owner/name");
   return {

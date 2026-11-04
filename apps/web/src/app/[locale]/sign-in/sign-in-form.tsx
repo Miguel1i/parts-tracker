@@ -1,168 +1,209 @@
 "use client";
 
-import { Loader2, Mail } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getPathname, useRouter } from "@/i18n/navigation";
-import { signIn, useSession } from "@/lib/auth/client";
+import { useRouter } from "@/i18n/navigation";
+import { signIn, signUp, useSession } from "@/lib/auth/client";
 import { safeNextPath } from "@/lib/auth/redirect";
+import { cn } from "@/lib/utils";
 
-function GithubIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
-      <path
-        fill="currentColor"
-        d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"
-      />
-    </svg>
-  );
-}
+type Mode = "signIn" | "signUp";
+type ErrorKey =
+  | "badCredentials"
+  | "taken"
+  | "usernameTaken"
+  | "invite_required"
+  | "banned"
+  | "password"
+  | "username";
 
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4" aria-hidden>
-      <path
-        fill="currentColor"
-        d="M21.35 11.1H12v2.9h5.35c-.23 1.5-1.7 4.4-5.35 4.4-3.22 0-5.85-2.67-5.85-5.95S8.78 6.5 12 6.5c1.83 0 3.06.78 3.76 1.45l2.56-2.47C16.68 3.96 14.55 3 12 3 7.03 3 3 7.03 3 12s4.03 9 9 9c5.2 0 8.64-3.65 8.64-8.8 0-.6-.07-1.05-.15-1.5z"
-      />
-    </svg>
-  );
-}
+/** Better Auth error codes → message keys under Auth.signIn.errors. */
+const ERROR_KEYS: Record<string, ErrorKey> = {
+  INVALID_EMAIL_OR_PASSWORD: "badCredentials",
+  INVALID_USERNAME_OR_PASSWORD: "badCredentials",
+  INVALID_PASSWORD: "badCredentials",
+  USER_NOT_FOUND: "badCredentials",
+  USER_ALREADY_EXISTS: "taken",
+  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "taken",
+  USERNAME_IS_ALREADY_TAKEN: "usernameTaken",
+  USERNAME_IS_ALREADY_TAKEN_PLEASE_TRY_ANOTHER: "usernameTaken",
+  INVALID_USERNAME: "username",
+  USERNAME_TOO_SHORT: "username",
+  USERNAME_TOO_LONG: "username",
+  PASSWORD_TOO_SHORT: "password",
+  PASSWORD_TOO_LONG: "password",
+  BANNED_USER: "banned",
+  INVITE_REQUIRED: "invite_required",
+};
 
-type Busy = "github" | "google" | "email" | null;
-
-export function SignInForm({ providers }: { providers: { github: boolean; google: boolean } }) {
+export function SignInForm() {
   const t = useTranslations("Auth.signIn");
-  const locale = useLocale();
   const router = useRouter();
   const params = useSearchParams();
   const { data: session } = useSession();
   const next = safeNextPath(params.get("next"));
-  const invited = params.has("invite");
+  const inviteToken = params.get("invite") ?? undefined;
 
+  const [mode, setMode] = useState<Mode>(inviteToken ? "signUp" : "signIn");
+  const [login, setLogin] = useState("");
   const [email, setEmail] = useState(params.get("email") ?? "");
-  const [busy, setBusy] = useState<Busy>(null);
-  const [sentTo, setSentTo] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(() => {
-    // Better Auth redirects back with ?error=<code> (validateUserInfo returns "invite_required").
-    const code = params.get("error")?.toLowerCase();
-    if (!code) return null;
-    if (code.includes("invite")) return t("errors.invite_required");
-    if (code.includes("ban")) return t("errors.banned");
-    return t("errors.generic");
-  });
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Already signed in: go where they were heading.
+  // Already signed in: go where they were heading (or wait for approval).
   useEffect(() => {
-    if (session?.user) router.replace(next);
+    if (session?.user) router.replace(session.user.status === "active" ? next : "/pending");
   }, [session?.user, next, router]);
 
-  // Better Auth redirects back to these paths, so they carry the locale prefix.
-  const callbackURL = getPathname({ href: next, locale });
-  const errorCallbackURL = getPathname({ href: "/sign-in", locale });
-  // New accounts may need approval; /pending sends active ones straight to the dashboard.
-  const newUserCallbackURL = getPathname({ href: "/pending", locale });
+  function showError(e: { code?: string; message?: string } | null | undefined) {
+    const raw = (e?.code ?? e?.message ?? "").toUpperCase().replace(/[^A-Z]+/g, "_");
+    const key: ErrorKey | null =
+      ERROR_KEYS[raw] ??
+      (raw.includes("INVITE") ? "invite_required" : raw.includes("BAN") ? "banned" : null);
+    setError(key ? t(`errors.${key}`) : t("errors.generic"));
+  }
 
-  async function social(provider: "github" | "google") {
-    setBusy(provider);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
     setError(null);
-    const { error } = await signIn.social({
-      provider,
-      callbackURL,
-      errorCallbackURL,
-      newUserCallbackURL,
-    });
-    if (error) {
-      setError(t("errors.generic"));
-      setBusy(null);
+    try {
+      let status: string | undefined;
+      if (mode === "signIn") {
+        const id = login.trim();
+        const { data, error } = id.includes("@")
+          ? await signIn.email({ email: id, password })
+          : await signIn.username({ username: id, password });
+        if (error) return showError(error);
+        status = (data?.user as { status?: string } | undefined)?.status;
+      } else {
+        const name = username.trim();
+        // `inviteToken` isn't a user field: the server's signup hooks read it from the request.
+        const body = {
+          email: email.trim(),
+          password,
+          name,
+          username: name,
+          ...(inviteToken ? { inviteToken } : {}),
+        } as Parameters<typeof signUp.email>[0];
+        const { data, error } = await signUp.email(body);
+        if (error) return showError(error);
+        status = (data?.user as { status?: string } | undefined)?.status;
+      }
+      router.replace(status === "active" ? next : "/pending");
+      router.refresh();
+    } finally {
+      setBusy(false);
     }
   }
 
-  async function magic(e: React.FormEvent) {
-    e.preventDefault();
-    const to = email.trim();
-    setBusy("email");
-    setError(null);
-    const { error } = await signIn.magicLink({
-      email: to,
-      callbackURL,
-      newUserCallbackURL,
-      errorCallbackURL,
-    });
-    setBusy(null);
-    if (error) setError(t("errors.generic"));
-    else setSentTo(to);
-  }
-
-  if (sentTo) {
-    return (
-      <div className="space-y-4" role="status">
-        <p className="text-sm">{t("sent", { email: sentTo })}</p>
-        <Button variant="outline" className="w-full" onClick={() => setSentTo(null)}>
-          {t("useAnother")}
-        </Button>
-      </div>
-    );
-  }
-
-  const anyProvider = providers.github || providers.google;
+  const tab = (m: Mode) => (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={mode === m}
+      onClick={() => {
+        setMode(m);
+        setError(null);
+      }}
+      className={cn(
+        "focus-visible:ring-ring/50 flex-1 rounded-md px-3 py-1.5 text-sm outline-none focus-visible:ring-[3px]",
+        mode === m ? "bg-background font-medium shadow-sm" : "text-muted-foreground",
+      )}
+    >
+      {m === "signIn" ? t("tabSignIn") : t("tabSignUp")}
+    </button>
+  );
 
   return (
     <div className="space-y-4">
-      {invited && <p className="bg-muted rounded-md p-3 text-sm">{t("invited")}</p>}
+      <div role="tablist" className="bg-muted flex gap-1 rounded-lg p-1">
+        {tab("signIn")}
+        {tab("signUp")}
+      </div>
+      {inviteToken && mode === "signUp" && (
+        <p className="bg-muted rounded-md p-3 text-sm">{t("invited")}</p>
+      )}
       {error && (
         <p role="alert" className="text-destructive text-sm">
           {error}
         </p>
       )}
-      {anyProvider ? (
-        <div className="grid gap-2">
-          {providers.github && (
-            <Button variant="outline" disabled={!!busy} onClick={() => social("github")}>
-              {busy === "github" ? <Loader2 className="size-4 animate-spin" /> : <GithubIcon />}
-              {t("github")}
-            </Button>
-          )}
-          {providers.google && (
-            <Button variant="outline" disabled={!!busy} onClick={() => social("google")}>
-              {busy === "google" ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
-              {t("google")}
-            </Button>
-          )}
-        </div>
-      ) : (
-        <p className="text-muted-foreground text-xs">{t("noProviders")}</p>
-      )}
-      <div className="text-muted-foreground flex items-center gap-3 text-xs uppercase">
-        <span className="bg-border h-px flex-1" />
-        {t("or")}
-        <span className="bg-border h-px flex-1" />
-      </div>
-      <form onSubmit={magic} className="grid gap-3">
+      <form onSubmit={submit} className="grid gap-3">
+        {mode === "signIn" ? (
+          <div className="grid gap-1.5">
+            <Label htmlFor="login">{t("login")}</Label>
+            <Input
+              id="login"
+              autoComplete="username"
+              required
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-1.5">
+              <Label htmlFor="username">{t("username")}</Label>
+              <Input
+                id="username"
+                autoComplete="username"
+                required
+                minLength={3}
+                maxLength={30}
+                pattern="[A-Za-z0-9_.]{3,30}"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                aria-describedby="username-help"
+              />
+              <p id="username-help" className="text-muted-foreground text-xs">
+                {t("usernameHelp")}
+              </p>
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="email">{t("email")}</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </>
+        )}
         <div className="grid gap-1.5">
-          <Label htmlFor="email">{t("email")}</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <Input
-            id="email"
-            type="email"
-            autoComplete="email"
+            id="password"
+            type="password"
+            autoComplete={mode === "signIn" ? "current-password" : "new-password"}
             required
-            value={email}
-            placeholder={t("emailPlaceholder")}
-            onChange={(e) => setEmail(e.target.value)}
+            minLength={mode === "signUp" ? 8 : undefined}
+            maxLength={128}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            aria-describedby={mode === "signUp" ? "password-help" : undefined}
           />
-        </div>
-        <Button type="submit" disabled={!!busy}>
-          {busy === "email" ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Mail className="size-4" />
+          {mode === "signUp" && (
+            <p id="password-help" className="text-muted-foreground text-xs">
+              {t("passwordHelp")}
+            </p>
           )}
-          {busy === "email" ? t("sending") : t("sendLink")}
+        </div>
+        <Button type="submit" disabled={busy}>
+          {busy && <Loader2 className="size-4 animate-spin" />}
+          {mode === "signIn" ? t("submitSignIn") : t("submitSignUp")}
         </Button>
+        {mode === "signIn" && <p className="text-muted-foreground text-xs">{t("forgot")}</p>}
       </form>
     </div>
   );

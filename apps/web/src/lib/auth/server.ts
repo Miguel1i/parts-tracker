@@ -2,45 +2,40 @@ import "server-only";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { admin, magicLink } from "better-auth/plugins";
-import { and, eq, gt, isNull } from "@parts/db/orm";
-import { getTranslations } from "next-intl/server";
+import { admin, username } from "better-auth/plugins";
 import { account, appSettings, getDb, invites, session, user, verification } from "@parts/db";
-import { routing, type Locale } from "@/i18n/routing";
-import { linkEmail, sendEmail } from "@/lib/email";
-import { enabledProviders } from "./providers";
+import { and, eq, gt, isNull } from "@parts/db/orm";
+import { siteUrl } from "@/lib/site-url";
 import { decideSignup, normalizeEmail, usableInvite } from "./signup";
 
-async function signupContext(email: string) {
+/** Reads the invite token a sign-up request carries (`inviteToken` in the JSON body). */
+function inviteTokenOf(ctx: { body?: unknown } | null | undefined): string | undefined {
+  const body = ctx?.body;
+  if (!body || typeof body !== "object") return undefined;
+  const token = (body as Record<string, unknown>).inviteToken;
+  return typeof token === "string" && token.length > 0 && token.length <= 200 ? token : undefined;
+}
+
+async function signupContext(email: string, token: string | undefined) {
   const db = getDb();
   const [settings] = await db.select().from(appSettings).where(eq(appSettings.id, 1));
-  const rows = await db
-    .select()
-    .from(invites)
-    .where(
-      and(
-        eq(invites.email, normalizeEmail(email)),
-        isNull(invites.usedAt),
-        gt(invites.expiresAt, new Date()),
-      ),
-    );
-  return { mode: settings?.signupMode ?? "approval", invite: usableInvite(rows, email) };
+  const rows = token
+    ? await db
+        .select()
+        .from(invites)
+        .where(
+          and(eq(invites.token, token), isNull(invites.usedAt), gt(invites.expiresAt, new Date())),
+        )
+    : [];
+  return {
+    mode: settings?.signupMode ?? "approval",
+    invite: usableInvite(rows, email, token),
+  };
 }
-
-/** The locale of a callback URL like `/pt/admin`, for the email copy. */
-function localeOf(url: string): Locale {
-  try {
-    const path = new URL(url).searchParams.get("callbackURL") ?? "";
-    return path.startsWith("/pt") ? "pt-PT" : routing.defaultLocale;
-  } catch {
-    return routing.defaultLocale;
-  }
-}
-
-const providers = enabledProviders();
 
 export const auth = betterAuth({
   appName: "Parts Tracker",
+  baseURL: siteUrl(),
   database: drizzleAdapter(getDb(), {
     provider: "sqlite",
     schema: { user, session, account, verification },
@@ -50,43 +45,33 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24,
     cookieCache: { enabled: true, maxAge: 60 },
   },
+  // Email (or username) and password. There's no email service, so addresses aren't verified:
+  // invites are redeemed by their secret token, and approval mode has an admin vet each account.
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+    autoSignIn: true,
+  },
   user: {
     additionalFields: {
       // Set only by the signup hook and admins, never from client input.
       status: { type: "string", input: false, required: false, defaultValue: "pending" },
     },
-    async validateUserInfo({ user: info, source }) {
+    async validateUserInfo({ user: info, source }, ctx) {
       if (source.action !== "create-user" || source.method === "admin") return;
       if (typeof info.email !== "string") return { error: "invite_required" };
-      const { mode, invite } = await signupContext(info.email);
+      const { mode, invite } = await signupContext(info.email, inviteTokenOf(ctx));
       const decision = decideSignup({ mode, invite });
       if (!decision.ok) return { error: decision.error, message: "An invite is required" };
     },
-  },
-  account: {
-    // Google always returns verified emails, so its logins link to an existing account by email.
-    // GitHub links only when Better Auth sees the address as verified.
-    accountLinking: { enabled: true, trustedProviders: ["google"] },
-  },
-  socialProviders: {
-    ...(providers.github && {
-      github: {
-        clientId: process.env.GITHUB_CLIENT_ID!,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      },
-    }),
-    ...(providers.google && {
-      google: {
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      },
-    }),
   },
   databaseHooks: {
     user: {
       create: {
         async before(data, ctx) {
-          const { mode, invite } = await signupContext(data.email);
+          const token = inviteTokenOf(ctx);
+          const { mode, invite } = await signupContext(data.email, token);
           const decision = decideSignup({
             mode,
             invite,
@@ -97,7 +82,6 @@ export const auth = betterAuth({
           return {
             data: {
               ...data,
-              // Magic-link sign-ups arrive without a name; start from the email's local part.
               name: data.name?.trim() || email.split("@")[0],
               email,
               status: decision.status,
@@ -105,8 +89,10 @@ export const auth = betterAuth({
             },
           };
         },
-        async after(created) {
-          const { invite } = await signupContext(created.email);
+        async after(created, ctx) {
+          const token = inviteTokenOf(ctx);
+          if (!token) return;
+          const { invite } = await signupContext(created.email, token);
           if (invite) {
             await getDb()
               .update(invites)
@@ -119,23 +105,8 @@ export const auth = betterAuth({
   },
   plugins: [
     admin({ defaultRole: "user", adminRoles: ["admin"] }),
-    magicLink({
-      expiresIn: 60 * 15,
-      async sendMagicLink({ email, url }) {
-        const t = await getTranslations({ locale: localeOf(url), namespace: "Email.magicLink" });
-        await sendEmail({
-          to: email,
-          subject: t("subject"),
-          ...linkEmail({
-            heading: t("heading"),
-            body: t("body"),
-            cta: t("cta"),
-            url,
-            footer: t("footer"),
-          }),
-        });
-      },
-    }),
+    // Sign in with the username or the email; usernames are 3-30 of a-z, 0-9, _ and .
+    username({ minUsernameLength: 3, maxUsernameLength: 30 }),
     nextCookies(),
   ],
 });

@@ -9,7 +9,7 @@ import { createDb, type Db } from "../src/client";
 import { importLegacy } from "../src/import";
 import type { LegacyFile } from "../src/legacy";
 import { MIGRATIONS_FOLDER, runMigrations } from "../src/migrate";
-import { auditLog, builds, products, user, userMerchants } from "../src/schema";
+import { account, auditLog, builds, products, user, userMerchants } from "../src/schema";
 
 const fixture = JSON.parse(
   readFileSync(new URL("./fixtures/pc_tracker.fixture.json", import.meta.url), "utf8"),
@@ -122,6 +122,24 @@ describe("promoteAdmin", () => {
     expect(row).toMatchObject({ userId: existing!.id, enabled: false });
     expect(await db.$count(userMerchants)).toBe(4);
     expect(await fkViolations(db)).toEqual([]);
+  });
+
+  it("sets the username and the password login, and updates the password on re-run", async () => {
+    const res = await promoteAdmin(db, "me@example.com", {
+      username: "Miguel",
+      passwordHash: "h1",
+    });
+    const [u] = await db.select().from(user).where(eq(user.id, res.userId));
+    expect(u).toMatchObject({ username: "miguel", displayUsername: "Miguel", name: "Miguel" });
+    await promoteAdmin(db, "me@example.com", { passwordHash: "h2" });
+    const creds = await db.select().from(account).where(eq(account.userId, res.userId));
+    expect(creds).toEqual([expect.objectContaining({ providerId: "credential", password: "h2" })]);
+  });
+
+  it("refuses a username that belongs to someone else or breaks the rules", async () => {
+    await promoteAdmin(db, "a@example.com", { username: "taken" });
+    await expect(promoteAdmin(db, "b@example.com", { username: "Taken" })).rejects.toThrow(/taken/);
+    await expect(promoteAdmin(db, "b@example.com", { username: "no spaces" })).rejects.toThrow();
   });
 
   it("is safe to re-run and rejects bad input", async () => {
