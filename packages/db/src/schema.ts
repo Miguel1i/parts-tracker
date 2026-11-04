@@ -1,3 +1,4 @@
+import type { IdentifierSighting, MatchSpec } from "@parts/core";
 import { sql } from "drizzle-orm";
 import {
   index,
@@ -102,8 +103,18 @@ export type AdapterConfig = {
   };
   /** JSON/search API endpoint used instead of HTML search, if the shop has one. */
   apiEndpoint?: string;
-  /** "Sold by the shop" rule (e.g. Worten marketplace filter). */
-  sellerRule?: { mustContain?: string; urlParam?: string };
+  /** "Sold by the shop" rule, used when `ownOnly` is set (see docs/matching.md §7). */
+  sellerRule?: {
+    /** Seller names that mean "the shop itself", e.g. ["Worten"] or ["Amazon", "Amazon EU S.à r.l."]. */
+    ownNames?: string[];
+    /** CSS selector for the seller name on a product page. */
+    sellerSelector?: string;
+    /** Substrings of the HTML that prove a marketplace seller (e.g. `sellerProfileTriggerId`). */
+    thirdPartyMarkers?: string[];
+    /** Search-URL param that filters to own-sold offers, if the shop has one. */
+    urlParam?: string;
+    mustContain?: string;
+  };
   /** Minimum gap between requests to this host, in ms (default 1500). */
   throttleMs?: number;
   /** Max concurrent requests to this host (default 2). */
@@ -145,6 +156,17 @@ export const merchants = sqliteTable(
 
 // ---------------------------------------------------------------- catalog
 
+/** Matching types stored in JSON columns; defined by the engine in @parts/core. */
+export type { IdentifierSighting, MatchSpec };
+
+/** Outcome of the last match on a pair, for the pinned-URL warning badge. */
+export type LastMatch = {
+  score: number;
+  decision: "accept" | "review" | "reject";
+  vetoes: string[];
+  at: number;
+};
+
 export const products = sqliteTable(
   "products",
   {
@@ -157,6 +179,10 @@ export const products = sqliteTable(
     refUrl: text("ref_url"),
     brand: text("brand"),
     refPrice: real("ref_price"),
+    matchSpec: text("match_spec", { mode: "json" })
+      .$type<MatchSpec>()
+      .notNull()
+      .default(sql`'{}'`),
     createdBy: text("created_by"), // TODO(milestone 5): FK → user.id
     archived: integer("archived", { mode: "boolean" }).notNull().default(false),
     createdAt: createdAt(),
@@ -180,6 +206,11 @@ export const productIdentifiers = sqliteTable(
     }),
     confidence: real("confidence").notNull().default(1),
     confirmed: integer("confirmed", { mode: "boolean" }).notNull().default(false),
+    /** Accepted pages where this value was seen (capped at 10); ≥ 2 merchants promote it. */
+    sightings: text("sightings", { mode: "json" })
+      .$type<IdentifierSighting[]>()
+      .notNull()
+      .default(sql`'[]'`),
     createdAt: createdAt(),
   },
   (t) => [
@@ -251,6 +282,9 @@ export const productMerchant = sqliteTable(
     manualUrl: text("manual_url"),
     /** URL learned from a search match. */
     autoUrl: text("auto_url"),
+    /** Consecutive runs where `autoUrl` failed revalidation; dropped at 3. */
+    autoUrlFailures: integer("auto_url_failures").notNull().default(0),
+    lastMatch: text("last_match", { mode: "json" }).$type<LastMatch>(),
     enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
     lastStatus: text("last_status", { enum: scrapeStatuses }),
     lastPriceEur: real("last_price_eur"),
@@ -273,6 +307,8 @@ export const blocklist = sqliteTable(
     merchantId: text("merchant_id").references(() => merchants.id, { onDelete: "cascade" }),
     url: text("url"),
     name: text("name"),
+    /** Shop-side product ID (ASIN, SKU). */
+    externalId: text("external_id"),
     createdAt: createdAt(),
   },
   (t) => [index("blocklist_pair_idx").on(t.productId, t.merchantId)],

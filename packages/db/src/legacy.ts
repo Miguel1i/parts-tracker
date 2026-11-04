@@ -312,7 +312,8 @@ export function mapLegacy(file: LegacyFile, fallbackYear = new Date().getFullYea
           value: gtin,
           source: typed.has("gtin") ? "user" : "learned",
           merchant: null,
-          confirmed: true,
+          // Codes the old app learned from a page are unverified (one was wrong); see docs/matching.md §6.
+          confirmed: typed.has("gtin"),
         });
       else warnings.push(`${c.name}: invalid GTIN "${rawGtin}"; skipped`);
     }
@@ -323,7 +324,7 @@ export function mapLegacy(file: LegacyFile, fallbackYear = new Date().getFullYea
         value: mpn,
         source: typed.has("mpn") ? "user" : "learned",
         merchant: null,
-        confirmed: true,
+        confirmed: typed.has("mpn"),
       });
 
     const pairMerchants = new Set([

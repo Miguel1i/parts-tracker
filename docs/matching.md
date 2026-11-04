@@ -1,6 +1,7 @@
 # Matching engine — design note (milestone 3)
 
-Status: **draft, awaiting owner approval.** No engine code is written until this is OK'd.
+Status: **approved by the owner on 2026-11-03 and implemented** in `packages/core` (milestone 3).
+Where the implementation differs from the first draft, the text below says so.
 
 This note describes the scored-rules engine in `packages/core`. It decides, for a reference
 product and a candidate offer seen at a merchant, whether the offer is the same product:
@@ -12,14 +13,16 @@ list of requirements and lessons (see "Lessons from the old app" at the end).
 
 `packages/core` stays pure: no network, no DB, no clock (the caller passes `now`). It owns:
 
-| Module             | Does                                                                                                   |
-| ------------------ | ------------------------------------------------------------------------------------------------------ |
-| `normalize/`       | text folding (accents, `™`, `®`, case), tokenizing, model-token detection, GTIN/MPN/ASIN normalization |
-| `attributes/`      | parses capacity, wattage, memory layout/speed/CL, colour, connectivity, packaging, tier… from a title  |
-| `extract/`         | HTML string → `Offer` (product page) or `Offer[]` + links (search/listing page)                        |
-| `rules/`           | one file per rule (A1–A16, B1–B15), each returning a `RuleResult`                                      |
-| `score.ts`         | runs the rules, sums contributions, applies vetoes and thresholds → `MatchDecision`                    |
-| `lexicon/words.ts` | the single multilingual word list (PT/ES/FR/EN/IT/DE)                                                  |
+| Module                                 | Does                                                                                         |
+| -------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `match/text.ts`, `tokens.ts`, `url.ts` | folding (accents, `™®`, case), tokenizing, reference-token weights, canonical URLs, ASINs    |
+| `match/identifiers.ts`, `gtin.ts`      | MPN/SKU comparison; GTIN-14 normalization and check digits                                   |
+| `match/attributes.ts`, `category.ts`   | capacity, wattage, RAM layout/speed/CL, colour, WiFi, packaging, tier, pack size; categories |
+| `extract/`                             | HTML → `Offer` (`extractProductPage`) or listing offers + links (`extractSearchPage`)        |
+| `rules/`                               | one file per scoring rule, each returning a `RuleResult`; `rules/index.ts` orders them       |
+| `match/score.ts`                       | `matchOffer` (rules → score → decision) and `prefilterLinks` (A9–A11)                        |
+| `match/learn.ts`                       | learned identifiers, auto-URL revalidation (A15), duplicate listings (B15)                   |
+| `lexicon/words.ts`                     | the single multilingual word list (PT/ES/FR/EN/IT/DE)                                        |
 
 The scraper (milestone 4) fetches pages, calls `extract*` and `matchOffer`, and writes the DB.
 HTML parsing uses **cheerio** (pure JS, works in Node, Vercel functions and Vitest). It is the
@@ -180,8 +183,8 @@ keeps looking. If nothing is left the result is `not_found` "no price" (A12), no
 
 | Score (no veto)  | Decision   | Effect                                                                         |
 | ---------------- | ---------- | ------------------------------------------------------------------------------ |
-| **≥ 70**         | **accept** | price point written, `product_merchant.autoUrl` set                            |
-| **45 – 69**      | **review** | `match_candidates` row, status `pending`; pair status `review`; no price point |
+| **≥ 65**         | **accept** | price point written, `product_merchant.autoUrl` set                            |
+| **45 – 64**      | **review** | `match_candidates` row, status `pending`; pair status `review`; no price point |
 | **< 45** or veto | **reject** | logged in the trace only                                                       |
 
 Extra accept guards: stage must be `page`, and either an identifier matched or `sim ≥ 0.9`.
@@ -189,19 +192,25 @@ Extra accept guards: stage must be `page`, and either an identifier matched or `
 What the numbers mean in practice:
 
 - Identifier + good title + plausible price: 45 + 50 + 5 + 10 = 110 → **100** → accept.
-- No identifier on the page, perfect title, brand, price in band, two attributes agree: 50 + 5 +
-  10 + 6 = **71** → accept. This is close to the old "all tokens present" rule, but now behind
-  every veto in §5 and the price band.
+- No identifier on the page, perfect title, brand, price in band: 50 + 5 + 10 = **65** → accept.
+  This is close to the old "all tokens present" rule, but now behind every veto in §5 and the
+  price band.
 - Same, but one query word missing (`sim ≈ 0.8`): 40 + 5 + 10 = **55** → review.
-- Same, but contradicting an unconfirmed learned GTIN: 71 − 10 = **61** → review.
+- Same, but contradicting an unconfirmed learned GTIN, or seller unknown at an own-only shop:
+  65 − 10 = **55** → review.
 - Perfect title but price 2.1× and seller unknown: 50 + 5 − 21 − 10 = **24** → reject.
 
-The thresholds and weights are constants in `score.ts`, tuned against the fixtures before merge.
+The first draft had accept at 70. Tuning against the fixtures showed that CPUs never earn
+attribute points (there is nothing to compare beyond the model), so a perfect CPU title with no
+code on the page topped out at 65 and every such shop would have gone to review. The constants
+live in `THRESHOLDS` in `match/score.ts`.
 
 ## 5. Hard rejection rules
 
-Every rule lives in `packages/core/src/rules/<id>.ts`, has its own test file with at least one
-must-reject and one must-accept case, and reads its word lists from `lexicon/words.ts`.
+Every scoring rule lives in `packages/core/src/rules/<id>.ts`, has its own `describe` block in
+`test/rules.test.ts` with at least one must-reject and one must-accept case, and reads its word
+lists from `lexicon/words.ts`. A9–A12, A15, A16, B12, B13 and B15 are pipeline steps rather than
+scoring rules (`score.ts`, `learn.ts`, `extract/`); `AT-attributes` is the attribute group of §3.
 
 | #   | Rule                       | Veto when                                                                                                                                                      | Otherwise                                                  |
 | --- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -224,7 +233,7 @@ must-reject and one must-accept case, and reads its word lists from `lexicon/wor
 | B1  | Connectivity               | one side has WiFi / BT / `-E` / `-F` suffix and the other doesn't                                                                                              | pass                                                       |
 | B2  | GPU sub-model              | product line differs (Ventus vs Gaming Trio vs Suprim; Windforce vs Eagle vs Aorus…)                                                                           | OC vs non-OC → −10                                         |
 | B3  | CPU suffix                 | suffix is part of the model token: 9800X ≠ 9800X3D, 7600 ≠ 7600X, 14600K ≠ 14600KF ≠ 14600                                                                     | pass                                                       |
-| B4  | Tray / boxed               | `spec.packaging` is `box` and the candidate says tray/OEM/MPK/"sem cooler"/unboxed/without fan, or the reverse                                                 | pass when `any`                                            |
+| B4  | Tray / boxed               | `spec.packaging` is `box` and the candidate says tray/OEM/MPK/bulk/unboxed/bandeja/"sem caixa", or the reverse ¹                                               | pass when `any`                                            |
 | B5  | Colour / edition           | the reference names a colour/edition and the candidate names a different one (chromax.black vs brown, White, Snow, ARGB vs non-RGB)                            | reference names it, candidate silent → −4 (attribute rule) |
 | B6  | Capacity / size            | parsed value + unit differ: TB/GB storage, W, mm radiator, inch                                                                                                | pass                                                       |
 | B7  | Memory kit                 | layout (2×16 vs 1×32), total capacity or speed (DDR5-6000 vs 6400) differs                                                                                     | CL differs → −10                                           |
@@ -236,6 +245,9 @@ must-reject and one must-accept case, and reads its word lists from `lexicon/wor
 | B13 | Price sanity               | that price value is discarded (instalment, "from", no currency)                                                                                                | —                                                          |
 | B14 | Brand                      | brands differ for motherboard, GPU board, PSU, case, cooler, fan, RAM, SSD                                                                                     | −15 for CPU / chip brand noise                             |
 | B15 | Duplicate listing          | — the scraper keeps the cheapest in-stock offer per pair per run; one series in history                                                                        | —                                                          |
+
+¹ "Sem cooler" / "without fan" is **not** a tray signal, unlike the first draft: AMD's boxed X3D
+(`…WOF`) ships without a cooler too, so it would reject the right product.
 
 Variant vocabularies are per category (GPU: Ti/Super/XT/XTX/GRE; SSD: EVO/Plus/Pro; board: MAX/
 Plus/Pro/Elite/WIFI; RAM: Neo/RGB; …), so "Pro" on an SSD and "Pro" in "ProArt" don't clash.
@@ -287,10 +299,9 @@ evidence "sold by ON4TECH"; nothing found → `own: "unknown"` → −10. Unlike
 whose seller couldn't be read is a penalty, not a rejection. This is a TypeScript type change on
 the JSON column only, no migration.
 
-## 8. Schema changes (proposed — please confirm)
+## 8. Schema changes (migration `0001`)
 
-The current schema covers almost everything. Four small additions, each needed by a rule in the
-build prompt:
+Four small additions, each needed by a rule in the build prompt:
 
 | Change                                                                                                                                              | Why                                                                                                                                                     |
 | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -302,52 +313,44 @@ build prompt:
 Plus one **data fix** found while reading the import: `packages/db/src/legacy.ts` imports learned
 GTINs/MPNs with `confirmed: true`. Under the new rules a confirmed GTIN mismatch is a veto, so the
 wrong learned `5606628885125` on the 9800X3D would reject the correct offer everywhere. The fix:
-import non-typed codes as `confirmed: false`, and a one-off update for the rows already in Turso
-(`source = 'learned'` → `confirmed = 0`).
+import non-typed codes as `confirmed: false`, and the same migration resets the rows already in
+the DB (`source = 'learned'` and kind GTIN/MPN → `confirmed = 0`).
+
+Saving the real pages showed where that code came from: `5606628885125` is the GTIN on PCBem's
+**tray** 9800X3D listing. The old app learned it from the tray page, then rejected the boxed
+offers, whose real barcode is `0730143315289`.
 
 ## 9. Fixtures
 
-There are no saved pages yet (the old app's `debug/` folder isn't in the backup), so fixtures are
-captured fresh.
+The old app's `debug/` folder isn't in the backup, so fixtures were captured fresh on 2026-11-03.
 
-**Format.** `packages/core/test/fixtures/<merchant-slug>/<case>.html` plus `<case>.json`:
+**Layout.** `packages/core/test/fixtures/<merchant>/<case>.html`, trimmed by
+`packages/core/scripts/capture-fixture.ts` (dev-only; `pnpm --filter @parts/core fixture:capture`).
+It keeps JSON-LD, small app-state JSON, meta tags, breadcrumbs, title/price/seller blocks and
+product links, and drops scripts, styles, menus, footers, carousels and reviews (28–350 KB per
+page). Expectations live in `test/fixtures.test.ts` next to the code that loads each page, rather
+than in a JSON file per case, so they are typed. The nine imported products are in
+`test/products.ts`, in the state the DB holds after migration `0001`. Pages that block plain
+fetches can be saved from a browser and trimmed with `fixture:capture --file`.
 
-```json
-{ "target": { "name": "AMD Ryzen 7 9800X3D", "category": "cpu", "refPrice": 399.9,
-              "identifiers": [...], "spec": { "packaging": "box" } },
-  "stage": "page",
-  "expect": { "decision": "accept", "title": "Processador AMD Ryzen 7 9800X3D…",
-              "price": 456.9, "vetoes": [] } }
-```
+**Status of the must-have cases** (all from `diagnostico.txt`):
 
-HTML is **trimmed** by a capture script (`scripts/capture-fixture.ts`, dev-only, outside
-`packages/core`): it keeps JSON-LD, embedded app-state JSON, meta tags, the breadcrumb, the title
-block, price block and seller block, removes other `<script>`, `<style>`, SVG, comments, nav and
-footer, and caps the file at ~150 KB. Pages that block plain fetches (Amazon, Worten, Chipman) can
-be saved from a normal browser ("Save page as → HTML only") and trimmed with the same script.
+| Merchant      | Page                         | Result                                                                                                         |
+| ------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Globaldata    | 9800X3D product page         | ✅ real page: accept on the MPN; the 560… GTIN is flagged suspect and loses confidence; 730… is learned        |
+| Globaldata    | search "AMD Ryzen 7 9800X3D" | ✅ real page: only the CPU link kept; the King Mod PCs and the bundle dropped by A5, facet links by A8         |
+| PCBem         | 9800X3D boxed page           | ✅ real page: accept (MPN in the SKU); title from JSON-LD, not the "Grátis" `<h1>`                             |
+| PCBem         | 9800X3D tray page            | ✅ real page: reject B4 when `packaging = box`, accept when `any`                                              |
+| PCBem         | search page                  | ⚠️ JS-rendered: the plain HTML has no products. A11 is tested on the logged `admin-ajax.php?add-to-cart=` URLs |
+| Radio Popular | search "AMD Ryzen 7 9800X3D" | ✅ real page: 12 result cards parsed, none is the CPU. The shop doesn't list it, so "missed" was right         |
+| Amazon.es     | B0DKFMSMYK product page      | ✅ real page: `#productTitle`, not the "O resumo do produto…" `<h1>`; sold by Amazon                           |
+| Amazon.es     | search results               | ✅ real page: only B0DKFMSMYK kept; "sem caixa/sem ventilador" dropped by B4, 9850X3D by A10                   |
+| Amazon.co.uk  | `9800X 3D` title             | ✅ real page: similarity 1; `EUR440.76` read as EUR                                                            |
+| Worten        | ON4TECH marketplace offer    | ⚠️ synthetic (Worten returns 403 to plain fetches): reject A13 with "ON4TECH" as evidence                      |
+| PCDiga        | 9800X3D product page         | ⚠️ not captured (403 to plain fetches)                                                                         |
 
-**Must-have cases** (all from `diagnostico.txt`):
-
-| Merchant      | Page                                    | Expect                                                                                                                                               |
-| ------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Globaldata    | 9800X3D product page                    | accept (MPN in page; learned 560… GTIN doesn't block it)                                                                                             |
-| Globaldata    | search "AMD Ryzen 7 9800X3D"            | links include the CPU; the three "Computador King Mod…" PCs rejected by A5/A4                                                                        |
-| PCBem         | 9800X3D boxed page                      | accept; if the page carries the 730… GTIN, review on a cold start (learned 560… conflicts) and accept once 730… is confirmed — tested in both states |
-| PCBem         | 9800X3D tray page                       | reject B4 when `packaging = box`; accept when `any`                                                                                                  |
-| PCBem         | search page                             | `admin-ajax.php?add-to-cart=` links dropped by A11                                                                                                   |
-| Radio Popular | search "AMD Ryzen 7 9800X3D"            | the product link/offer is found (the old parser found 0 of 5,438 links)                                                                              |
-| Amazon.es     | B0DKFMSMYK product page                 | title is the real product title, not the "O resumo do produto…" summary block                                                                        |
-| Amazon.es     | "Unboxed / Fan-Free / without" listings | reject B4 (box) and price penalty/veto at 852 €                                                                                                      |
-| Amazon.co.uk  | `9800X 3D` title                        | the spaced suffix still matches `9800x3d`; B11 not triggered for a CPU                                                                               |
-| Worten        | search with ON4TECH marketplace offers  | reject A13 with "ON4TECH" as evidence                                                                                                                |
-| PCDiga        | 9800X3D product page                    | accept (control case: the old app got this right)                                                                                                    |
-
-**Per-rule cases** are mostly synthetic title/price pairs in each rule's test file (cheap and
-exhaustive), using the 9 imported products: the 5070 Ti vs 5070 / Ventus / non-OC, B850 Tomahawk
-MAX WIFI vs non-WiFi, Z5 Neo 2×16 6000 CL30 vs 2×32 / 6400 / CL36, 990 EVO Plus 2 TB vs 1 TB / 990
-Pro, NH-D15S chromax.black vs brown, Straight Power 12 1000 W Platinum vs 850 W / Gold, HX1200i vs
-HX750 (the existing Worten blocklist entry), and accessory listings "backplate para RTX 5070 Ti".
-Where a real page is easy to save, it replaces the synthetic case.
+The ⚠️ rows need a browser: the owner can save those pages, or milestone 4's Playwright runner can
+capture them. **Per-rule cases** are synthetic title/price pairs built from the nine products.
 
 ## 10. Lessons from the old app
 
@@ -363,9 +366,8 @@ Where a real page is easy to save, it replaces the synthetic case.
 - Price parsing already handles `1.234,56` (`parsePrice`); extraction adds currency detection so a
   GBP price is never read as EUR.
 
-## Questions for the owner
+## Decisions log
 
-1. Thresholds **70 / 45** and the weights above, as a starting point to tune against fixtures?
-2. The four schema additions in §8 and the `confirmed` data fix?
-3. Fixtures: may I capture pages with a plain fetch from this machine, and will you save the
-   blocked ones (Amazon.es, Worten) from your browser when I ask?
+- 2026-11-03: the owner approved the note as drafted (weights, thresholds, schema additions, data
+  fix, fixture capture). The accept threshold was then lowered from 70 to 65 after fixture tuning
+  (§4).

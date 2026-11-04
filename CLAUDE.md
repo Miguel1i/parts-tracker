@@ -21,13 +21,14 @@ DB: `pnpm db:generate` (after editing `packages/db/src/schema.ts`; commit the SQ
 - **Navigation lives only in the sidebar** (`src/lib/nav.ts`). Account menu, theme and language appear in both the sidebar footer and the top bar. **Admin is never in the sidebar** — it's reached from the account menu for admins only, and `/admin` must be guarded server-side.
 - UI: shadcn/ui components in `src/components/ui` (ok to adjust), `cn` from `@/lib/utils`. Test in light + dark, at mobile and desktop widths.
 - **DB:** `getDb()` from `@parts/db`. Env `TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN`; a relative `file:` URL resolves to the repo root, so web and scripts share `local.db`. GTINs are stored as 14 digits (`normalizeGtin` from `@parts/core`). `price_points` is append-only. Timestamps are `timestamp_ms` Dates. No auth tables yet: user columns are plain text with `TODO(milestone 5)` FKs, and imported data belongs to `legacy-admin` until milestone 5 reassigns it.
+- **Matching** (`docs/matching.md`): `matchOffer`/`prefilterLinks`/`extractProductPage`/`extractSearchPage` from `@parts/core`. One file per rule in `packages/core/src/rules/`, word lists only in `src/lexicon/words.ts`, thresholds in `THRESHOLDS`. Fixtures are trimmed real pages in `packages/core/test/fixtures/` (excluded from Prettier; capture with `pnpm --filter @parts/core fixture:capture`).
 - One PR per milestone from a `feat/*` branch; conventional commits; PRs auto-merge (squash) when CI passes.
 
 ## Milestones
 
 - [x] 1. Scaffold — monorepo, Next.js, Tailwind, shadcn, theming, sidebar shell, i18n (en, pt-PT), CI
 - [x] 2. DB — Drizzle + Turso, schema, migrations, legacy import
-- [ ] 3. Core matching — `docs/matching.md` first (needs owner OK), then rules engine + fixtures
+- [x] 3. Core matching — scored rules engine + HTML extraction in `packages/core` (design: `docs/matching.md`)
 - [ ] 4. Scraper — Playwright runner, GitHub Actions cron + dispatch
 - [ ] 5. Auth & admin — Better Auth, roles, approval signup, admin area
 - [ ] 6. User features — builds, profile & settings, per-user merchants

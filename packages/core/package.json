@@ -8,10 +8,16 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "fixture:capture": "tsx scripts/capture-fixture.ts"
   },
   "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^3"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0"
   }
 }
