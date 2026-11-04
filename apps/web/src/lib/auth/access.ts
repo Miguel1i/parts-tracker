@@ -12,10 +12,11 @@ export type AccessUser = {
   banExpires?: Date | string | null;
 };
 
-function isBanned(u: AccessUser, now: Date) {
+function isBanned(u: AccessUser, now: Date | undefined) {
   if (!u.banned) return false;
   if (!u.banExpires) return true;
-  return new Date(u.banExpires) > now;
+  // Read the clock only when it matters (Cache Components flags `new Date()` in prerenders).
+  return new Date(u.banExpires) > (now ?? new Date());
 }
 
 /**
@@ -27,7 +28,7 @@ function isBanned(u: AccessUser, now: Date) {
 export function evaluateAccess(
   user: AccessUser | null | undefined,
   need: AccessNeed,
-  now = new Date(),
+  now?: Date,
 ): AccessResult {
   if (!user?.id) return "unauthenticated";
   if (isBanned(user, now)) return "banned";

@@ -43,8 +43,8 @@ export function InvitePanel({ invites }: { invites: Invite[] }) {
         <CardTitle className="text-base">{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-4">
-        <form onSubmit={submit} className="flex flex-col gap-2 sm:flex-row sm:items-end">
+      <CardContent className="@container grid gap-4">
+        <form onSubmit={submit} className="@md:flex-row @md:items-end flex flex-col gap-2">
           <div className="grid flex-1 gap-1.5">
             <Label htmlFor="invite-email">{t("email")}</Label>
             <Input
@@ -59,7 +59,7 @@ export function InvitePanel({ invites }: { invites: Invite[] }) {
           <div className="grid gap-1.5">
             <Label htmlFor="invite-role">{t("role")}</Label>
             <Select value={role} onValueChange={(v) => setRole(v as "user" | "admin")}>
-              <SelectTrigger id="invite-role" className="w-full sm:w-28">
+              <SelectTrigger id="invite-role" className="@md:w-28 w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -84,7 +84,7 @@ export function InvitePanel({ invites }: { invites: Invite[] }) {
                   <span className="min-w-0 flex-1 truncate">{i.email}</span>
                   {i.role === "admin" && <Badge variant="secondary">{t("roles.admin")}</Badge>}
                   <span className="text-muted-foreground hidden text-xs sm:inline">
-                    {t("expires", { when: format.relativeTime(i.expiresAt) })}
+                    {t("expires", { when: format.dateTime(i.expiresAt, { dateStyle: "medium" }) })}
                   </span>
                   <Button
                     variant="ghost"

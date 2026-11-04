@@ -9,6 +9,9 @@ import { initLocale } from "@/i18n/server";
 import { requireAdmin } from "@/lib/auth/guard";
 import { cn } from "@/lib/utils";
 
+// Session-dependent and admin-only: render on request (see ../layout.tsx).
+export const instant = false;
+
 const PAGE_SIZE = 50;
 const ENTITIES = [
   "user",

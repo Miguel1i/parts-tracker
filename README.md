@@ -2,7 +2,7 @@
 
 Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portuguese, Spanish, French and UK merchants). Prices are scraped on a schedule or on demand, every observation is kept, and history is shown in interactive charts.
 
-> Status: **milestone 4 — scraper**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
+> Status: **milestone 5 — auth & admin**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
 
 ## Stack
 
@@ -13,7 +13,7 @@ Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portugu
 | i18n     | next-intl — English at `/`, Portuguese at `/pt`                                   |
 | Database | Turso (libSQL) + Drizzle ORM; local SQLite file                                   |
 | Scraper  | Node/TS + Playwright (Chromium) in GitHub Actions                                 |
-| Auth     | Better Auth with roles and admin approval _(milestone 5)_                         |
+| Auth     | Better Auth (GitHub, Google, email magic link via Resend), roles, admin approval  |
 | Tests    | Vitest                                                                            |
 
 ## Layout
@@ -61,7 +61,7 @@ Copy `pc_tracker.json` from the old Python app to `.scratch/pc_tracker.json` (gi
 pnpm db:import-legacy   # or: pnpm db:import-legacy path/to/pc_tracker.json --owner <userId>
 ```
 
-It imports merchants, products, GTIN/MPN/ASIN identifiers, manual and auto URLs, the last known status per shop, blocklists and the full price history. The components go into a "Legacy build" owned by `legacy-admin`, which milestone 5 reassigns to the first admin. Re-running skips products that already exist, so history is never duplicated.
+It imports merchants, products, GTIN/MPN/ASIN identifiers, manual and auto URLs, the last known status per shop, blocklists and the full price history. The components go into a "Legacy build" owned by the first admin, or by a banned `legacy-admin` placeholder user when no admin exists yet; `pnpm seed:admin` moves that data to the admin and deletes the placeholder. Re-running skips products that already exist, so history is never duplicated.
 
 ### Production database (Turso)
 
@@ -108,6 +108,26 @@ gh secret set TURSO_AUTH_TOKEN
 ```
 
 Until both secrets are set, the job logs a warning and skips. Run it by hand with `gh workflow run scrape.yml -f productId=<id>`.
+
+## Auth & admin
+
+Sign-in is [Better Auth](https://www.better-auth.com) with its Drizzle adapter: GitHub and Google OAuth (each enabled only when its client id and secret are set) and an email magic link sent through Resend. Without `RESEND_API_KEY` in development, the link is printed to the `pnpm dev` console instead. Accounts with the same verified email are linked.
+
+**First admin.** Create it once per database, then sign in with a magic link to that address (or GitHub/Google with the same email):
+
+```bash
+pnpm seed:admin --email you@example.com
+```
+
+**Sign-up modes** (Admin → Users): `open` (anyone, active at once), `approval` (default: new accounts are `pending` until an admin approves them) and `invite_only`. Invites (7 days, sent by email) work in every mode and skip approval, with the role chosen by the admin.
+
+**Admin area** (`/admin`, reached from the account menu, never in the sidebar): users (approve, invite, role, ban, sign out everywhere, delete, signup mode), merchants (CRUD, order, adapter editor, "Test merchant"), catalog identifiers, the review queue (Approve pins the URL and confirms the page's identifiers; Reject blocklists it) and the audit log of every admin change.
+
+**Guards.** `requireAdmin()` (pages; anyone else gets a 404) and `adminAction(schema, handler)` (every admin Server Action) in `apps/web/src/lib/auth/guard.ts` re-check the session on the server. `admin-guard.test.ts` calls every admin action as anonymous, pending, banned and plain users and checks each is refused before touching the DB.
+
+**Test merchant** dispatches `scrape.yml` for one (product, merchant) pair with a fine-grained token (`GH_DISPATCH_TOKEN`: this repo only, **Actions: read and write**), then polls the run. Without the token the page shows the equivalent `pnpm scrape` command to run locally.
+
+Production secrets: paste them yourself into `vercel env add <NAME>` (`BETTER_AUTH_SECRET` from `openssl rand -base64 32`, `BETTER_AUTH_URL` = the site URL, the OAuth client ids/secrets, `RESEND_API_KEY`, `EMAIL_FROM`, `GH_DISPATCH_TOKEN`). OAuth callback URLs: `<BETTER_AUTH_URL>/api/auth/callback/github` and `/api/auth/callback/google`.
 
 ## Translations
 

@@ -7,11 +7,17 @@ import { PageHeader } from "@/components/empty-state";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
 import { splitAdapterConfig } from "@/lib/admin/adapter-schema";
-import { requireAdmin } from "@/lib/auth/guard";
+import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { MerchantForm } from "../merchant-form";
 import { TestPanel } from "../test-panel";
 
-export async function generateMetadata(): Promise<Metadata> {
+// Session-dependent and admin-only: render on request (see ../layout.tsx).
+export const instant = false;
+
+// Titles only for admins, so a 404 doesn't reveal what lives here.
+export const generateMetadata = () => adminMetadata(metadata);
+
+async function metadata(): Promise<Metadata> {
   const locale = (await initLocale()) ?? routing.defaultLocale;
   const t = await getTranslations({ locale, namespace: "Admin.merchants" });
   return { title: t("title") };

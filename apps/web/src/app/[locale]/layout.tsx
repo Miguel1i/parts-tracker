@@ -64,7 +64,7 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
               </a>
               <SidebarProvider>
                 <AppSidebar />
-                <SidebarInset>
+                <SidebarInset className="min-w-0">
                   <TopBar />
                   <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
                     {children}

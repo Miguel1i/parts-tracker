@@ -6,12 +6,18 @@ import { Button } from "@/components/ui/button";
 import { routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { initLocale } from "@/i18n/server";
-import { requireAdmin } from "@/lib/auth/guard";
+import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { getDb, merchants } from "@parts/db";
 import { asc } from "@parts/db/orm";
 import { MerchantsTable } from "./merchants-table";
 
-export async function generateMetadata(): Promise<Metadata> {
+// Session-dependent and admin-only: render on request (see ../layout.tsx).
+export const instant = false;
+
+// Titles only for admins, so a 404 doesn't reveal what lives here.
+export const generateMetadata = () => adminMetadata(metadata);
+
+async function metadata(): Promise<Metadata> {
   const locale = (await initLocale()) ?? routing.defaultLocale;
   const t = await getTranslations({ locale, namespace: "Admin.merchants" });
   return { title: t("title") };

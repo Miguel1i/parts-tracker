@@ -8,17 +8,23 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
 import { getSettings } from "@/lib/admin/queries";
-import { requireAdmin } from "@/lib/auth/guard";
+import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { cn } from "@/lib/utils";
 import { InvitePanel } from "./invite-panel";
 import { SignupModeSelect } from "./signup-mode-select";
 import { UsersTable, type UserRow } from "./users-table";
 
+// Session-dependent and admin-only: render on request (see ../layout.tsx).
+export const instant = false;
+
 const PAGE_SIZE = 50;
 const filters = ["all", "pending", "active", "admins", "banned"] as const;
 type Filter = (typeof filters)[number];
 
-export async function generateMetadata(): Promise<Metadata> {
+// Titles only for admins, so a 404 doesn't reveal what lives here.
+export const generateMetadata = () => adminMetadata(metadata);
+
+async function metadata(): Promise<Metadata> {
   const locale = (await initLocale()) ?? routing.defaultLocale;
   const t = await getTranslations({ locale, namespace: "Admin.nav" });
   return { title: t("users") };
@@ -101,7 +107,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
   return (
     <>
       <PageHeader title={t("title")} description={t("description")} />
-      <div className="mb-8 grid gap-4 lg:grid-cols-2">
+      <div className="mb-8 grid gap-4 xl:grid-cols-2">
         <SignupModeSelect mode={settings.signupMode} />
         <InvitePanel
           invites={openInvites.map((i) => ({
@@ -113,7 +119,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
         />
       </div>
 
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <nav aria-label={t("filterLabel")} className="-mx-1 flex gap-1 overflow-x-auto px-1">
           {filters.map((f) => (
             <Link

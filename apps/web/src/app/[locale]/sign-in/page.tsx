@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
-import { enabledProviders } from "@/lib/auth/server";
+import { enabledProviders } from "@/lib/auth/providers";
 import { SignInForm } from "./sign-in-form";
 
 export async function generateMetadata(): Promise<Metadata> {

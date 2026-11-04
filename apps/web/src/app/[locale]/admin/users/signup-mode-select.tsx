@@ -35,7 +35,7 @@ export function SignupModeSelect({ mode }: { mode: Mode }) {
             run(() => setSignupMode({ mode: value as Mode }), { success: t("saved") })
           }
         >
-          <SelectTrigger id="signup-mode" className="w-full sm:w-64">
+          <SelectTrigger id="signup-mode" className="w-full max-w-64">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

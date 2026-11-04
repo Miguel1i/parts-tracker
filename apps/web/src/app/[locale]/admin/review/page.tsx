@@ -11,6 +11,9 @@ import { requireAdmin } from "@/lib/auth/guard";
 import { cn } from "@/lib/utils";
 import { DecisionButtons } from "./decision-buttons";
 
+// Session-dependent and admin-only: render on request (see ../layout.tsx).
+export const instant = false;
+
 const PAGE_SIZE = 25;
 const STATUSES = ["pending", "approved", "rejected"] as const;
 type Status = (typeof STATUSES)[number];

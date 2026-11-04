@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
-import { requireAdmin } from "@/lib/auth/guard";
+import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { getAdminCounts } from "@/lib/admin/queries";
 
 /*
@@ -15,7 +15,10 @@ import { getAdminCounts } from "@/lib/admin/queries";
  */
 export const instant = false;
 
-export async function generateMetadata(): Promise<Metadata> {
+// Titles only for admins, so a 404 doesn't reveal what lives here.
+export const generateMetadata = () => adminMetadata(metadata);
+
+async function metadata(): Promise<Metadata> {
   const locale = (await initLocale()) ?? routing.defaultLocale;
   const t = await getTranslations({ locale, namespace: "Admin" });
   return {
@@ -30,7 +33,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/[locale]/a
   const counts = await getAdminCounts();
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
+    <div className="flex flex-col gap-6 xl:flex-row xl:gap-10">
       <AdminNav counts={counts} />
       <div className="min-w-0 flex-1">{children}</div>
     </div>

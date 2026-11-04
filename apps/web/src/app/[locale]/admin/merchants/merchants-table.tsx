@@ -136,7 +136,10 @@ export function MerchantsTable({ rows }: { rows: MerchantRow[] }) {
                   <span className="text-muted-foreground mt-0.5 block text-xs">
                     {m.lastHealthAt
                       ? t("health.checked", {
-                          when: format.relativeTime(m.lastHealthAt),
+                          when: format.dateTime(m.lastHealthAt, {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                          }),
                         })
                       : t("health.never")}
                   </span>

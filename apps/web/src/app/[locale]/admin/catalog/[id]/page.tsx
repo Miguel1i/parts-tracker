@@ -11,6 +11,9 @@ import { isHttpUrl } from "@/lib/admin/review";
 import { requireAdmin } from "@/lib/auth/guard";
 import { ArchiveButton, IdentifierActions } from "./controls";
 
+// Session-dependent and admin-only: render on request (see ../layout.tsx).
+export const instant = false;
+
 export default async function ProductPage({ params }: PageProps<"/[locale]/admin/catalog/[id]">) {
   await initLocale();
   await requireAdmin();

@@ -31,9 +31,9 @@ export function AdminNav({ counts }: { counts: { pendingUsers: number; pendingRe
   return (
     <nav
       aria-label={t("label")}
-      className="-mx-4 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:w-52 lg:shrink-0 lg:overflow-visible lg:px-0"
+      className="-mx-4 overflow-x-auto px-4 sm:-mx-6 sm:px-6 xl:mx-0 xl:w-52 xl:shrink-0 xl:overflow-visible xl:px-0"
     >
-      <ul className="flex gap-1 lg:sticky lg:top-20 lg:flex-col">
+      <ul className="flex gap-1 xl:sticky xl:top-20 xl:flex-col">
         {sections.map(({ key, icon: Icon }) => {
           const href = `/admin/${key}` as const;
           const active = pathname === href || pathname.startsWith(`${href}/`);

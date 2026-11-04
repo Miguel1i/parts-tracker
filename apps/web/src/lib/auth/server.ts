@@ -8,15 +8,8 @@ import { getTranslations } from "next-intl/server";
 import { account, appSettings, getDb, invites, session, user, verification } from "@parts/db";
 import { routing, type Locale } from "@/i18n/routing";
 import { linkEmail, sendEmail } from "@/lib/email";
+import { enabledProviders } from "./providers";
 import { decideSignup, normalizeEmail, usableInvite } from "./signup";
-
-/** OAuth providers whose client id and secret are both configured. */
-export function enabledProviders() {
-  return {
-    github: Boolean(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
-    google: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-  };
-}
 
 async function signupContext(email: string) {
   const db = getDb();
@@ -98,10 +91,13 @@ export const auth = betterAuth({
             createdByAdmin: ctx?.path === "/admin/create-user",
           });
           if (!decision.ok) return false;
+          const email = normalizeEmail(data.email);
           return {
             data: {
               ...data,
-              email: normalizeEmail(data.email),
+              // Magic-link sign-ups arrive without a name; start from the email's local part.
+              name: data.name?.trim() || email.split("@")[0],
+              email,
               status: decision.status,
               role: decision.role,
             },

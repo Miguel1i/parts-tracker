@@ -18,6 +18,9 @@ import { Link } from "@/i18n/navigation";
 import { initLocale } from "@/i18n/server";
 import { requireAdmin } from "@/lib/auth/guard";
 
+// Session-dependent and admin-only: render on request (see ../layout.tsx).
+export const instant = false;
+
 const LIMIT = 200;
 
 export default async function CatalogPage({ searchParams }: PageProps<"/[locale]/admin/catalog">) {

@@ -1,4 +1,5 @@
 import "server-only";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { cache } from "react";
@@ -33,6 +34,13 @@ export async function requireUser(): Promise<SessionUser> {
   if (result === "pending") redirect({ href: "/pending", locale });
   redirect({ href: "/sign-in", locale });
   throw new Error("unreachable");
+}
+
+/** Page metadata (titles) only for active admins; everyone else gets the app defaults. */
+export async function adminMetadata(build: () => Promise<Metadata>): Promise<Metadata> {
+  const session = await getSession();
+  if (evaluateAccess(session?.user, "admin") !== "ok") return { robots: { index: false } };
+  return build();
 }
 
 export class ForbiddenError extends Error {
