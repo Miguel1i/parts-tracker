@@ -4,7 +4,7 @@ import { EmptyState, PageHeader } from "@/components/empty-state";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
 
-type Section = "Compare" | "Builds" | "Admin";
+type Section = "Compare" | "Builds";
 
 /** Header + empty state for sections that land in later milestones. */
 export async function PlaceholderPage({ section, icon }: { section: Section; icon: LucideIcon }) {

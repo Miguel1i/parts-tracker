@@ -28,7 +28,10 @@ export function resolveDatabaseUrl(url: string | undefined = process.env.TURSO_D
   if (!raw.startsWith("file:") || raw === ":memory:") return raw;
   const path = raw.slice("file:".length);
   if (path === ":memory:" || isAbsolute(path) || /^[a-zA-Z]:[\\/]/.test(path)) return raw;
-  return `file:${join(workspaceRoot(process.cwd()), path).replaceAll("\\", "/")}`;
+  // String concatenation rather than path.join: Next's tracer treats join(cwd, …) as dynamic
+  // filesystem access and would bundle the whole repo into the server output.
+  const root = workspaceRoot(process.cwd()).replaceAll("\\", "/").replace(/\/$/, "");
+  return `file:${root}/${path.replace(/^\.\//, "")}`;
 }
 
 export function createDb(

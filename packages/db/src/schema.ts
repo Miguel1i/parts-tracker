@@ -1,4 +1,4 @@
-import type { IdentifierSighting, MatchSpec } from "@parts/core";
+import type { IdentifierSighting, MatchSpec, RuleResult } from "@parts/core";
 import { sql } from "drizzle-orm";
 import {
   index,
@@ -9,13 +9,6 @@ import {
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-
-/*
- * Better Auth tables (user, session, account, verification) are generated in milestone 5.
- * Until then every user reference (`userId`, `createdBy`, `invitedBy`, `actorUserId`) is a
- * plain text column.
- * TODO(milestone 5): add foreign keys from those columns to `user.id`.
- */
 
 const id = () =>
   text("id")
@@ -33,6 +26,8 @@ const createdAt = () =>
 
 export const signupModes = ["open", "approval", "invite_only"] as const;
 export const roles = ["admin", "user"] as const;
+/** `pending` accounts (signup mode `approval`) can sign in but can't use the app until approved. */
+export const userStatuses = ["active", "pending"] as const;
 export const merchantHealth = ["ok", "degraded", "blocked"] as const;
 export const identifierKinds = ["gtin", "mpn", "asin"] as const;
 export const identifierSources = ["user", "learned"] as const;
@@ -42,6 +37,93 @@ export const runTriggers = ["cron", "manual"] as const;
 export const runStatuses = ["queued", "running", "succeeded", "failed", "cancelled"] as const;
 
 export type ScrapeStatus = (typeof scrapeStatuses)[number];
+export type Role = (typeof roles)[number];
+export type UserStatus = (typeof userStatuses)[number];
+export type SignupMode = (typeof signupModes)[number];
+
+// ---------------------------------------------------------------- auth (Better Auth)
+
+/*
+ * Better Auth core tables plus the admin plugin fields (role, banned, banReason, banExpires,
+ * session.impersonatedBy). The JS property names are Better Auth's field names; the Drizzle
+ * adapter maps them to these snake_case columns. `status` is our additional field.
+ */
+
+const updatedAt = () =>
+  timestamp("updated_at")
+    .notNull()
+    .default(sql`(cast(unixepoch('subsec') * 1000 as integer))`)
+    .$onUpdate(() => new Date());
+
+export const user = sqliteTable("user", {
+  id: id(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: integer("email_verified", { mode: "boolean" }).notNull().default(false),
+  image: text("image"),
+  role: text("role", { enum: roles }).notNull().default("user"),
+  status: text("status", { enum: userStatuses }).notNull().default("pending"),
+  banned: integer("banned", { mode: "boolean" }).notNull().default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const session = sqliteTable(
+  "session",
+  {
+    id: id(),
+    expiresAt: timestamp("expires_at").notNull(),
+    token: text("token").notNull().unique(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    impersonatedBy: text("impersonated_by"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("session_user_idx").on(t.userId)],
+);
+
+export const account = sqliteTable(
+  "account",
+  {
+    id: id(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    scope: text("scope"),
+    password: text("password"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("account_user_idx").on(t.userId)],
+);
+
+export const verification = sqliteTable(
+  "verification",
+  {
+    id: id(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("verification_identifier_idx").on(t.identifier)],
+);
+
+export type User = typeof user.$inferSelect;
 
 // ---------------------------------------------------------------- admin & settings
 
@@ -64,7 +146,9 @@ export const invites = sqliteTable(
     email: text("email").notNull(),
     role: text("role", { enum: roles }).notNull().default("user"),
     token: text("token").notNull(),
-    invitedBy: text("invited_by").notNull(), // TODO(milestone 5): FK → user.id
+    invitedBy: text("invited_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
     expiresAt: timestamp("expires_at").notNull(),
     usedAt: timestamp("used_at"),
     createdAt: createdAt(),
@@ -76,7 +160,7 @@ export const auditLog = sqliteTable(
   "audit_log",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    actorUserId: text("actor_user_id"), // TODO(milestone 5): FK → user.id
+    actorUserId: text("actor_user_id").references(() => user.id, { onDelete: "set null" }),
     action: text("action").notNull(),
     entity: text("entity").notNull(),
     entityId: text("entity_id"),
@@ -183,7 +267,7 @@ export const products = sqliteTable(
       .$type<MatchSpec>()
       .notNull()
       .default(sql`'{}'`),
-    createdBy: text("created_by"), // TODO(milestone 5): FK → user.id
+    createdBy: text("created_by").references(() => user.id, { onDelete: "set null" }),
     archived: integer("archived", { mode: "boolean" }).notNull().default(false),
     createdAt: createdAt(),
   },
@@ -225,7 +309,9 @@ export const builds = sqliteTable(
   "builds",
   {
     id: id(),
-    userId: text("user_id").notNull(), // TODO(milestone 5): FK → user.id
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     notes: text("notes"),
     isPublic: integer("is_public", { mode: "boolean" }).notNull().default(false),
@@ -257,7 +343,9 @@ export const buildItems = sqliteTable(
 export const userMerchants = sqliteTable(
   "user_merchants",
   {
-    userId: text("user_id").notNull(), // TODO(milestone 5): FK → user.id
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
     merchantId: text("merchant_id")
       .notNull()
       .references(() => merchants.id, { onDelete: "cascade" }),
@@ -325,7 +413,7 @@ export const scrapeRuns = sqliteTable(
       .notNull()
       .default(sql`'{}'`),
     status: text("status", { enum: runStatuses }).notNull().default("queued"),
-    requestedBy: text("requested_by"), // TODO(milestone 5): FK → user.id
+    requestedBy: text("requested_by").references(() => user.id, { onDelete: "set null" }),
     startedAt: timestamp("started_at"),
     finishedAt: timestamp("finished_at"),
     stats: text("stats", { mode: "json" }).$type<Record<string, number>>(),
@@ -360,6 +448,17 @@ export const pricePoints = sqliteTable(
   (t) => [index("price_points_pair_ts_idx").on(t.productId, t.merchantId, t.ts)],
 );
 
+/** What the scraper stores on a review candidate (see packages/scraper/src/store.ts). */
+export type CandidateSignals = {
+  results?: RuleResult[];
+  vetoes?: string[];
+  similarity?: number;
+  stage?: string;
+  /** Identifiers read from the candidate page; Approve confirms them (docs/matching.md §6). */
+  page?: { gtins: string[]; mpn?: string; asin?: string; sku?: string; brand?: string };
+  [key: string]: unknown;
+};
+
 export const matchCandidates = sqliteTable(
   "match_candidates",
   {
@@ -374,7 +473,7 @@ export const matchCandidates = sqliteTable(
     title: text("title"),
     priceEur: real("price_eur"),
     score: real("score").notNull(),
-    signals: text("signals", { mode: "json" }).$type<Record<string, unknown>>(),
+    signals: text("signals", { mode: "json" }).$type<CandidateSignals>(),
     status: text("status", { enum: candidateStatuses }).notNull().default("pending"),
     runId: text("run_id").references(() => scrapeRuns.id, { onDelete: "set null" }),
     createdAt: createdAt(),

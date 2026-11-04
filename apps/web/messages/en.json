@@ -22,7 +22,11 @@
     "menu": "Account",
     "signedOut": "You're not signed in",
     "signIn": "Sign in",
-    "soon": "Soon"
+    "soon": "Soon",
+    "profile": "Profile & settings",
+    "admin": "Admin",
+    "signOut": "Sign out",
+    "pending": "Awaiting approval"
   },
   "Locale": {
     "change": "Change language"
@@ -59,15 +63,456 @@
   },
   "Admin": {
     "title": "Admin",
-    "description": "Users, merchants, catalog and scrape runs.",
-    "empty": {
-      "title": "Admins only",
-      "body": "The admin area (users, merchant adapters, review queue, runs) arrives with the auth milestone."
+    "description": "Users, merchants, catalog and the review queue.",
+    "nav": {
+      "label": "Admin sections",
+      "users": "Users",
+      "merchants": "Merchants",
+      "catalog": "Catalog",
+      "review": "Review queue",
+      "audit": "Audit log",
+      "pendingCount": "{count, plural, one {# pending} other {# pending}}"
+    },
+    "common": {
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "confirm": "Confirm",
+      "close": "Close",
+      "actions": "Actions",
+      "search": "Search",
+      "searchPlaceholder": "Search…",
+      "noResults": "Nothing matches.",
+      "loading": "Loading…",
+      "error": "Something went wrong.",
+      "yes": "Yes",
+      "no": "No",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {page}",
+      "never": "Never",
+      "all": "All"
+    },
+    "merchants": {
+      "title": "Merchants",
+      "description": "Shops to scrape, how to search them and how to read their pages.",
+      "new": "New merchant",
+      "newTitle": "New merchant",
+      "empty": {
+        "title": "No merchants yet",
+        "body": "Add the first shop to start tracking prices."
+      },
+      "columns": {
+        "name": "Merchant",
+        "country": "Country",
+        "currency": "Currency",
+        "shipping": "Shipping",
+        "enabled": "Enabled",
+        "visible": "Visible",
+        "flags": "Flags",
+        "health": "Health",
+        "order": "Order"
+      },
+      "freeOver": "free over {amount}",
+      "ownOnly": "Own stock only",
+      "needsBrowser": "Browser",
+      "health": {
+        "ok": "OK",
+        "degraded": "Degraded",
+        "blocked": "Blocked",
+        "unknown": "Unknown",
+        "checked": "Checked {when}",
+        "never": "Never checked"
+      },
+      "toggle": {
+        "enabled": "Enable {name}",
+        "visible": "Show {name} to users"
+      },
+      "moveUp": "Move {name} up",
+      "moveDown": "Move {name} down",
+      "toasts": {
+        "created": "Merchant created",
+        "saved": "Merchant saved",
+        "deleted": "Merchant deleted",
+        "moved": "Order updated"
+      },
+      "form": {
+        "sections": {
+          "general": "General",
+          "shop": "Shop",
+          "flags": "Behaviour",
+          "adapter": "Adapter",
+          "selectors": "CSS selectors",
+          "sellerRule": "Seller rule",
+          "limits": "Request limits"
+        },
+        "fields": {
+          "name": "Name",
+          "slug": "Slug",
+          "slugHint": "Lowercase letters, digits and hyphens.",
+          "country": "Country",
+          "countryHint": "2-letter code, e.g. PT.",
+          "baseUrl": "Base URL",
+          "searchTemplate": "Search URL template",
+          "searchTemplateHint": "Must contain '{q}', which is replaced by the search terms.",
+          "currency": "Currency",
+          "currencyHint": "3 uppercase letters, e.g. EUR.",
+          "shipping": "Shipping (in the shop's currency)",
+          "freeShippingOver": "Free shipping over",
+          "freeShippingOverHint": "Leave empty if there is no threshold.",
+          "color": "Colour",
+          "colorHint": "#rrggbb, used in charts. Optional.",
+          "notes": "Notes",
+          "enabled": "Enabled",
+          "enabledHint": "Scrape this shop on scheduled runs.",
+          "visibleToUsers": "Visible to users",
+          "visibleToUsersHint": "Users can see it and add their own links.",
+          "ownOnly": "Own stock only",
+          "ownOnlyHint": "Reject offers sold by marketplace sellers.",
+          "needsBrowser": "Needs a browser",
+          "needsBrowserHint": "Skip plain fetch and render pages with Playwright.",
+          "selItem": "Result item",
+          "selTitle": "Title",
+          "selPrice": "Price",
+          "selUrl": "Link",
+          "selStock": "Stock",
+          "selImage": "Image",
+          "apiEndpoint": "API endpoint",
+          "apiEndpointHint": "Used instead of HTML search when the shop has a JSON API.",
+          "ownNames": "Own seller names",
+          "ownNamesHint": "Comma-separated, e.g. Amazon, Amazon EU.",
+          "sellerSelector": "Seller selector",
+          "thirdPartyMarkers": "Marketplace markers",
+          "thirdPartyMarkersHint": "Comma-separated HTML snippets that prove a marketplace seller.",
+          "urlParam": "Own-sold URL parameter",
+          "mustContain": "Must contain",
+          "throttleMs": "Minimum gap between requests (ms)",
+          "throttleMsHint": "At least 1500; lower values are raised by the scraper.",
+          "maxConcurrency": "Max concurrent requests",
+          "maxConcurrencyHint": "1 or 2.",
+          "overrides": "Other overrides (JSON)",
+          "overridesHint": "A JSON object with any other adapter keys."
+        },
+        "errors": {
+          "name": "Enter a name.",
+          "slug": "Use lowercase letters, digits and hyphens.",
+          "country": "Use a 2-letter country code.",
+          "baseUrl": "Enter an http(s) URL.",
+          "searchTemplate": "Enter an http(s) URL containing '{q}'.",
+          "currency": "Use 3 uppercase letters, e.g. EUR.",
+          "shipping": "Enter 0 or more.",
+          "freeShippingOver": "Enter 0 or more, or leave empty.",
+          "color": "Use the form #rrggbb.",
+          "overrides": "Must be a valid JSON object.",
+          "throttleMs": "Enter a whole number, at least 1500.",
+          "maxConcurrency": "Enter 1 or 2.",
+          "adapter": "The adapter configuration is invalid."
+        }
+      },
+      "delete": {
+        "button": "Delete merchant",
+        "title": "Delete {name}?",
+        "body": "This removes the merchant and its links. Merchants with price history can't be deleted: disable them instead.",
+        "confirm": "Delete"
+      },
+      "test": {
+        "title": "Test this merchant",
+        "description": "Runs a real check of one product at this merchant and shows what it found. Like a scheduled run, an accepted offer is saved to the price history; uncertain ones go to the review queue. Disabled product links are skipped.",
+        "product": "Product",
+        "choose": "Choose a product",
+        "noProducts": "There are no products to test with.",
+        "run": "Run test",
+        "running": "Running…",
+        "dispatched": "Test run started.",
+        "notDispatched": "GitHub dispatch isn't configured here. Run this in the repo to start the run:",
+        "copy": "Copy command",
+        "copied": "Copied",
+        "status": "Status",
+        "started": "Started",
+        "finished": "Finished",
+        "ghRun": "Open on GitHub",
+        "statuses": {
+          "queued": "Queued",
+          "running": "Running",
+          "succeeded": "Succeeded",
+          "failed": "Failed",
+          "cancelled": "Cancelled"
+        },
+        "pollStopped": "Stopped waiting after 10 minutes. Reopen the page to check again.",
+        "logs": "Logs",
+        "noLogs": "No log lines yet.",
+        "candidates": "Match candidates",
+        "noCandidates": "No candidates.",
+        "points": "Prices recorded",
+        "noPoints": "No prices recorded.",
+        "title_": "Title",
+        "price": "Price",
+        "score": "Score",
+        "inStock": "In stock",
+        "outOfStock": "Out of stock",
+        "vetoes": "Vetoes: {vetoes}",
+        "stats": "Stats"
+      }
+    },
+    "catalog": {
+      "title": "Catalog",
+      "description": "Products, their identifiers and archive state.",
+      "searchPlaceholder": "Search products by name",
+      "showArchived": "Show archived",
+      "empty": "No products found",
+      "name": "Name",
+      "category": "Category",
+      "brand": "Brand",
+      "refPrice": "Reference price",
+      "identifiers": "Identifiers",
+      "unconfirmedCount": "{count} unconfirmed",
+      "archived": "Archived",
+      "limited": "Showing the first {count} products. Narrow the search to see others.",
+      "query": "Search query",
+      "refUrl": "Reference URL",
+      "noIdentifiers": "No identifiers yet.",
+      "kind": "Kind",
+      "value": "Value",
+      "source": "Source",
+      "sourceMerchant": "Source shop",
+      "confidence": "Confidence",
+      "confirmed": "Confirmed",
+      "sightings": "Sightings",
+      "sources": {
+        "user": "User",
+        "learned": "Learned"
+      },
+      "remove": "Remove",
+      "removeTitle": "Remove this identifier?",
+      "removeDescription": "{value} will no longer be used to match offers for this product.",
+      "identifierConfirmed": "Identifier confirmed",
+      "identifierRemoved": "Identifier removed",
+      "archive": "Archive product",
+      "unarchive": "Unarchive product",
+      "archivedToast": "Product archived",
+      "unarchived": "Product unarchived"
+    },
+    "review": {
+      "title": "Review queue",
+      "description": "Uncertain matches waiting for a decision.",
+      "filter": "Filter by status",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "empty": "Nothing here",
+      "emptyHint": "No candidates with this status.",
+      "reference": "Reference product",
+      "candidate": "Candidate offer",
+      "confirmedIds": "Confirmed identifiers",
+      "pageIds": "Identifiers on the page",
+      "noPageIds": "None found on the page.",
+      "score": "Score",
+      "vetoes": "Vetoes",
+      "rules": "Rules ({count})",
+      "approve": "Approve",
+      "reject": "Reject",
+      "approved": "Candidate approved",
+      "rejected": "Candidate rejected and blocklisted"
+    },
+    "audit": {
+      "title": "Audit log",
+      "description": "Every admin change, newest first.",
+      "filter": "Filter by entity",
+      "empty": "No entries yet",
+      "entities": {
+        "user": "Users",
+        "merchant": "Merchants",
+        "product": "Products",
+        "identifier": "Identifiers",
+        "candidate": "Candidates",
+        "invite": "Invites",
+        "settings": "Settings"
+      },
+      "time": "Time",
+      "actor": "Actor",
+      "action": "Action",
+      "target": "Entity",
+      "diff": "Details",
+      "show": "Show",
+      "system": "System",
+      "deletedUser": "Deleted user"
+    },
+    "users": {
+      "title": "Users",
+      "description": "Approve sign-ups, invite people, and manage roles and access.",
+      "filterLabel": "Filter users",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "active": "Active",
+        "admins": "Admins",
+        "banned": "Banned"
+      },
+      "search": "Search users",
+      "searchPlaceholder": "Name or email",
+      "empty": "No users match.",
+      "you": "you",
+      "pageOf": "Page {page} of {pages}",
+      "previous": "Previous",
+      "next": "Next",
+      "buildCount": "{count, plural, =0 {No builds} one {# build} other {# builds}}",
+      "actionsFor": "Actions for {name}",
+      "columns": {
+        "user": "User",
+        "status": "Status",
+        "builds": "Builds",
+        "joined": "Joined",
+        "actions": "Actions"
+      },
+      "roles": {
+        "admin": "Admin",
+        "user": "User"
+      },
+      "status": {
+        "active": "Active",
+        "pending": "Pending",
+        "banned": "Banned"
+      },
+      "fields": {
+        "name": "Display name"
+      },
+      "actions": {
+        "approve": "Approve",
+        "editName": "Edit name",
+        "makeAdmin": "Make admin",
+        "makeUser": "Remove admin role",
+        "revokeSessions": "Sign out everywhere",
+        "ban": "Ban",
+        "unban": "Unban",
+        "delete": "Delete user"
+      },
+      "done": {
+        "approved": "User approved",
+        "role": "Role changed",
+        "revoked": "Sessions revoked",
+        "banned": "User banned",
+        "unbanned": "User unbanned",
+        "deleted": "User deleted"
+      },
+      "ban": {
+        "title": "Ban {name}",
+        "description": "They're signed out everywhere and can't sign in until unbanned.",
+        "reason": "Reason (optional)",
+        "days": "Duration in days",
+        "permanent": "Permanent"
+      },
+      "delete": {
+        "title": "Delete {name}?",
+        "description": "This removes the account, its sessions and its builds. Shared catalog data and price history stay. It can't be undone.",
+        "typeEmail": "Type {email} to confirm"
+      },
+      "builds": {
+        "title": "Builds of {name}",
+        "description": "Read-only list; builds are edited by their owner.",
+        "public": "Shared"
+      },
+      "signup": {
+        "title": "Sign-up mode",
+        "label": "Who can create an account",
+        "saved": "Sign-up mode saved",
+        "modes": {
+          "open": "Open",
+          "approval": "Approval required",
+          "invite_only": "Invite only"
+        },
+        "help": {
+          "open": "Anyone can sign up and use the app straight away.",
+          "approval": "Anyone can sign up, but an admin approves each new account. Invited people skip approval.",
+          "invite_only": "Only people with an invite can create an account."
+        }
+      },
+      "invite": {
+        "title": "Invite someone",
+        "description": "Sends a sign-in link valid for 7 days. Invited accounts skip approval.",
+        "email": "Email",
+        "role": "Role",
+        "roles": {
+          "admin": "Admin",
+          "user": "User"
+        },
+        "send": "Send invite",
+        "sent": "Invite sent to {email}",
+        "open": "{count, plural, one {# open invite} other {# open invites}}",
+        "expires": "expires {when}",
+        "revoke": "Revoke the invite for {email}",
+        "revoked": "Invite revoked"
+      }
+    },
+    "errors": {
+      "generic": "Something went wrong. Try again.",
+      "invalid": "Some values aren't valid.",
+      "notFound": "It no longer exists. Reload the page.",
+      "self": "You can't do that to your own account.",
+      "emailMismatch": "The email doesn't match.",
+      "userExists": "A user with that email already exists.",
+      "slugTaken": "That slug is already used.",
+      "nameTaken": "That name is already used.",
+      "duplicate": "A merchant with that name or slug already exists.",
+      "invalidAdapter": "The adapter settings aren't valid.",
+      "hasHistory": "This merchant has price history, which is kept for good. Disable it instead.",
+      "alreadyDecided": "Someone already decided on this candidate.",
+      "dispatchFailed": "GitHub didn't accept the run. Check GH_DISPATCH_TOKEN and GH_REPO."
     }
   },
   "NotFound": {
     "title": "Page not found",
     "body": "That page doesn't exist.",
     "back": "Back to dashboard"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Sign in",
+      "description": "Use GitHub, Google or a one-time link sent to your email.",
+      "github": "Continue with GitHub",
+      "google": "Continue with Google",
+      "or": "or",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "sendLink": "Email me a sign-in link",
+      "sending": "Sending…",
+      "sent": "Check your inbox: we sent a sign-in link to {email}. It expires in 15 minutes.",
+      "useAnother": "Use another email",
+      "invited": "You've been invited. Sign in with the email the invite was sent to.",
+      "noProviders": "GitHub and Google sign-in aren't configured on this server.",
+      "error": "Sign-in failed. Try again.",
+      "errors": {
+        "invite_required": "Sign-up is by invitation only. Ask an admin for an invite.",
+        "banned": "This account has been suspended.",
+        "generic": "Sign-in failed. Try again."
+      }
+    },
+    "pending": {
+      "title": "Waiting for approval",
+      "body": "Your account ({email}) was created. An admin needs to approve it before you can use Parts Tracker; you'll be able to sign in normally once that happens.",
+      "check": "Check again",
+      "signOut": "Sign out"
+    }
+  },
+  "Email": {
+    "magicLink": {
+      "subject": "Your Parts Tracker sign-in link",
+      "heading": "Sign in to Parts Tracker",
+      "body": "Click the button below to sign in. The link works once and expires in 15 minutes.",
+      "cta": "Sign in",
+      "footer": "If you didn't ask for this, you can ignore this email."
+    },
+    "invite": {
+      "subject": "You're invited to Parts Tracker",
+      "heading": "You're invited to Parts Tracker",
+      "body": "{inviter} invited you to track PC part prices with Parts Tracker. Sign in with this email address to accept; the invite expires in 7 days.",
+      "cta": "Accept the invite",
+      "footer": "If you weren't expecting this, you can ignore this email."
+    }
   }
 }

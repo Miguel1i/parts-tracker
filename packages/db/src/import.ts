@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { ensureLegacyPlaceholder, LEGACY_ADMIN_USER_ID } from "./admin";
 import type { Db } from "./client";
 import { mapLegacy, type LegacyFile, type LegacyPlan, type MerchantRow } from "./legacy";
 import {
@@ -15,11 +16,7 @@ import {
 } from "./schema";
 import { LEGACY_MERCHANTS } from "./seed-data";
 
-/**
- * Owner of imported data until real users exist.
- * TODO(milestone 5): reassign rows with this id to the first admin.
- */
-export const LEGACY_ADMIN_USER_ID = "legacy-admin";
+export { LEGACY_ADMIN_USER_ID } from "./admin";
 export const LEGACY_BUILD_NAME = "Legacy build";
 
 type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
@@ -102,6 +99,8 @@ export async function importPlan(
 ): Promise<ImportSummary> {
   return db.transaction(async (tx) => {
     await ensureSettings(tx);
+    // Until `pnpm seed:admin` runs, imported data belongs to a placeholder user.
+    if (ownerId === LEGACY_ADMIN_USER_ID) await ensureLegacyPlaceholder(tx);
     const m = await upsertMerchants(tx, plan.merchants);
     const merchantId = (name: string) => m.ids.get(name)!;
 
