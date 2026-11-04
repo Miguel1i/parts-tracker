@@ -64,7 +64,9 @@ export const auth = betterAuth({
     },
   },
   account: {
-    accountLinking: { enabled: true, trustedProviders: ["github", "google"] },
+    // Google always returns verified emails, so its logins link to an existing account by email.
+    // GitHub links only when Better Auth sees the address as verified.
+    accountLinking: { enabled: true, trustedProviders: ["google"] },
   },
   socialProviders: {
     ...(providers.github && {

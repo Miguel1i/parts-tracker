@@ -111,7 +111,7 @@ Until both secrets are set, the job logs a warning and skips. Run it by hand wit
 
 ## Auth & admin
 
-Sign-in is [Better Auth](https://www.better-auth.com) with its Drizzle adapter: GitHub and Google OAuth (each enabled only when its client id and secret are set) and an email magic link sent through Resend. Without `RESEND_API_KEY` in development, the link is printed to the `pnpm dev` console instead. Accounts with the same verified email are linked.
+Sign-in is [Better Auth](https://www.better-auth.com) with its Drizzle adapter: GitHub and Google OAuth (each enabled only when its client id and secret are set) and an email magic link sent through Resend. Without `RESEND_API_KEY` in development, the link is printed to the `pnpm dev` console instead. Logins with the same verified email link to one account.
 
 **First admin.** Create it once per database, then sign in with a magic link to that address (or GitHub/Google with the same email):
 
