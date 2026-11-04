@@ -16,7 +16,8 @@
     "db:generate": "pnpm --filter @parts/db db:generate",
     "db:migrate": "pnpm --filter @parts/db db:migrate",
     "db:seed": "pnpm --filter @parts/db db:seed",
-    "db:import-legacy": "pnpm --filter @parts/db db:import-legacy"
+    "db:import-legacy": "pnpm --filter @parts/db db:import-legacy",
+    "scrape": "pnpm --filter @parts/scraper scrape"
   },
   "devDependencies": {
     "prettier": "^3",

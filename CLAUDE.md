@@ -4,13 +4,15 @@ Parts Tracker: PC part price tracker. The full spec and milestone plan is `docs/
 
 ## Repo
 
-- pnpm workspace: `apps/web` (Next.js 16), `packages/core` (pure TS, parsing/matching/GTIN; no I/O), `packages/db` (`@parts/db`: Drizzle schema, libSQL client, migrations in `packages/db/drizzle`, seed, legacy import).
+- pnpm workspace: `apps/web` (Next.js 16), `packages/core` (pure TS, parsing/matching/GTIN; no I/O), `packages/db` (`@parts/db`: Drizzle schema, libSQL client, migrations in `packages/db/drizzle`, seed, legacy import), `packages/scraper` (`@parts/scraper`: fetch → Playwright fallback, per-host throttle, pair pipeline, DB writes; run by `.github/workflows/scrape.yml`).
 - Next.js 16 differs from older versions: read `apps/web/node_modules/next/dist/docs/` before using an API you're unsure of (see `apps/web/AGENTS.md`).
 - Windows dev machine: git comes from GitHub Desktop (`%LOCALAPPDATA%\GitHubDesktop\app-*\resources\app\git\cmd`), gh is at `C:\Program Files\GitHub CLI\gh.exe`. When editing JSON from PowerShell, write UTF-8 **without BOM** (a BOM in package.json breaks Next/Tailwind).
 
 ## Commands (repo root)
 
 `pnpm dev` · `pnpm lint` · `pnpm typecheck` · `pnpm test` · `pnpm format` · `pnpm build`. CI runs format check, lint, typecheck, test, build.
+
+Scraper: `pnpm scrape [--product <id|name>] [--merchant <id|slug|name>] [--no-browser]` (Chromium once: `pnpm --filter @parts/scraper browser:install`).
 
 DB: `pnpm db:generate` (after editing `packages/db/src/schema.ts`; commit the SQL) · `db:migrate` · `db:seed` (12 legacy merchants) · `db:import-legacy` (reads gitignored `.scratch/pc_tracker.json`; never commit it).
 
@@ -22,6 +24,7 @@ DB: `pnpm db:generate` (after editing `packages/db/src/schema.ts`; commit the SQ
 - UI: shadcn/ui components in `src/components/ui` (ok to adjust), `cn` from `@/lib/utils`. Test in light + dark, at mobile and desktop widths.
 - **DB:** `getDb()` from `@parts/db`. Env `TURSO_DATABASE_URL`/`TURSO_AUTH_TOKEN`; a relative `file:` URL resolves to the repo root, so web and scripts share `local.db`. GTINs are stored as 14 digits (`normalizeGtin` from `@parts/core`). `price_points` is append-only. Timestamps are `timestamp_ms` Dates. No auth tables yet: user columns are plain text with `TODO(milestone 5)` FKs, and imported data belongs to `legacy-admin` until milestone 5 reassigns it.
 - **Matching** (`docs/matching.md`): `matchOffer`/`prefilterLinks`/`extractProductPage`/`extractSearchPage` from `@parts/core`. One file per rule in `packages/core/src/rules/`, word lists only in `src/lexicon/words.ts`, thresholds in `THRESHOLDS`. Fixtures are trimmed real pages in `packages/core/test/fixtures/` (excluded from Prettier; capture with `pnpm --filter @parts/core fixture:capture`).
+- **Scraper** (`packages/scraper`): `scrapePair` is pure apart from its `PageFetcher`, so test it with `FakeFetcher` over core fixtures. All network goes through `SmartFetcher` (limits from `clampLimits`: ≥ 1.5 s, ≤ 2 in flight per host). Never add CAPTCHA solving; blocked → status `blocked`. Raw HTML only goes to `debug/` (the Actions artifact), never the DB. Repo is public (owner's choice), so Actions minutes are unlimited.
 - One PR per milestone from a `feat/*` branch; conventional commits; PRs auto-merge (squash) when CI passes.
 
 ## Milestones
@@ -29,7 +32,7 @@ DB: `pnpm db:generate` (after editing `packages/db/src/schema.ts`; commit the SQ
 - [x] 1. Scaffold — monorepo, Next.js, Tailwind, shadcn, theming, sidebar shell, i18n (en, pt-PT), CI
 - [x] 2. DB — Drizzle + Turso, schema, migrations, legacy import
 - [x] 3. Core matching — scored rules engine + HTML extraction in `packages/core` (design: `docs/matching.md`)
-- [ ] 4. Scraper — Playwright runner, GitHub Actions cron + dispatch
+- [x] 4. Scraper — Playwright runner, GitHub Actions cron + dispatch
 - [ ] 5. Auth & admin — Better Auth, roles, approval signup, admin area
 - [ ] 6. User features — builds, profile & settings, per-user merchants
 - [ ] 7. Views & charts

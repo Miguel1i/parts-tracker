@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { extractProductPage, isPlausibleTitle } from "../src/extract/page";
 import { detectCurrency, readPrice } from "../src/extract/price";
@@ -104,23 +105,30 @@ describe("title extraction", () => {
 });
 
 describe("A13 seller detection", () => {
-  // Synthetic: Worten returns 403 to plain fetches. Markup shape from diagnostico.txt
-  // ("vendedor: ON4TECH … marketplace-seller"). Replace with a saved page when available.
+  // Real page saved on 2026-11-03 by the milestone 4 browser runner (Worten blocks plain
+  // fetches): the 9800X3D offer from the marketplace seller ON4TECH.
+  const WORTEN_ON4TECH =
+    "https://www.worten.pt/produtos/processador-ryzen-7-9800x3d-4-7-ghz-96-mb-l3-1400374-amd-mrkean-8435280949534";
+  const on4tech = readFileSync(
+    new URL("./fixtures/worten/9800x3d-on4tech.html", import.meta.url),
+    "utf8",
+  );
   const worten = `<html><body>
     ${ld({ "@type": "Product", name: "Processador Amd Ryzen 7 9800x3d 4,7 Ghz 8 Núcleos 120w", offers: { "@type": "Offer", price: 442, priceCurrency: "EUR" } })}
-    <div class="seller-info">Vendido por <a class="marketplace-seller" href="/marketplace/on4tech">ON4TECH</a> Avaliação 0 de 5</div>
+    <div class="seller-info">Vendido por <a class="marketplace-seller" href="/marketplace/on4tech">ON4TECH</a></div>
   </body></html>`;
 
-  it("finds the Worten marketplace seller and rejects it for an own-only shop", () => {
-    const o = extractProductPage(
-      worten,
-      "https://www.worten.pt/produtos/processador-amd-ryzen-7-9800x3d-7891",
-    );
-    expect(o.seller?.own).toBe(false);
-    expect(o.seller?.name).toMatch(/ON4TECH/);
+  it("finds the Worten marketplace seller on the real page and rejects it for an own-only shop", () => {
+    const o = extractProductPage(on4tech, WORTEN_ON4TECH);
+    expect(o.title).toBe("Processador Ryzen 7 9800x3d 4,7 GHz 96 MB L3 1400374 AMD");
+    expect(o.price).toMatchObject({ value: 492, currency: "EUR" });
+    expect(o.seller).toMatchObject({ own: false, name: "ON4TECH" });
     const d = matchOffer(cpu, o, { ownOnly: true });
     expect(d.decision).toBe("reject");
-    expect(d.results.find((r) => r.rule === "A13-seller")?.evidence).toMatch(/ON4TECH/);
+    expect(d.vetoes).toEqual(["A13-seller"]);
+    expect(d.results.find((r) => r.rule === "A13-seller")?.evidence).toBe("sold by ON4TECH");
+    // At a shop that allows marketplace offers the same page is not vetoed.
+    expect(matchOffer(cpu, o, { ownOnly: false }).vetoes).toEqual([]);
   });
 
   it("recognises the shop selling its own offer", () => {

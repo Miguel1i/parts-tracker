@@ -90,6 +90,27 @@ describe("Globaldata search page", () => {
   });
 });
 
+describe("PCBem search page (JS-rendered; saved from the browser runner)", () => {
+  const s = search(
+    "pcbem/9800x3d-search.html",
+    "https://www.pcbem.pt/?s=AMD+Ryzen+7+9800X3D&post_type=product",
+  );
+  const { kept, dropped } = prefilterLinks(cpu, s.links);
+
+  it("keeps only the boxed CPU", () => {
+    expect(kept.map((k) => k.url)).toEqual([PCBEM_BOX]);
+  });
+
+  it("drops the tray by B4, the prebuilt PC by A5 and the home link by A11", () => {
+    const rule = (url: string) => dropped.find((d) => d.url === url)?.rule;
+    expect(rule(PCBEM_TRAY)).toBe("A9:B4-packaging");
+    expect(
+      rule("https://www.pcbem.pt/loja/computador-r7-9800x3d-rtx-5070-1tb-32gb-powered-by-asus/"),
+    ).toBe("A9:A5-prebuilt");
+    expect(rule("https://www.pcbem.pt/")).toBe("A11-junk-link");
+  });
+});
+
 describe("PCBem 9800X3D (old app: correct page rejected)", () => {
   const box = page("pcbem/9800x3d-box.html", PCBEM_BOX);
   const tray = page("pcbem/9800x3d-tray.html", PCBEM_TRAY);

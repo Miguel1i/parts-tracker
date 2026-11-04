@@ -50,6 +50,8 @@ const FURNITURE = [
   "[id*='carousel' i]",
   "[class*='newsletter']",
   "[class*='cookie']",
+  "[id*='cookie' i]",
+  "[id^='CybotCookiebot']",
   "[id*='review' i]",
   "[class*='review']",
   "#aplus",
