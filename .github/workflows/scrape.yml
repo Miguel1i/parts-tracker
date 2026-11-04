@@ -1,0 +1,109 @@
+name: Scrape
+
+# Scheduled scrape of every enabled (product, merchant) pair, plus on-demand runs that the web
+# app dispatches (milestone 6) with a pre-created `scrape_runs` row. The repo is public, so
+# Actions minutes are unlimited; keep runs polite anyway (see packages/scraper).
+
+on:
+  schedule:
+    # Every 6 hours, off the hour to avoid the top-of-hour Actions queue.
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      productId:
+        description: Product id (empty = all products)
+        required: false
+        default: ""
+      merchantId:
+        description: Merchant id, slug or name (empty = all enabled merchants)
+        required: false
+        default: ""
+      runId:
+        description: scrape_runs id created by the web app (empty = create one)
+        required: false
+        default: ""
+
+concurrency:
+  # One scrape at a time per scope; a queued cron run waits instead of overlapping.
+  group: scrape-${{ inputs.productId || 'all' }}-${{ inputs.merchantId || 'all' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    name: scrape
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+    steps:
+      # Until the Turso secrets exist the job is a no-op (a warning, not a failure every 6 h).
+      - name: Check secrets
+        id: secrets
+        run: |
+          if [ -z "$TURSO_DATABASE_URL" ]; then
+            echo "::warning::TURSO_DATABASE_URL is not set (gh secret set TURSO_DATABASE_URL); skipping"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v5
+        if: steps.secrets.outputs.ok == 'true'
+
+      - uses: pnpm/action-setup@v4
+        if: steps.secrets.outputs.ok == 'true'
+
+      - uses: actions/setup-node@v5
+        if: steps.secrets.outputs.ok == 'true'
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+        if: steps.secrets.outputs.ok == 'true'
+
+      - name: Playwright version
+        id: pw
+        if: steps.secrets.outputs.ok == 'true'
+        run: echo "version=$(pnpm --filter @parts/scraper exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        if: steps.secrets.outputs.ok == 'true'
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+
+      # Downloads Chromium only on a cache miss; the system packages are installed every run.
+      - name: Install Chromium
+        if: steps.secrets.outputs.ok == 'true'
+        run: pnpm --filter @parts/scraper exec playwright install --with-deps chromium
+
+      - name: Scrape
+        if: steps.secrets.outputs.ok == 'true'
+        env:
+          PRODUCT_ID: ${{ inputs.productId }}
+          MERCHANT_ID: ${{ inputs.merchantId }}
+          RUN_ID: ${{ inputs.runId }}
+          TRIGGER: ${{ github.event_name == 'schedule' && 'cron' || 'manual' }}
+          GH_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: >-
+          pnpm --filter @parts/scraper scrape
+          --trigger "$TRIGGER"
+          --product "$PRODUCT_ID"
+          --merchant "$MERCHANT_ID"
+          --run-id "$RUN_ID"
+          --gh-run-url "$GH_RUN_URL"
+          --debug-dir debug
+
+      # Raw HTML of failed fetches, for diagnosing blocks and broken extractors. Never in the DB.
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.secrets.outputs.ok == 'true'
+        with:
+          name: scrape-debug-${{ github.run_id }}
+          path: debug/
+          if-no-files-found: ignore
+          retention-days: 7

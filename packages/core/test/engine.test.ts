@@ -69,6 +69,8 @@ describe("identifiers and URLs", () => {
     expect(isJunkLink("/?add-to-cart=9905074")).toBe(true);
     expect(isJunkLink("javascript:void(0)")).toBe(true);
     expect(isJunkLink("https://www.pcbem.pt/loja/amd-am5-ryzen-7-9800x3d/")).toBe(false);
+    expect(isJunkLink("https://www.pcbem.pt/")).toBe(true);
+    expect(isJunkLink("https://www.pcbem.pt")).toBe(true);
   });
   it("A8: detects search URLs", () => {
     expect(looksLikeSearchUrl("https://www.worten.pt/search?query=9800x3d")).toBe(true);

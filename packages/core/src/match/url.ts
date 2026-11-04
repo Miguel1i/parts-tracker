@@ -58,9 +58,19 @@ const JUNK_SCHEME = /^\s*(?:#|javascript:|mailto:|tel:|sms:|whatsapp:|data:)/i;
 const JUNK_PATH =
   /(?:[?&](?:add-to-cart|add_to_cart|add-to-wishlist|remove_item|wishlist|compare)=|admin-ajax\.php|\/(?:cart|carrinho|checkout|basket|cesta|panier|wishlist|lista-de-desejos|login|account|conta|minha-conta|my-account|register|compare|comparar)(?:\/|\?|$))/i;
 
+/** The shop's home page ("Home" breadcrumbs and logos sit inside result cards). */
+function isHomePage(href: string): boolean {
+  try {
+    const u = new URL(href, "https://x.invalid");
+    return (u.pathname === "/" || u.pathname === "") && !u.search;
+  } catch {
+    return false;
+  }
+}
+
 /** A11: links that are never a product page. */
 export function isJunkLink(href: string): boolean {
-  return JUNK_SCHEME.test(href) || JUNK_PATH.test(href);
+  return JUNK_SCHEME.test(href) || JUNK_PATH.test(href) || isHomePage(href);
 }
 
 export function hostOf(url: string): string {

@@ -2,7 +2,7 @@
 
 Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portuguese, Spanish, French and UK merchants). Prices are scraped on a schedule or on demand, every observation is kept, and history is shown in interactive charts.
 
-> Status: **milestone 2 — database**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
+> Status: **milestone 4 — scraper**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
 
 ## Stack
 
@@ -12,7 +12,7 @@ Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portugu
 | UI       | Tailwind CSS v4, shadcn/ui (Radix), lucide icons, next-themes (light/dark/system) |
 | i18n     | next-intl — English at `/`, Portuguese at `/pt`                                   |
 | Database | Turso (libSQL) + Drizzle ORM; local SQLite file                                   |
-| Scraper  | Playwright in GitHub Actions _(milestone 4)_                                      |
+| Scraper  | Node/TS + Playwright (Chromium) in GitHub Actions                                 |
 | Auth     | Better Auth with roles and admin approval _(milestone 5)_                         |
 | Tests    | Vitest                                                                            |
 
@@ -22,6 +22,7 @@ Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portugu
 apps/web          Next.js app
 packages/core     pure parsing & matching logic, GTIN helpers (no I/O)
 packages/db       Drizzle schema, libSQL client, migrations, seed & legacy import
+packages/scraper  fetch/Playwright runner that matches offers and writes prices (GitHub Actions)
 docs/             build prompt and design notes
 ```
 
@@ -70,6 +71,44 @@ It imports merchants, products, GTIN/MPN/ASIN identifiers, manual and auto URLs,
 4. Put them in `apps/web/.env.local` as `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN`, then run `pnpm db:migrate`, `pnpm db:seed` and optionally `pnpm db:import-legacy`.
 5. Add the same two variables in Vercel (`vercel env add`) and, for the scraper (milestone 4), as GitHub secrets (`gh secret set`). Paste the token into those commands yourself; never commit it.
 
+## Scraper
+
+`packages/scraper` checks every enabled (product, merchant) pair and writes the results:
+
+1. A pinned URL (`product_merchant.manual_url`) is always used. The rules still run, and a disagreement shows up as a warning in `last_match`.
+2. Otherwise the learned `auto_url` is revalidated. It is dropped after 3 runs in a row that don't match.
+3. Otherwise the shop is searched by GTIN, then MPN, then the product's query. At Amazon shops a known ASIN is tried first (`/dp/<ASIN>`).
+
+Pages are scored by the matching engine in `@parts/core` (see [docs/matching.md](docs/matching.md)):
+
+- **Accept** appends a `price_points` row (EUR plus the original currency and shipping) and stores the URL as `auto_url`.
+- **Review** writes a pending `match_candidates` row with the rule breakdown.
+- **Reject** is only logged.
+
+Each run writes `scrape_runs` and one `scrape_logs` row per pair: `ok`, `out_of_stock`, `not_found`, `blocked` or `error`, with timings and a truncated trace. FX rates come from the ECB daily file, cached in `fx_rates` for 6 h.
+
+**Politeness:** plain `fetch` comes first, with a desktop Chrome UA and `Accept-Language: pt-PT`. Requests to one host are at least 1.5 s apart, with at most 2 in flight per shop, and 429/202 responses are retried with backoff. Playwright is used when the merchant has `needs_browser`, when a page needs JavaScript, or when the shop answers 403/429/202/503; its init script hides `navigator.webdriver`. The scraper never solves CAPTCHAs: if a shop still blocks, the pair is marked `blocked` and the run moves on. A merchant's `adapter_config.throttleMs`/`maxConcurrency` can slow a shop down further but never speed it up.
+
+```bash
+pnpm --filter @parts/scraper browser:install     # once: download Chromium for Playwright
+pnpm scrape                                      # every enabled pair, into local.db (or Turso if set)
+pnpm scrape --product <id|name> --merchant <id|slug|name>
+pnpm scrape --no-browser                         # plain fetch only
+```
+
+The raw HTML of failed fetches goes to `debug/` (gitignored), and in Actions to the run's `scrape-debug-*` artifact. It is never stored in the DB.
+
+### GitHub Actions
+
+`.github/workflows/scrape.yml` runs on a cron schedule (`17 */6 * * *`, every 6 h) and on `workflow_dispatch` with the inputs `productId`, `merchantId` and `runId` (a `scrape_runs` row created by the web app; one is created when the input is empty). It needs two repo secrets. Paste the token into the command yourself:
+
+```bash
+gh secret set TURSO_DATABASE_URL
+gh secret set TURSO_AUTH_TOKEN
+```
+
+Until both secrets are set, the job logs a warning and skips. Run it by hand with `gh workflow run scrape.yml -f productId=<id>`.
+
 ## Translations
 
 All UI text lives in `apps/web/messages/<locale>.json`; `en.json` is the source of truth and keys are type-checked. To add a language, add a JSON file with the same keys and register the locale in `apps/web/src/i18n/routing.ts`. A test fails if any locale is missing keys.
@@ -80,4 +119,4 @@ Import the GitHub repo in Vercel and set **Root Directory** to `apps/web` (Verce
 
 ## Free-tier budget
 
-To be filled in as services are added (Vercel Hobby, Turso, GitHub Actions — this repo is public, so Actions minutes are unlimited). Turso: check the current free-tier limits at turso.tech/pricing; price history is append-only, so watch storage and row reads as it grows.
+To be filled in as services are added (Vercel Hobby, Turso). **GitHub Actions:** the owner chose to keep this repo **public** (asked in milestone 4, 2026-11-03), so standard-runner minutes are unlimited. A private repo would get 2,000 min/month; a full scrape takes roughly 5–15 min, so the 6-hourly cron would use about 600–1,800 of them. Turso: check the current free-tier limits at turso.tech/pricing; price history is append-only, so watch storage and row reads as it grows.

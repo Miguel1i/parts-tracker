@@ -335,22 +335,22 @@ fetches can be saved from a browser and trimmed with `fixture:capture --file`.
 
 **Status of the must-have cases** (all from `diagnostico.txt`):
 
-| Merchant      | Page                         | Result                                                                                                         |
-| ------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Globaldata    | 9800X3D product page         | ✅ real page: accept on the MPN; the 560… GTIN is flagged suspect and loses confidence; 730… is learned        |
-| Globaldata    | search "AMD Ryzen 7 9800X3D" | ✅ real page: only the CPU link kept; the King Mod PCs and the bundle dropped by A5, facet links by A8         |
-| PCBem         | 9800X3D boxed page           | ✅ real page: accept (MPN in the SKU); title from JSON-LD, not the "Grátis" `<h1>`                             |
-| PCBem         | 9800X3D tray page            | ✅ real page: reject B4 when `packaging = box`, accept when `any`                                              |
-| PCBem         | search page                  | ⚠️ JS-rendered: the plain HTML has no products. A11 is tested on the logged `admin-ajax.php?add-to-cart=` URLs |
-| Radio Popular | search "AMD Ryzen 7 9800X3D" | ✅ real page: 12 result cards parsed, none is the CPU. The shop doesn't list it, so "missed" was right         |
-| Amazon.es     | B0DKFMSMYK product page      | ✅ real page: `#productTitle`, not the "O resumo do produto…" `<h1>`; sold by Amazon                           |
-| Amazon.es     | search results               | ✅ real page: only B0DKFMSMYK kept; "sem caixa/sem ventilador" dropped by B4, 9850X3D by A10                   |
-| Amazon.co.uk  | `9800X 3D` title             | ✅ real page: similarity 1; `EUR440.76` read as EUR                                                            |
-| Worten        | ON4TECH marketplace offer    | ⚠️ synthetic (Worten returns 403 to plain fetches): reject A13 with "ON4TECH" as evidence                      |
-| PCDiga        | 9800X3D product page         | ⚠️ not captured (403 to plain fetches)                                                                         |
+| Merchant      | Page                         | Result                                                                                                    |
+| ------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Globaldata    | 9800X3D product page         | ✅ real page: accept on the MPN; the 560… GTIN is flagged suspect and loses confidence; 730… is learned   |
+| Globaldata    | search "AMD Ryzen 7 9800X3D" | ✅ real page: only the CPU link kept; the King Mod PCs and the bundle dropped by A5, facet links by A8    |
+| PCBem         | 9800X3D boxed page           | ✅ real page: accept (MPN in the SKU); title from JSON-LD, not the "Grátis" `<h1>`                        |
+| PCBem         | 9800X3D tray page            | ✅ real page: reject B4 when `packaging = box`, accept when `any`                                         |
+| PCBem         | search page                  | ✅ real page (browser): only the boxed CPU kept; tray dropped by B4, prebuilt by A5, the home link by A11 |
+| Radio Popular | search "AMD Ryzen 7 9800X3D" | ✅ real page: 12 result cards parsed, none is the CPU. The shop doesn't list it, so "missed" was right    |
+| Amazon.es     | B0DKFMSMYK product page      | ✅ real page: `#productTitle`, not the "O resumo do produto…" `<h1>`; sold by Amazon                      |
+| Amazon.es     | search results               | ✅ real page: only B0DKFMSMYK kept; "sem caixa/sem ventilador" dropped by B4, 9850X3D by A10              |
+| Amazon.co.uk  | `9800X 3D` title             | ✅ real page: similarity 1; `EUR440.76` read as EUR                                                       |
+| Worten        | ON4TECH marketplace offer    | ✅ real page (browser): reject A13 "sold by ON4TECH" at the own-only shop                                 |
+| PCDiga        | 9800X3D product page         | ⚠️ not captured: Cloudflare blocks plain fetches and the headless browser alike                           |
 
-The ⚠️ rows need a browser: the owner can save those pages, or milestone 4's Playwright runner can
-capture them. **Per-rule cases** are synthetic title/price pairs built from the nine products.
+Milestone 4's Playwright runner saved the Worten and PCBem pages (`pnpm --filter @parts/scraper save-page`,
+then `fixture:capture --file`). PCDiga still needs the owner to save the page from a normal browser. **Per-rule cases** are synthetic title/price pairs built from the nine products.
 
 ## 10. Lessons from the old app
 
