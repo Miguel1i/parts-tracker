@@ -109,6 +109,21 @@ describe("pinned URL (A16)", () => {
     expect(o.status).toBe("blocked");
     expect(o.failurePages).toHaveLength(1);
   });
+
+  it("keeps a pinned page without a price for the debug artifact", async () => {
+    const html = "<html><head><title>AMD Ryzen 7 9800X3D</title></head><body></body></html>";
+    const f = new FakeFetcher({ [PCBEM_TRAY]: { html } });
+    const o = await scrapePair(
+      input({
+        merchant: pcbem,
+        state: { manualUrl: PCBEM_TRAY, autoUrl: null, autoUrlFailures: 0 },
+      }),
+      f,
+      { now },
+    );
+    expect(o.status).toBe("not_found");
+    expect(o.failurePages).toEqual([{ url: PCBEM_TRAY, status: 200, reason: "no price", html }]);
+  });
 });
 
 describe("auto URL revalidation (A15)", () => {

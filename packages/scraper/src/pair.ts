@@ -157,6 +157,10 @@ export async function scrapePair(
       offer = extractProductPage(r.html, r.finalUrl, extractOpts);
     }
     const decision = matchOffer(target, offer, mm, { pinned });
+    // A page that loaded but shows no price is usually a changed layout or a soft block (a
+    // different page for datacenter IPs); keep it for the debug artifact.
+    if (!offer.price && failurePages.length < 4)
+      failurePages.push({ url, status: r.status, reason: "no price", html: r.html });
     const price = offer.price ? `${offer.price.eur.toFixed(2)}€` : "no price";
     log(`  → ${describe(decision)} | ${price} ${offer.stock} | ${offer.title ?? "(no title)"}`);
     if (decision.warning) log(`  ⚠ pinned URL: the rules say ${decision.ruleDecision}`);
