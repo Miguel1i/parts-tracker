@@ -212,7 +212,8 @@ describe("runScrape", () => {
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ status: "pending", url: GLOBALDATA_PAGE });
     expect(rows[0]!.score).toBeGreaterThanOrEqual(45);
-    expect((rows[0]!.signals as { results: unknown[] }).results.length).toBeGreaterThan(3);
+    expect(rows[0]!.signals!.results!.length).toBeGreaterThan(3);
+    expect(rows[0]!.signals!.page!.gtins.length).toBeGreaterThan(0);
     expect(await db.select().from(pricePoints)).toHaveLength(0);
   });
 });

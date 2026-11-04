@@ -19,6 +19,7 @@ import {
   scrapeLogs,
   scrapeRuns,
   type Db,
+  type CandidateSignals,
   type ScrapeStatus,
 } from "@parts/db";
 import { and, eq, gte, inArray, or } from "drizzle-orm";
@@ -311,7 +312,15 @@ async function writePair(
         vetoes: r.decision.vetoes,
         similarity: r.decision.similarity,
         stage: r.offer.stage,
-      },
+        // Identifiers on the page, so the review queue's Approve can confirm them.
+        page: {
+          gtins: r.offer.gtins,
+          ...(r.offer.mpn ? { mpn: r.offer.mpn } : {}),
+          ...(r.offer.asin ? { asin: r.offer.asin } : {}),
+          ...(r.offer.sku ? { sku: r.offer.sku } : {}),
+          ...(r.offer.brand ? { brand: r.offer.brand } : {}),
+        },
+      } satisfies CandidateSignals,
       runId,
     };
     // One pending row per pair + canonical URL; a rejected one stays rejected.
