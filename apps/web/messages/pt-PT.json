@@ -96,6 +96,358 @@
       "page": "Página {page}",
       "never": "Nunca",
       "all": "Todos"
+    },
+    "merchants": {
+      "title": "Comerciantes",
+      "description": "Lojas a consultar, como pesquisá-las e como ler as suas páginas.",
+      "new": "Novo comerciante",
+      "newTitle": "Novo comerciante",
+      "empty": {
+        "title": "Ainda não há comerciantes",
+        "body": "Adicione a primeira loja para começar a acompanhar preços."
+      },
+      "columns": {
+        "name": "Comerciante",
+        "country": "País",
+        "currency": "Moeda",
+        "shipping": "Envio",
+        "enabled": "Ativo",
+        "visible": "Visível",
+        "flags": "Opções",
+        "health": "Estado",
+        "order": "Ordem"
+      },
+      "freeOver": "grátis acima de {amount}",
+      "ownOnly": "Apenas stock próprio",
+      "needsBrowser": "Navegador",
+      "health": {
+        "ok": "OK",
+        "degraded": "Degradado",
+        "blocked": "Bloqueado",
+        "unknown": "Desconhecido",
+        "checked": "Verificado {when}",
+        "never": "Nunca verificado"
+      },
+      "toggle": {
+        "enabled": "Ativar {name}",
+        "visible": "Mostrar {name} aos utilizadores"
+      },
+      "moveUp": "Subir {name}",
+      "moveDown": "Descer {name}",
+      "toasts": {
+        "created": "Comerciante criado",
+        "saved": "Comerciante guardado",
+        "deleted": "Comerciante eliminado",
+        "moved": "Ordem atualizada"
+      },
+      "form": {
+        "sections": {
+          "general": "Geral",
+          "shop": "Loja",
+          "flags": "Comportamento",
+          "adapter": "Adaptador",
+          "selectors": "Seletores CSS",
+          "sellerRule": "Regra de vendedor",
+          "limits": "Limites de pedidos"
+        },
+        "fields": {
+          "name": "Nome",
+          "slug": "Slug",
+          "slugHint": "Letras minúsculas, algarismos e hífenes.",
+          "country": "País",
+          "countryHint": "Código de 2 letras, por exemplo PT.",
+          "baseUrl": "URL base",
+          "searchTemplate": "Modelo de URL de pesquisa",
+          "searchTemplateHint": "Tem de conter '{q}', que é substituído pelos termos de pesquisa.",
+          "currency": "Moeda",
+          "currencyHint": "3 letras maiúsculas, por exemplo EUR.",
+          "shipping": "Envio (na moeda da loja)",
+          "freeShippingOver": "Envio grátis acima de",
+          "freeShippingOverHint": "Deixe vazio se não houver limite.",
+          "color": "Cor",
+          "colorHint": "#rrggbb, usada nos gráficos. Opcional.",
+          "notes": "Notas",
+          "enabled": "Ativo",
+          "enabledHint": "Consultar esta loja nas execuções agendadas.",
+          "visibleToUsers": "Visível aos utilizadores",
+          "visibleToUsersHint": "Os utilizadores veem-na e podem adicionar as suas ligações.",
+          "ownOnly": "Apenas stock próprio",
+          "ownOnlyHint": "Rejeitar ofertas de vendedores do marketplace.",
+          "needsBrowser": "Requer navegador",
+          "needsBrowserHint": "Ignorar o pedido simples e renderizar as páginas com Playwright.",
+          "selItem": "Item de resultado",
+          "selTitle": "Título",
+          "selPrice": "Preço",
+          "selUrl": "Ligação",
+          "selStock": "Stock",
+          "selImage": "Imagem",
+          "apiEndpoint": "Endpoint da API",
+          "apiEndpointHint": "Usado em vez da pesquisa HTML quando a loja tem uma API JSON.",
+          "ownNames": "Nomes do vendedor próprio",
+          "ownNamesHint": "Separados por vírgulas, por exemplo Amazon, Amazon EU.",
+          "sellerSelector": "Seletor do vendedor",
+          "thirdPartyMarkers": "Marcadores de marketplace",
+          "thirdPartyMarkersHint": "Excertos de HTML, separados por vírgulas, que provam um vendedor de marketplace.",
+          "urlParam": "Parâmetro de URL de venda própria",
+          "mustContain": "Tem de conter",
+          "throttleMs": "Intervalo mínimo entre pedidos (ms)",
+          "throttleMsHint": "Pelo menos 1500; valores inferiores são aumentados pelo scraper.",
+          "maxConcurrency": "Máximo de pedidos em simultâneo",
+          "maxConcurrencyHint": "1 ou 2.",
+          "overrides": "Outras definições (JSON)",
+          "overridesHint": "Um objeto JSON com quaisquer outras chaves do adaptador."
+        },
+        "errors": {
+          "name": "Introduza um nome.",
+          "slug": "Use letras minúsculas, algarismos e hífenes.",
+          "country": "Use um código de país de 2 letras.",
+          "baseUrl": "Introduza um URL http(s).",
+          "searchTemplate": "Introduza um URL http(s) que contenha '{q}'.",
+          "currency": "Use 3 letras maiúsculas, por exemplo EUR.",
+          "shipping": "Introduza 0 ou mais.",
+          "freeShippingOver": "Introduza 0 ou mais, ou deixe vazio.",
+          "color": "Use o formato #rrggbb.",
+          "overrides": "Tem de ser um objeto JSON válido.",
+          "throttleMs": "Introduza um número inteiro, pelo menos 1500.",
+          "maxConcurrency": "Introduza 1 ou 2.",
+          "adapter": "A configuração do adaptador é inválida."
+        }
+      },
+      "delete": {
+        "button": "Eliminar comerciante",
+        "title": "Eliminar {name}?",
+        "body": "Isto remove o comerciante e as suas ligações. Não é possível eliminar comerciantes com histórico de preços: desative-os.",
+        "confirm": "Eliminar"
+      },
+      "test": {
+        "title": "Testar este comerciante",
+        "description": "Executa um produto no pipeline deste comerciante e mostra o que encontrou. Nada é aprovado automaticamente.",
+        "product": "Produto",
+        "choose": "Escolha um produto",
+        "noProducts": "Não há produtos para testar.",
+        "run": "Executar teste",
+        "running": "A executar…",
+        "dispatched": "Teste iniciado.",
+        "notDispatched": "O arranque via GitHub não está configurado aqui. Execute isto no repositório para iniciar:",
+        "copy": "Copiar comando",
+        "copied": "Copiado",
+        "status": "Estado",
+        "started": "Início",
+        "finished": "Fim",
+        "ghRun": "Abrir no GitHub",
+        "statuses": {
+          "queued": "Em fila",
+          "running": "A executar",
+          "succeeded": "Concluído",
+          "failed": "Falhou",
+          "cancelled": "Cancelado"
+        },
+        "pollStopped": "Deixou de esperar ao fim de 10 minutos. Reabra a página para voltar a verificar.",
+        "logs": "Registos",
+        "noLogs": "Ainda sem linhas de registo.",
+        "candidates": "Candidatos",
+        "noCandidates": "Sem candidatos.",
+        "points": "Preços registados",
+        "noPoints": "Sem preços registados.",
+        "title_": "Título",
+        "price": "Preço",
+        "score": "Pontuação",
+        "inStock": "Em stock",
+        "outOfStock": "Sem stock",
+        "vetoes": "Vetos: {vetoes}",
+        "stats": "Estatísticas"
+      }
+    },
+    "catalog": {
+      "title": "Catálogo",
+      "description": "Produtos, os seus identificadores e estado de arquivo.",
+      "searchPlaceholder": "Pesquisar produtos por nome",
+      "showArchived": "Mostrar arquivados",
+      "empty": "Nenhum produto encontrado",
+      "name": "Nome",
+      "category": "Categoria",
+      "brand": "Marca",
+      "refPrice": "Preço de referência",
+      "identifiers": "Identificadores",
+      "unconfirmedCount": "{count} por confirmar",
+      "archived": "Arquivado",
+      "limited": "A mostrar os primeiros {count} produtos. Restrinja a pesquisa para ver os restantes.",
+      "query": "Termo de pesquisa",
+      "refUrl": "URL de referência",
+      "noIdentifiers": "Ainda sem identificadores.",
+      "kind": "Tipo",
+      "value": "Valor",
+      "source": "Origem",
+      "sourceMerchant": "Loja de origem",
+      "confidence": "Confiança",
+      "confirmed": "Confirmado",
+      "sightings": "Avistamentos",
+      "sources": {
+        "user": "Utilizador",
+        "learned": "Aprendido"
+      },
+      "remove": "Remover",
+      "removeTitle": "Remover este identificador?",
+      "removeDescription": "{value} deixará de ser usado para associar ofertas a este produto.",
+      "identifierConfirmed": "Identificador confirmado",
+      "identifierRemoved": "Identificador removido",
+      "archive": "Arquivar produto",
+      "unarchive": "Desarquivar produto",
+      "archivedToast": "Produto arquivado",
+      "unarchived": "Produto desarquivado"
+    },
+    "review": {
+      "title": "Fila de revisão",
+      "description": "Associações incertas à espera de decisão.",
+      "filter": "Filtrar por estado",
+      "status": {
+        "pending": "Pendentes",
+        "approved": "Aprovados",
+        "rejected": "Rejeitados"
+      },
+      "empty": "Nada por aqui",
+      "emptyHint": "Não há candidatos com este estado.",
+      "reference": "Produto de referência",
+      "candidate": "Oferta candidata",
+      "confirmedIds": "Identificadores confirmados",
+      "pageIds": "Identificadores na página",
+      "noPageIds": "Nenhum encontrado na página.",
+      "score": "Pontuação",
+      "vetoes": "Vetos",
+      "rules": "Regras ({count})",
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "approved": "Candidato aprovado",
+      "rejected": "Candidato rejeitado e bloqueado"
+    },
+    "audit": {
+      "title": "Registo de auditoria",
+      "description": "Todas as alterações de administração, das mais recentes para as mais antigas.",
+      "filter": "Filtrar por entidade",
+      "empty": "Ainda sem registos",
+      "entities": {
+        "user": "Utilizadores",
+        "merchant": "Lojas",
+        "product": "Produtos",
+        "identifier": "Identificadores",
+        "candidate": "Candidatos",
+        "invite": "Convites",
+        "settings": "Definições"
+      },
+      "time": "Hora",
+      "actor": "Autor",
+      "action": "Ação",
+      "target": "Entidade",
+      "diff": "Detalhes",
+      "show": "Mostrar",
+      "system": "Sistema",
+      "deletedUser": "Utilizador eliminado"
+    },
+    "users": {
+      "title": "Utilizadores",
+      "description": "Aprove registos, convide pessoas e gira funções e acessos.",
+      "filterLabel": "Filtrar utilizadores",
+      "filters": {
+        "all": "Todos",
+        "pending": "Pendentes",
+        "active": "Ativos",
+        "admins": "Administradores",
+        "banned": "Banidos"
+      },
+      "search": "Pesquisar utilizadores",
+      "searchPlaceholder": "Nome ou email",
+      "empty": "Nenhum utilizador corresponde.",
+      "you": "você",
+      "pageOf": "Página {page} de {pages}",
+      "previous": "Anterior",
+      "next": "Seguinte",
+      "buildCount": "{count, plural, =0 {Sem configurações} one {# configuração} other {# configurações}}",
+      "actionsFor": "Ações para {name}",
+      "columns": {
+        "user": "Utilizador",
+        "status": "Estado",
+        "builds": "Configurações",
+        "joined": "Registo",
+        "actions": "Ações"
+      },
+      "roles": {
+        "admin": "Administrador",
+        "user": "Utilizador"
+      },
+      "status": {
+        "active": "Ativo",
+        "pending": "Pendente",
+        "banned": "Banido"
+      },
+      "fields": {
+        "name": "Nome a apresentar"
+      },
+      "actions": {
+        "approve": "Aprovar",
+        "editName": "Editar nome",
+        "makeAdmin": "Tornar administrador",
+        "makeUser": "Retirar função de administrador",
+        "revokeSessions": "Terminar todas as sessões",
+        "ban": "Banir",
+        "unban": "Levantar banimento",
+        "delete": "Eliminar utilizador"
+      },
+      "done": {
+        "approved": "Utilizador aprovado",
+        "role": "Função alterada",
+        "revoked": "Sessões terminadas",
+        "banned": "Utilizador banido",
+        "unbanned": "Banimento levantado",
+        "deleted": "Utilizador eliminado"
+      },
+      "ban": {
+        "title": "Banir {name}",
+        "description": "As sessões são terminadas em todo o lado e não pode iniciar sessão até o banimento ser levantado.",
+        "reason": "Motivo (opcional)",
+        "days": "Duração em dias",
+        "permanent": "Permanente"
+      },
+      "delete": {
+        "title": "Eliminar {name}?",
+        "description": "Remove a conta, as sessões e as configurações. O catálogo partilhado e o histórico de preços mantêm-se. Não pode ser anulado.",
+        "typeEmail": "Escreva {email} para confirmar"
+      },
+      "builds": {
+        "title": "Configurações de {name}",
+        "description": "Apenas leitura; as configurações são editadas pelo dono.",
+        "public": "Partilhada"
+      },
+      "signup": {
+        "title": "Modo de registo",
+        "label": "Quem pode criar conta",
+        "saved": "Modo de registo guardado",
+        "modes": {
+          "open": "Aberto",
+          "approval": "Requer aprovação",
+          "invite_only": "Só por convite"
+        },
+        "help": {
+          "open": "Qualquer pessoa se pode registar e usar a aplicação de imediato.",
+          "approval": "Qualquer pessoa se pode registar, mas um administrador aprova cada conta nova. Quem foi convidado não precisa de aprovação.",
+          "invite_only": "Só quem tem convite pode criar conta."
+        }
+      },
+      "invite": {
+        "title": "Convidar alguém",
+        "description": "Envia um link de acesso válido por 7 dias. Contas convidadas não precisam de aprovação.",
+        "email": "Email",
+        "role": "Função",
+        "roles": {
+          "admin": "Administrador",
+          "user": "Utilizador"
+        },
+        "send": "Enviar convite",
+        "sent": "Convite enviado para {email}",
+        "open": "{count, plural, one {# convite pendente} other {# convites pendentes}}",
+        "expires": "expira {when}",
+        "revoke": "Revogar o convite para {email}",
+        "revoked": "Convite revogado"
+      }
     }
   },
   "NotFound": {
