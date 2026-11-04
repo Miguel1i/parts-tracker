@@ -30,6 +30,8 @@ export interface RunOptions {
   /** Skip pairs checked within this many minutes (manual runs default to app_settings). */
   skipRecentMinutes?: number;
   now?: () => number;
+  /** Backoff sleep for DB retries (tests pass an instant one). */
+  sleep?: (ms: number) => Promise<void>;
   log?: (line: string) => void;
   /** Receives raw HTML of failed fetches, for the Actions artifact. Never written to the DB. */
   onFailurePage?: (pair: PlannedPair, page: FailurePage) => void | Promise<void>;
@@ -50,6 +52,35 @@ export async function mapLimit<T>(items: T[], limit: number, fn: (item: T) => Pr
   await Promise.all(Array.from({ length: Math.max(1, Math.min(limit, items.length)) }, worker));
 }
 
+/**
+ * Retries a DB call after a transient failure (Turso over HTTP occasionally drops a pooled
+ * socket mid-run: "UND_ERR_SOCKET other side closed").
+ */
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  options: { attempts?: number; delayMs?: number; sleep?: (ms: number) => Promise<void> } = {},
+): Promise<T> {
+  const attempts = options.attempts ?? 3;
+  const delay = options.delayMs ?? 1000;
+  const sleep = options.sleep ?? ((ms) => new Promise<void>((r) => setTimeout(r, ms)));
+  for (let i = 1; ; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i >= attempts) throw err;
+      await sleep(delay * 2 ** (i - 1));
+    }
+  }
+}
+
+const errorText = (err: unknown) => {
+  const e = err as { message?: string; cause?: { message?: string; code?: string } };
+  return [e?.message?.split("\n")[0], e?.cause?.code ?? e?.cause?.message]
+    .filter(Boolean)
+    .join(" — ")
+    .slice(0, 300);
+};
+
 /** Serializes DB writes so read-modify-write of shared rows (identifiers) can't interleave. */
 function serial() {
   let chain: Promise<unknown> = Promise.resolve();
@@ -66,10 +97,13 @@ export async function runScrape(options: RunOptions): Promise<RunResult> {
   const log = options.log ?? (() => {});
   const scope = options.scope ?? {};
   const started = now();
-  const runId = await startRun(
-    db,
-    { runId: options.runId, trigger: options.trigger, scope, ghRunUrl: options.ghRunUrl },
-    new Date(started),
+  const retry = <T>(fn: () => Promise<T>) => withRetry(fn, { sleep: options.sleep });
+  const runId = await retry(() =>
+    startRun(
+      db,
+      { runId: options.runId, trigger: options.trigger, scope, ghRunUrl: options.ghRunUrl },
+      new Date(started),
+    ),
   );
   const stats: Record<string, number> = {
     pairs: 0,
@@ -81,6 +115,7 @@ export async function runScrape(options: RunOptions): Promise<RunResult> {
     error: 0,
     review: 0,
     requests: 0,
+    writeErrors: 0,
   };
   const outcomes: RunResult["outcomes"] = [];
 
@@ -135,20 +170,28 @@ export async function runScrape(options: RunOptions): Promise<RunResult> {
         log(
           `${pair.merchant.name.padEnd(20)} ${outcome.status.padEnd(12)} ${pair.product.name} — ${outcome.message}`,
         );
-        await write(() => savePair(db, runId, pair, outcome, new Date(now())));
+        try {
+          await write(() => retry(() => savePair(db, runId, pair, outcome, new Date(now()))));
+        } catch (err) {
+          // One unsaved pair must not lose the rest of the run.
+          stats.writeErrors!++;
+          log(`  ! could not save ${pair.merchant.name} / ${pair.product.name}: ${errorText(err)}`);
+        }
         if (options.onFailurePage && outcome.status !== "ok")
           for (const page of outcome.failurePages) await options.onFailurePage(pair, page);
         outcomes.push({ pair, outcome });
       });
       const merchantId = list[0]!.merchant.id;
-      await write(() => saveMerchantHealth(db, merchantId, statuses, new Date(now())));
+      await write(() =>
+        retry(() => saveMerchantHealth(db, merchantId, statuses, new Date(now()))),
+      ).catch((err) => log(`  ! could not save health of ${merchantId}: ${errorText(err)}`));
     });
 
     stats.durationMs = now() - started;
-    await finishRun(db, runId, "succeeded", stats, new Date(now()));
+    await retry(() => finishRun(db, runId, "succeeded", stats, new Date(now())));
   } catch (err) {
     stats.durationMs = now() - started;
-    await finishRun(db, runId, "failed", stats, new Date(now())).catch(() => {});
+    await retry(() => finishRun(db, runId, "failed", stats, new Date(now()))).catch(() => {});
     throw err;
   }
   return { runId, stats, outcomes };
