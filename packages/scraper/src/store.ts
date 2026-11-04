@@ -27,6 +27,9 @@ import { productAsin } from "./queries";
 
 export type RunScope = { productId?: string; merchantId?: string };
 
+/** A DB handle or an open transaction. */
+export type Writer = Pick<Db, "select" | "insert" | "update" | "delete">;
+
 type ProductRow = typeof products.$inferSelect;
 type MerchantRow = typeof merchants.$inferSelect;
 type IdentifierRow = typeof productIdentifiers.$inferSelect;
@@ -245,9 +248,22 @@ export function shippingFor(
   return merchant.shipping;
 }
 
-/** Writes one pair's outcome: log, price point, candidate, pair state, learned identifiers. */
+/**
+ * Writes one pair's outcome (log, price point, candidate, pair state, learned identifiers) in
+ * one transaction, so a retry after a dropped connection can't leave half a pair behind.
+ */
 export async function savePair(
   db: Db,
+  runId: string,
+  pair: PlannedPair,
+  outcome: PairOutcome,
+  now: Date,
+) {
+  await db.transaction((tx) => writePair(tx, runId, pair, outcome, now));
+}
+
+async function writePair(
+  db: Writer,
   runId: string,
   pair: PlannedPair,
   outcome: PairOutcome,
@@ -339,7 +355,7 @@ export async function savePair(
 }
 
 async function applyIdentifierUpdates(
-  db: Db,
+  db: Writer,
   productId: string,
   merchantId: string,
   outcome: PairOutcome,

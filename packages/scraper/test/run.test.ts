@@ -18,7 +18,7 @@ import { eq } from "drizzle-orm";
 import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
 import { cpu } from "../../core/test/products";
 import { loadRates } from "../src/fx";
-import { runScrape } from "../src/run";
+import { runScrape, withRetry } from "../src/run";
 import { FakeFetcher, globaldataRoutes, GLOBALDATA_PAGE } from "./helpers";
 
 // A temp file rather than :memory:, because libsql runs transactions on another connection.
@@ -214,6 +214,51 @@ describe("runScrape", () => {
     expect(rows[0]!.score).toBeGreaterThanOrEqual(45);
     expect((rows[0]!.signals as { results: unknown[] }).results.length).toBeGreaterThan(3);
     expect(await db.select().from(pricePoints)).toHaveLength(0);
+  });
+});
+
+describe("DB write failures", () => {
+  it("retries a dropped connection, then keeps going past a pair it can't save", async () => {
+    let failures = 2; // the first two transactions fail like a dropped Turso socket
+    const realTx = db.transaction.bind(db);
+    db.transaction = ((fn: Parameters<typeof db.transaction>[0]) => {
+      if (failures-- > 0) return Promise.reject(new Error("fetch failed: other side closed"));
+      return realTx(fn);
+    }) as typeof db.transaction;
+    const result = await runScrape({
+      db,
+      fetcher: fetcher(),
+      rates: { EUR: 1 },
+      trigger: "cron",
+      sleep: async () => {},
+    });
+    expect(result.stats).toMatchObject({ pairs: 2, writeErrors: 0 });
+    expect(await db.select().from(scrapeLogs)).toHaveLength(2);
+
+    failures = 100;
+    const lines: string[] = [];
+    const second = await runScrape({
+      db,
+      fetcher: fetcher(),
+      rates: { EUR: 1 },
+      trigger: "cron",
+      sleep: async () => {},
+      log: (l) => lines.push(l),
+    });
+    expect(second.stats.writeErrors).toBe(2);
+    expect(lines.join("\n")).toMatch(/could not save .*other side closed/);
+    const [run] = await db.select().from(scrapeRuns).where(eq(scrapeRuns.id, second.runId));
+    expect(run!.status).toBe("succeeded");
+  });
+
+  it("withRetry gives up after the last attempt", async () => {
+    let calls = 0;
+    const fail = () => {
+      calls++;
+      return Promise.reject(new Error("down"));
+    };
+    await expect(withRetry(fail, { attempts: 3, sleep: async () => {} })).rejects.toThrow("down");
+    expect(calls).toBe(3);
   });
 });
 
