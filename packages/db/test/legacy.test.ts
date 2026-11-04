@@ -108,13 +108,19 @@ describe("mapLegacy", () => {
 
   it("normalizes GTINs to 14 digits and records MPNs and ASINs", () => {
     expect(cpu!.identifiers).toEqual([
-      { kind: "gtin", value: "05606628885125", source: "learned", merchant: null, confirmed: true },
+      {
+        kind: "gtin",
+        value: "05606628885125",
+        source: "learned",
+        merchant: null,
+        confirmed: false,
+      },
       {
         kind: "mpn",
         value: "100-100001084WOF",
         source: "learned",
         merchant: null,
-        confirmed: true,
+        confirmed: false,
       },
       { kind: "asin", value: "B0DKFMSMYK", source: "user", merchant: "Amazon.es", confirmed: true },
     ]);
