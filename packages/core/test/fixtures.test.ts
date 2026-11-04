@@ -141,6 +141,28 @@ describe("PCBem 9800X3D (old app: correct page rejected)", () => {
   });
 });
 
+describe("PCDiga 9800X3D (saved from a normal browser; Cloudflare blocks the scraper)", () => {
+  const PCDIGA =
+    "https://www.pcdiga.com/componentes/processadores/processadores-amd/processador-amd-ryzen-7-9800x3d-zen-5-8-core-4-7ghz-c-turbo-5-2ghz-104mb-cache-sktam5-100-100001084wof-730143315289";
+  const o = page("pcdiga/9800x3d-product.html", PCDIGA);
+
+  it("reads the offer price, not the strikethrough or the instalment", () => {
+    // 399,90 € offer; 457,00 € strikethrough; "desde 16.75 € /mês" instalment (B13).
+    expect(o.price).toMatchObject({ value: 399.9, currency: "EUR", eur: 399.9 });
+    expect(o.gtins).toEqual(["00730143315289"]);
+    expect(o.mpn).toBe("100-100001084WOF");
+    expect(o.stock).toBe("in_stock");
+    expect(o.categoryHints).toContain("Processadores AMD");
+  });
+
+  it("is accepted on the MPN and confirms the real GTIN is the boxed one", () => {
+    const d = matchOffer(cpu, o);
+    expect(d.decision).toBe("accept");
+    expect(d.identifierMatch).toBe(true);
+    expect(d.suspectIdentifiers).toEqual(["05606628885125"]);
+  });
+});
+
 describe("Amazon.es 9800X3D (old app: title read from the summary block)", () => {
   const o = page(
     "amazon-es/9800x3d-product.html",

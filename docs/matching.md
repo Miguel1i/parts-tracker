@@ -347,10 +347,11 @@ fetches can be saved from a browser and trimmed with `fixture:capture --file`.
 | Amazon.es     | search results               | ✅ real page: only B0DKFMSMYK kept; "sem caixa/sem ventilador" dropped by B4, 9850X3D by A10              |
 | Amazon.co.uk  | `9800X 3D` title             | ✅ real page: similarity 1; `EUR440.76` read as EUR                                                       |
 | Worten        | ON4TECH marketplace offer    | ✅ real page (browser): reject A13 "sold by ON4TECH" at the own-only shop                                 |
-| PCDiga        | 9800X3D product page         | ⚠️ not captured: Cloudflare blocks plain fetches and the headless browser alike                           |
+| PCDiga        | 9800X3D product page         | ✅ real page (normal browser): accept on the MPN; 399,90 € read, not the strikethrough or instalment      |
 
 Milestone 4's Playwright runner saved the Worten and PCBem pages (`pnpm --filter @parts/scraper save-page`,
-then `fixture:capture --file`). PCDiga still needs the owner to save the page from a normal browser. **Per-rule cases** are synthetic title/price pairs built from the nine products.
+then `fixture:capture --file`). PCDiga's Cloudflare blocks the runner, so its page was saved from a normal
+browser and trimmed by hand (the scraper still reports PCDiga as `blocked`). **Per-rule cases** are synthetic title/price pairs built from the nine products.
 
 ## 10. Lessons from the old app
 
