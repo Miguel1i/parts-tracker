@@ -1,6 +1,15 @@
 import { and, asc, eq, sql } from "drizzle-orm";
 import type { Db } from "./client";
-import { auditLog, builds, invites, products, scrapeRuns, user, userMerchants } from "./schema";
+import {
+  account,
+  auditLog,
+  builds,
+  invites,
+  products,
+  scrapeRuns,
+  user,
+  userMerchants,
+} from "./schema";
 
 /** Owner of data imported before real users existed (see migration 0002_auth). */
 export const LEGACY_ADMIN_USER_ID = "legacy-admin";
@@ -38,36 +47,93 @@ export async function firstAdminId(db: Conn): Promise<string | undefined> {
 
 export type PromoteResult = { userId: string; created: boolean; reassigned: number };
 
+/** Better Auth's username rules (plugin defaults): 3-30 of a-z, 0-9, _ and ., stored lowercased. */
+export function normalizeUsername(raw: string): string {
+  const username = raw.trim().toLowerCase();
+  if (!/^[a-z0-9_.]{3,30}$/.test(username)) {
+    throw new Error(`Usernames are 3-30 letters, digits, _ or . (got "${raw}")`);
+  }
+  return username;
+}
+
+export type PromoteOptions = {
+  /** Sign-in username; kept if omitted. */
+  username?: string;
+  /** A Better Auth password hash (`hashPassword` from better-auth/crypto) for the email/password login. */
+  passwordHash?: string;
+};
+
 /**
  * Creates (or promotes) `email` as an active admin and moves every row owned by the legacy
  * placeholder to them, then deletes the placeholder. One transaction; safe to re-run.
  */
-export async function promoteAdmin(db: Db, rawEmail: string): Promise<PromoteResult> {
+export async function promoteAdmin(
+  db: Db,
+  rawEmail: string,
+  options: PromoteOptions = {},
+): Promise<PromoteResult> {
   const email = rawEmail.trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error(`Not an email: ${rawEmail}`);
   if (email === LEGACY_ADMIN_EMAIL) throw new Error("That's the placeholder account");
+  const username = options.username === undefined ? undefined : normalizeUsername(options.username);
 
   return db.transaction(async (tx) => {
+    if (username) {
+      const [taken] = await tx
+        .select({ email: user.email })
+        .from(user)
+        .where(eq(user.username, username));
+      if (taken && taken.email !== email) throw new Error(`Username "${username}" is taken`);
+    }
     const [existing] = await tx.select({ id: user.id }).from(user).where(eq(user.email, email));
     let userId: string;
     if (existing) {
       userId = existing.id;
       await tx
         .update(user)
-        .set({ role: "admin", status: "active", banned: false, banReason: null, banExpires: null })
+        .set({
+          role: "admin",
+          status: "active",
+          banned: false,
+          banReason: null,
+          banExpires: null,
+          ...(username ? { username, displayUsername: options.username!.trim() } : {}),
+        })
         .where(eq(user.id, userId));
     } else {
       const [created] = await tx
         .insert(user)
         .values({
-          name: email.split("@")[0]!,
+          name: options.username?.trim() || email.split("@")[0]!,
           email,
+          ...(username ? { username, displayUsername: options.username!.trim() } : {}),
           emailVerified: true,
           role: "admin",
           status: "active",
         })
         .returning({ id: user.id });
       userId = created!.id;
+    }
+
+    if (options.passwordHash) {
+      // Better Auth keeps the email/password login as an account with provider "credential".
+      const [cred] = await tx
+        .select({ id: account.id })
+        .from(account)
+        .where(and(eq(account.userId, userId), eq(account.providerId, "credential")));
+      if (cred) {
+        await tx
+          .update(account)
+          .set({ password: options.passwordHash })
+          .where(eq(account.id, cred.id));
+      } else {
+        await tx.insert(account).values({
+          userId,
+          accountId: userId,
+          providerId: "credential",
+          password: options.passwordHash,
+        });
+      }
     }
 
     const legacy = LEGACY_ADMIN_USER_ID;
@@ -104,7 +170,14 @@ export async function promoteAdmin(db: Db, rawEmail: string): Promise<PromoteRes
       action: existing ? "user.promote" : "user.create",
       entity: "user",
       entityId: userId,
-      diff: { role: "admin", status: "active", via: "seed:admin", reassigned },
+      diff: {
+        role: "admin",
+        status: "active",
+        via: "seed:admin",
+        reassigned,
+        ...(username ? { username } : {}),
+        ...(options.passwordHash ? { password: "set" } : {}),
+      },
     });
 
     return { userId, created: !existing, reassigned };

@@ -380,7 +380,8 @@
         "banned": "Banido"
       },
       "fields": {
-        "name": "Nome a apresentar"
+        "name": "Nome a apresentar",
+        "username": "Nome de utilizador"
       },
       "actions": {
         "approve": "Aprovar",
@@ -390,7 +391,8 @@
         "revokeSessions": "Terminar todas as sessões",
         "ban": "Banir",
         "unban": "Levantar banimento",
-        "delete": "Eliminar utilizador"
+        "delete": "Eliminar utilizador",
+        "setPassword": "Definir palavra-passe"
       },
       "done": {
         "approved": "Utilizador aprovado",
@@ -398,7 +400,8 @@
         "revoked": "Sessões terminadas",
         "banned": "Utilizador banido",
         "unbanned": "Banimento levantado",
-        "deleted": "Utilizador eliminado"
+        "deleted": "Utilizador eliminado",
+        "password": "Palavra-passe definida"
       },
       "ban": {
         "title": "Banir {name}",
@@ -434,19 +437,31 @@
       },
       "invite": {
         "title": "Convidar alguém",
-        "description": "Envia um link de acesso válido por 7 dias. Contas convidadas não precisam de aprovação.",
+        "description": "Cria um link de registo válido por 7 dias. Contas convidadas não precisam de aprovação. Envie o link como preferir; também é enviado por email se o Resend estiver configurado.",
         "email": "Email",
         "role": "Função",
         "roles": {
           "admin": "Administrador",
           "user": "Utilizador"
         },
-        "send": "Enviar convite",
-        "sent": "Convite enviado para {email}",
+        "send": "Criar convite",
+        "sent": "Convite criado para {email}",
         "open": "{count, plural, one {# convite pendente} other {# convites pendentes}}",
         "expires": "expira {when}",
         "revoke": "Revogar o convite para {email}",
-        "revoked": "Convite revogado"
+        "revoked": "Convite revogado",
+        "emailed": "Convite criado e enviado para {email}",
+        "linkTitle": "Link de convite para {email}",
+        "linkHelp": "Envie-lhe este link. Funciona uma vez, para este email, até expirar.",
+        "copy": "Copiar link",
+        "copied": "Link copiado",
+        "copyLink": "Copiar o link de convite para {email}"
+      },
+      "password": {
+        "title": "Nova palavra-passe para {name}",
+        "description": "Pode usá-la de imediato; os outros dispositivos mantêm a sessão até a terminar.",
+        "label": "Nova palavra-passe",
+        "help": "Pelo menos 8 caracteres. Comunique-a por um canal seguro."
       }
     },
     "errors": {
@@ -473,23 +488,28 @@
   "Auth": {
     "signIn": {
       "title": "Iniciar sessão",
-      "description": "Use o GitHub, o Google ou um link de uso único enviado para o seu email.",
-      "github": "Continuar com o GitHub",
-      "google": "Continuar com o Google",
-      "or": "ou",
+      "description": "Use o seu email ou nome de utilizador e a sua palavra-passe.",
+      "tabSignIn": "Iniciar sessão",
+      "tabSignUp": "Criar conta",
+      "login": "Email ou nome de utilizador",
+      "username": "Nome de utilizador",
+      "usernameHelp": "3–30 caracteres: letras, algarismos, _ e .",
       "email": "Email",
-      "emailPlaceholder": "nome@exemplo.pt",
-      "sendLink": "Enviar link de acesso por email",
-      "sending": "A enviar…",
-      "sent": "Veja a sua caixa de entrada: enviámos um link de acesso para {email}. Expira em 15 minutos.",
-      "useAnother": "Usar outro email",
-      "invited": "Recebeu um convite. Inicie sessão com o email para onde o convite foi enviado.",
-      "noProviders": "O acesso com GitHub e Google não está configurado neste servidor.",
-      "error": "Não foi possível iniciar sessão. Tente novamente.",
+      "password": "Palavra-passe",
+      "passwordHelp": "Pelo menos 8 caracteres.",
+      "submitSignIn": "Iniciar sessão",
+      "submitSignUp": "Criar conta",
+      "forgot": "Esqueceu-se da palavra-passe? Peça a um administrador para definir uma nova.",
+      "invited": "Recebeu um convite. Crie a conta com o email para onde o convite foi enviado.",
       "errors": {
-        "invite_required": "O registo é apenas por convite. Peça um convite a um administrador.",
+        "badCredentials": "Email, nome de utilizador ou palavra-passe errados.",
+        "taken": "Já existe uma conta com esse email. Inicie sessão.",
+        "usernameTaken": "Esse nome de utilizador já está a ser usado.",
+        "username": "Os nomes de utilizador têm 3–30 caracteres: letras, algarismos, _ e .",
+        "password": "As palavras-passe têm 8–128 caracteres.",
+        "invite_required": "O registo é apenas por convite. Peça um link de convite a um administrador.",
         "banned": "Esta conta foi suspensa.",
-        "generic": "Não foi possível iniciar sessão. Tente novamente."
+        "generic": "Não resultou. Tente novamente."
       }
     },
     "pending": {
@@ -500,18 +520,11 @@
     }
   },
   "Email": {
-    "magicLink": {
-      "subject": "O seu link de acesso ao Parts Tracker",
-      "heading": "Iniciar sessão no Parts Tracker",
-      "body": "Clique no botão abaixo para iniciar sessão. O link só funciona uma vez e expira em 15 minutos.",
-      "cta": "Iniciar sessão",
-      "footer": "Se não pediu este email, pode ignorá-lo."
-    },
     "invite": {
       "subject": "Foi convidado para o Parts Tracker",
       "heading": "Foi convidado para o Parts Tracker",
-      "body": "{inviter} convidou-o para acompanhar preços de componentes com o Parts Tracker. Inicie sessão com este endereço de email para aceitar; o convite expira em 7 dias.",
-      "cta": "Aceitar o convite",
+      "body": "{inviter} convidou-o para acompanhar preços de componentes com o Parts Tracker. Crie a sua conta com este endereço de email; o link expira em 7 dias.",
+      "cta": "Criar a sua conta",
       "footer": "Se não esperava este email, pode ignorá-lo."
     }
   }

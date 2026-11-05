@@ -21,6 +21,7 @@
   "dependencies": {
     "@libsql/client": "^0.18.0",
     "@parts/core": "workspace:*",
+    "better-auth": "1.7.14",
     "drizzle-orm": "^0.45.4"
   },
   "devDependencies": {

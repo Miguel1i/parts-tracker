@@ -28,3 +28,6 @@ Thumbs.db
 
 # local scratch (legacy data copies, never committed)
 .scratch/
+
+.vercel
+.env*

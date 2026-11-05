@@ -3,6 +3,7 @@ import type { Role, SignupMode, UserStatus } from "@parts/db/schema";
 export type InviteRow = {
   id: string;
   email: string;
+  token: string;
   role: Role;
   expiresAt: Date;
   usedAt: Date | null;
@@ -16,15 +17,24 @@ export function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
 
-/** An invite counts only for the same email, unused and unexpired. */
+/**
+ * An invite counts only with its secret token (from the invite link), for the same email, unused
+ * and unexpired. Emails aren't verified, so the email alone must never be enough: anyone could
+ * register an invited address first and take the invite (and its role).
+ */
 export function usableInvite(
   invites: InviteRow[],
   email: string,
+  token: string | undefined,
   now = new Date(),
 ): InviteRow | undefined {
+  if (!token) return undefined;
   const wanted = normalizeEmail(email);
   return invites
-    .filter((i) => normalizeEmail(i.email) === wanted && !i.usedAt && i.expiresAt > now)
+    .filter(
+      (i) =>
+        i.token === token && normalizeEmail(i.email) === wanted && !i.usedAt && i.expiresAt > now,
+    )
     .sort((a, b) => b.expiresAt.getTime() - a.expiresAt.getTime())[0];
 }
 

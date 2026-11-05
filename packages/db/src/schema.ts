@@ -59,6 +59,9 @@ export const user = sqliteTable("user", {
   id: id(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
+  /** Better Auth username plugin: stored lowercased; `displayUsername` keeps the typed casing. */
+  username: text("username").unique(),
+  displayUsername: text("display_username"),
   emailVerified: integer("email_verified", { mode: "boolean" }).notNull().default(false),
   image: text("image"),
   role: text("role", { enum: roles }).notNull().default("user"),

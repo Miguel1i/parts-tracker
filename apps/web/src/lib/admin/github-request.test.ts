@@ -27,6 +27,18 @@ describe("buildDispatchRequest", () => {
     expect(JSON.parse(r2.init.body).ref).toBe("dev");
   });
 
+  it("falls back to the Vercel Git repo", () => {
+    const r = buildDispatchRequest(
+      {
+        GH_DISPATCH_TOKEN: "t",
+        VERCEL_GIT_REPO_OWNER: "Miguel1i",
+        VERCEL_GIT_REPO_SLUG: "parts-tracker",
+      },
+      inputs,
+    )!;
+    expect(r.url).toContain("/repos/Miguel1i/parts-tracker/");
+  });
+
   it("rejects a malformed repo", () => {
     expect(() =>
       buildDispatchRequest({ GH_DISPATCH_TOKEN: "t", GH_REPO: "a/b/../c" }, inputs),

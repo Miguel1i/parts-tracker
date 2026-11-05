@@ -13,7 +13,7 @@ Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portugu
 | i18n     | next-intl — English at `/`, Portuguese at `/pt`                                   |
 | Database | Turso (libSQL) + Drizzle ORM; local SQLite file                                   |
 | Scraper  | Node/TS + Playwright (Chromium) in GitHub Actions                                 |
-| Auth     | Better Auth (GitHub, Google, email magic link via Resend), roles, admin approval  |
+| Auth     | Better Auth (email/username + password), roles, invites, admin approval           |
 | Tests    | Vitest                                                                            |
 
 ## Layout
@@ -111,23 +111,29 @@ Until both secrets are set, the job logs a warning and skips. Run it by hand wit
 
 ## Auth & admin
 
-Sign-in is [Better Auth](https://www.better-auth.com) with its Drizzle adapter: GitHub and Google OAuth (each enabled only when its client id and secret are set) and an email magic link sent through Resend. Without `RESEND_API_KEY` in development, the link is printed to the `pnpm dev` console instead. Logins with the same verified email link to one account.
+Sign-in is [Better Auth](https://www.better-auth.com) with its Drizzle adapter: **email or username plus password**. There's no email service in the sign-in path, so addresses aren't verified. Invites are redeemed only with their secret link, and the default `approval` mode has an admin vet each new account. A forgotten password is reset by an admin (Admin → Users → Set password).
 
-**First admin.** Create it once per database, then sign in with a magic link to that address (or GitHub/Google with the same email):
+**First admin.** Create it once per database. It asks for a password (not echoed); re-run it to change the password or username:
 
 ```bash
-pnpm seed:admin --email you@example.com
+pnpm seed:admin --email you@example.com --username you
 ```
 
-**Sign-up modes** (Admin → Users): `open` (anyone, active at once), `approval` (default: new accounts are `pending` until an admin approves them) and `invite_only`. Invites (7 days, sent by email) work in every mode and skip approval, with the role chosen by the admin.
+**Sign-up modes** (Admin → Users): `open` (anyone, active at once), `approval` (default: new accounts are `pending` until an admin approves them) and `invite_only`. An invite is a sign-up link valid for 7 days that skips approval and carries the role the admin chose. Admin → Users shows the link to copy, and it's also emailed when Resend is configured.
 
-**Admin area** (`/admin`, reached from the account menu, never in the sidebar): users (approve, invite, role, ban, sign out everywhere, delete, signup mode), merchants (CRUD, order, adapter editor, "Test merchant"), catalog identifiers, the review queue (Approve pins the URL and confirms the page's identifiers; Reject blocklists it) and the audit log of every admin change.
+**Admin area** (`/admin`, reached from the account menu, never in the sidebar): users (approve, invite, role, set password, ban, sign out everywhere, delete, signup mode), merchants (CRUD, order, adapter editor, "Test merchant"), catalog identifiers, the review queue (Approve pins the URL and confirms the page's identifiers; Reject blocklists it) and the audit log of every admin change.
 
 **Guards.** `requireAdmin()` (pages; anyone else gets a 404) and `adminAction(schema, handler)` (every admin Server Action) in `apps/web/src/lib/auth/guard.ts` re-check the session on the server. `admin-guard.test.ts` calls every admin action as anonymous, pending, banned and plain users and checks each is refused before touching the DB.
 
 **Test merchant** dispatches `scrape.yml` for one (product, merchant) pair with a fine-grained token (`GH_DISPATCH_TOKEN`: this repo only, **Actions: read and write**), then polls the run. Without the token the page shows the equivalent `pnpm scrape` command to run locally.
 
-Production secrets: run `bash scripts/setup-vercel-env.sh` from a checkout where `apps/web` is linked to Vercel. It generates the auth secret, walks through creating each OAuth app and key, sets everything on Vercel and redeploys (`--dry-run` to preview). Or paste them yourself into `vercel env add <NAME>` (`BETTER_AUTH_SECRET` from `openssl rand -base64 32`, `BETTER_AUTH_URL` = the site URL, the OAuth client ids/secrets, `RESEND_API_KEY`, `EMAIL_FROM`, `GH_DISPATCH_TOKEN`). OAuth callback URLs: `<BETTER_AUTH_URL>/api/auth/callback/github` and `/api/auth/callback/google`.
+**Production env (Vercel).** Only `BETTER_AUTH_SECRET` is required: `BETTER_AUTH_URL` and `GH_REPO` come from Vercel's system variables, and the Turso pair is already set. Run the script once to create the gitignored `apps/web/.env.vercel`, fill it in, then run it again to push it (`--dry-run` previews). You can also paste that file into Vercel → Settings → Environment Variables.
+
+```bash
+bash scripts/setup-vercel-env.sh
+```
+
+From PowerShell: `& "C:\Program Files\Git\bin\bash.exe" -lc "bash scripts/setup-vercel-env.sh"`.
 
 ## Translations
 

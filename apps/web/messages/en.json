@@ -380,7 +380,8 @@
         "banned": "Banned"
       },
       "fields": {
-        "name": "Display name"
+        "name": "Display name",
+        "username": "Username"
       },
       "actions": {
         "approve": "Approve",
@@ -390,7 +391,8 @@
         "revokeSessions": "Sign out everywhere",
         "ban": "Ban",
         "unban": "Unban",
-        "delete": "Delete user"
+        "delete": "Delete user",
+        "setPassword": "Set password"
       },
       "done": {
         "approved": "User approved",
@@ -398,7 +400,8 @@
         "revoked": "Sessions revoked",
         "banned": "User banned",
         "unbanned": "User unbanned",
-        "deleted": "User deleted"
+        "deleted": "User deleted",
+        "password": "Password set"
       },
       "ban": {
         "title": "Ban {name}",
@@ -434,19 +437,31 @@
       },
       "invite": {
         "title": "Invite someone",
-        "description": "Sends a sign-in link valid for 7 days. Invited accounts skip approval.",
+        "description": "Creates a sign-up link valid for 7 days. Invited accounts skip approval. Send the link however you like; it's also emailed when Resend is configured.",
         "email": "Email",
         "role": "Role",
         "roles": {
           "admin": "Admin",
           "user": "User"
         },
-        "send": "Send invite",
-        "sent": "Invite sent to {email}",
+        "send": "Create invite",
+        "sent": "Invite created for {email}",
         "open": "{count, plural, one {# open invite} other {# open invites}}",
         "expires": "expires {when}",
         "revoke": "Revoke the invite for {email}",
-        "revoked": "Invite revoked"
+        "revoked": "Invite revoked",
+        "emailed": "Invite created and emailed to {email}",
+        "linkTitle": "Invite link for {email}",
+        "linkHelp": "Send this link to them. It works once, for this email, until it expires.",
+        "copy": "Copy link",
+        "copied": "Link copied",
+        "copyLink": "Copy the invite link for {email}"
+      },
+      "password": {
+        "title": "Set a new password for {name}",
+        "description": "They sign in with it straight away; other devices stay signed in until you sign them out.",
+        "label": "New password",
+        "help": "At least 8 characters. Tell them over a safe channel."
       }
     },
     "errors": {
@@ -473,23 +488,28 @@
   "Auth": {
     "signIn": {
       "title": "Sign in",
-      "description": "Use GitHub, Google or a one-time link sent to your email.",
-      "github": "Continue with GitHub",
-      "google": "Continue with Google",
-      "or": "or",
+      "description": "Use your email or username and your password.",
+      "tabSignIn": "Sign in",
+      "tabSignUp": "Create account",
+      "login": "Email or username",
+      "username": "Username",
+      "usernameHelp": "3–30 characters: letters, digits, _ and .",
       "email": "Email",
-      "emailPlaceholder": "you@example.com",
-      "sendLink": "Email me a sign-in link",
-      "sending": "Sending…",
-      "sent": "Check your inbox: we sent a sign-in link to {email}. It expires in 15 minutes.",
-      "useAnother": "Use another email",
-      "invited": "You've been invited. Sign in with the email the invite was sent to.",
-      "noProviders": "GitHub and Google sign-in aren't configured on this server.",
-      "error": "Sign-in failed. Try again.",
+      "password": "Password",
+      "passwordHelp": "At least 8 characters.",
+      "submitSignIn": "Sign in",
+      "submitSignUp": "Create account",
+      "forgot": "Forgot your password? Ask an admin to set a new one.",
+      "invited": "You've been invited. Create your account with the email the invite was sent to.",
       "errors": {
-        "invite_required": "Sign-up is by invitation only. Ask an admin for an invite.",
+        "badCredentials": "Wrong email, username or password.",
+        "taken": "An account with that email already exists. Sign in instead.",
+        "usernameTaken": "That username is taken.",
+        "username": "Usernames are 3–30 characters: letters, digits, _ and .",
+        "password": "Passwords are 8–128 characters.",
+        "invite_required": "Sign-up is by invitation only. Ask an admin for an invite link.",
         "banned": "This account has been suspended.",
-        "generic": "Sign-in failed. Try again."
+        "generic": "That didn't work. Try again."
       }
     },
     "pending": {
@@ -500,18 +520,11 @@
     }
   },
   "Email": {
-    "magicLink": {
-      "subject": "Your Parts Tracker sign-in link",
-      "heading": "Sign in to Parts Tracker",
-      "body": "Click the button below to sign in. The link works once and expires in 15 minutes.",
-      "cta": "Sign in",
-      "footer": "If you didn't ask for this, you can ignore this email."
-    },
     "invite": {
       "subject": "You're invited to Parts Tracker",
       "heading": "You're invited to Parts Tracker",
-      "body": "{inviter} invited you to track PC part prices with Parts Tracker. Sign in with this email address to accept; the invite expires in 7 days.",
-      "cta": "Accept the invite",
+      "body": "{inviter} invited you to track PC part prices with Parts Tracker. Create your account with this email address; the link expires in 7 days.",
+      "cta": "Create your account",
       "footer": "If you weren't expecting this, you can ignore this email."
     }
   }
