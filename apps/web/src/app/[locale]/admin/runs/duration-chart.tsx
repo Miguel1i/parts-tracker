@@ -90,7 +90,7 @@ export function DurationChart({ runs }: { runs: RunDuration[] }) {
       ) : (
         <ChartContainer
           config={config}
-          role="img"
+          role="figure"
           aria-label={summary}
           className="aspect-auto h-56 w-full justify-start"
         >

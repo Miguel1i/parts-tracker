@@ -115,7 +115,9 @@ export function SignInForm() {
       }}
       className={cn(
         "focus-visible:ring-ring/50 flex-1 rounded-md px-3 py-1.5 text-sm outline-none focus-visible:ring-[3px]",
-        mode === m ? "bg-background font-medium shadow-sm" : "text-muted-foreground",
+        mode === m
+          ? "bg-background font-medium shadow-sm"
+          : "text-foreground/80 hover:text-foreground",
       )}
     >
       {m === "signIn" ? t("tabSignIn") : t("tabSignUp")}

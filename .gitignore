@@ -31,3 +31,6 @@ Thumbs.db
 
 .vercel
 .env*
+
+# Playwright sessions
+apps/web/e2e/.auth/

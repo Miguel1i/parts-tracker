@@ -197,7 +197,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
       ) : (
         <ChartContainer
           config={config}
-          role="img"
+          role="figure"
           aria-label={summary}
           className="aspect-auto h-72 w-full justify-start"
         >

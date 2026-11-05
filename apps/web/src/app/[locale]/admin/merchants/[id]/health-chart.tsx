@@ -116,7 +116,7 @@ export function HealthChart({ days }: { days: DayHealth[] }) {
       ) : (
         <ChartContainer
           config={config}
-          role="img"
+          role="figure"
           aria-label={summary}
           className="aspect-auto h-64 w-full justify-start"
         >

@@ -2,7 +2,7 @@
 
 Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portuguese, Spanish, French and UK merchants). Prices are scraped on a schedule or on demand, every observation is kept, and history is shown in interactive charts.
 
-> Status: **milestone 7 — views & charts**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
+> Status: **all 8 milestones done**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
 
 ## Stack
 
@@ -14,7 +14,7 @@ Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portugu
 | Database | Turso (libSQL) + Drizzle ORM; local SQLite file                                   |
 | Scraper  | Node/TS + Playwright (Chromium) in GitHub Actions                                 |
 | Auth     | Better Auth (email/username + password), roles, invites, admin approval           |
-| Tests    | Vitest                                                                            |
+| Tests    | Vitest; Playwright + axe smoke tests                                              |
 
 ## Layout
 
@@ -156,10 +156,30 @@ From PowerShell: `& "C:\Program Files\Git\bin\bash.exe" -lc "bash scripts/setup-
 
 All UI text lives in `apps/web/messages/<locale>.json`; `en.json` is the source of truth and keys are type-checked. To add a language, add a JSON file with the same keys and register the locale in `apps/web/src/i18n/routing.ts`. A test fails if any locale is missing keys.
 
+## Tests
+
+- `pnpm test`: Vitest in every package (matching rules and fixtures, scraper pipeline, transforms, guards: every admin and user Server Action refused for anonymous/pending/banned callers, build ownership across users).
+- `pnpm --filter web build && pnpm --filter web e2e`: Playwright smoke tests against the production build and a throwaway `e2e.db` (seeded by `apps/web/e2e/seed.mts`): signed-out pages, sign-in, dashboard, the product chart and its tooltip, compare, and the admin area (404 for anonymous and regular users, reachable for admins), in light and dark at desktop and phone sizes, with an axe accessibility check (serious/critical violations fail) and a no-horizontal-scroll check. CI runs both.
+
 ## Deploy (Vercel)
 
-Import the GitHub repo in Vercel and set **Root Directory** to `apps/web` (Vercel detects pnpm workspaces). Environment variables are listed in [.env.example](.env.example).
+The repo is linked to the Vercel project `parts-tracker` with **Root Directory** `apps/web`: every PR gets a preview deployment and `main` deploys to production (https://parts-tracker-azure.vercel.app).
+
+Before the first production use:
+
+1. **Database:** apply the migrations to Turso from the main checkout (its `apps/web/.env.local` points at Turso): `pnpm db:migrate`. `pnpm seed:admin --email you@example.com --username you` creates or updates the first admin and sets their password (it also migrates).
+2. **Environment:** only `BETTER_AUTH_SECRET` is required on top of the Turso pair; `BETTER_AUTH_URL` and `GH_REPO` default from Vercel's system variables. Run `bash scripts/setup-vercel-env.sh` (creates the gitignored `apps/web/.env.vercel` to fill in, then pushes it and redeploys). Optional: `RESEND_API_KEY` + `EMAIL_FROM` (invite emails), `GH_DISPATCH_TOKEN` (Check now / Test merchant on GitHub Actions; without it runs only happen on the schedule).
+3. **GitHub Actions:** the scrape workflow needs the repo secrets `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` (`gh secret set …`, already set for this repo).
 
 ## Free-tier budget
 
-To be filled in as services are added (Vercel Hobby, Turso). **GitHub Actions:** the owner chose to keep this repo **public** (asked in milestone 4, 2026-11-03), so standard-runner minutes are unlimited. A private repo would get 2,000 min/month; a full scrape takes roughly 5–15 min, so the 6-hourly cron would use about 600–1,800 of them. Turso: check the current free-tier limits at turso.tech/pricing; price history is append-only, so watch storage and row reads as it grows.
+Checked November 2026; limits change, so re-check the providers' pages.
+
+| Service               | Free tier                                                                                                                                            | This app's use                                                                                                                                                                                                                                                                             |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Vercel Hobby**      | ~100 GB transfer and ~1 M function invocations a month; personal, non-commercial use only; function time-outs well above what pages need.            | Pages and Server Actions only: scraping never runs on Vercel. A handful of users stays far below the limits.                                                                                                                                                                               |
+| **Turso (free)**      | 5 GB storage, 500 M rows read and 10 M rows written a month, 100 databases. Going over **any** one metric blocks the databases until the next month. | Writes: about one `price_points` + one `scrape_logs` row per pair per run. 12 shops × 10 parts × 4 runs/day ≈ 30 k rows/month, well under 10 M. Reads: pages read a bounded 400-day window and indexed lookups; price history is append-only, so storage grows slowly (tens of MB a year). |
+| **GitHub Actions**    | Unlimited standard-runner minutes for **public** repos (the owner chose public, 2026-11-03); 2,000 min/month for private ones.                       | `scrape.yml` wakes hourly; skipped hours stop after checkout + install (~1 min), real runs take ~5–15 min. Private would need the interval at 12–24 h.                                                                                                                                     |
+| **Resend (optional)** | 3,000 emails a month, 100 a day; the default `onboarding@resend.dev` sender only reaches your own address.                                           | Invite emails only; without it, admins copy invite links.                                                                                                                                                                                                                                  |
+
+Sources: [Vercel Hobby limits](https://dev.to/abhijais1/is-vercel-free-what-the-hobby-plan-covers-in-2026-2ke), [Turso pricing](https://turso.tech/pricing), [Resend sending limits](https://resend.com/docs/knowledge-base/resend-sending-limits).

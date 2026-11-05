@@ -93,7 +93,7 @@ export function ProductOffersChart({
           {!table && (
             <ChartContainer
               config={{}}
-              role="img"
+              role="figure"
               aria-label={summary}
               className="aspect-auto w-full min-w-0 justify-start"
               style={{ height: Math.max(140, rows.length * 40 + 40) }}

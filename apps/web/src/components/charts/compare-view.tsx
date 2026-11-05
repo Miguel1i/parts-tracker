@@ -1,5 +1,7 @@
 "use client";
 
+import { cn } from "@/lib/utils";
+
 import { Columns3 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
@@ -19,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useRouter } from "@/i18n/navigation";
 import { buildCompareRows, serializeHide, type RawCell } from "@/lib/charts/compare";
@@ -107,12 +108,29 @@ export function CompareView({
             </SelectContent>
           </Select>
         )}
-        <Tabs value={view} onValueChange={(v) => changeView(v as View)}>
-          <TabsList aria-label={t("view.label")}>
-            <TabsTrigger value="grid">{t("view.grid")}</TabsTrigger>
-            <TabsTrigger value="heatmap">{t("view.heatmap")}</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* A view switch, not tabs: there are no tab panels, so it's a pressed-button group. */}
+        <div
+          role="group"
+          aria-label={t("view.label")}
+          className="bg-muted inline-flex rounded-lg p-1"
+        >
+          {(["grid", "heatmap"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              aria-pressed={view === v}
+              onClick={() => changeView(v)}
+              className={cn(
+                "focus-visible:ring-ring/50 rounded-md px-3 py-1 text-sm outline-none focus-visible:ring-[3px]",
+                view === v
+                  ? "bg-background font-medium shadow-sm"
+                  : "text-foreground/80 hover:text-foreground",
+              )}
+            >
+              {t(`view.${v}`)}
+            </button>
+          ))}
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
