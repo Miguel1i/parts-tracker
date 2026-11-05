@@ -10,7 +10,13 @@
     "admin": "Admin",
     "toggleSidebar": "Toggle sidebar",
     "main": "Main",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "menu": "Menu",
+    "home": "Parts Tracker home",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "Theme": {
     "change": "Change theme",
@@ -833,6 +839,16 @@
         "description": "They sign in with it straight away; other devices stay signed in until you sign them out.",
         "label": "New password",
         "help": "At least 8 characters. Tell them over a safe channel."
+      },
+      "pending": {
+        "title": "Waiting for approval",
+        "count": "{count, plural, =0 {none} one {# account} other {# accounts}}",
+        "none": "No sign-ups are waiting. New accounts appear here when sign-up mode is “Approval required”.",
+        "signedUp": "signed up {when}",
+        "approve": "Approve",
+        "reject": "Reject",
+        "approved": "{name} can now use Parts Tracker",
+        "rejected": "{name}'s sign-up was turned down"
       }
     },
     "runs": {
@@ -1171,5 +1187,69 @@
         "error": "Error"
       }
     }
+  },
+  "Ui": {
+    "close": "Close",
+    "toast": {
+      "success": "Done",
+      "error": "Error",
+      "info": "Info",
+      "warning": "Warning",
+      "loading": "Working"
+    }
+  },
+  "Landing": {
+    "kicker": "Price watch for PC parts",
+    "headline1": "Every shop.",
+    "headline2": "One price tag.",
+    "subline": "Parts Tracker checks the shops PCPartPicker doesn't cover, matches every listing to the exact part and keeps the cheapest in-stock price at the top of your build.",
+    "create": "Create account",
+    "signIn": "Sign in",
+    "note": "Free to use. New accounts may need an admin's approval.",
+    "receipt": {
+      "label": "Example price check",
+      "title": "Price check",
+      "sample": "Sample",
+      "part": "AMD Ryzen 7 9800X3D",
+      "code": "CPU · AM5 · 8 cores",
+      "shop": "Shop",
+      "price": "Price",
+      "cheapest": "Cheapest",
+      "inStock": "In stock",
+      "outOfStock": "Out of stock",
+      "low30": "Lowest in 30 days",
+      "spread": "Spread across shops",
+      "checked": "Checked 4 shops · 06:00",
+      "caption": "Illustrative sample. Shops and prices are made up."
+    },
+    "how": {
+      "label": "How it works",
+      "title": "Three steps, then it runs on its own.",
+      "step1": {
+        "title": "List your parts",
+        "body": "Add the parts in your build. Each one is identified by its barcode and a clean name, so variants don't get mixed up."
+      },
+      "step2": {
+        "title": "We check the shops",
+        "body": "On a schedule, Parts Tracker visits every shop you follow, matches listings to your parts and records price and stock."
+      },
+      "step3": {
+        "title": "Buy at the low",
+        "body": "Your dashboard shows the cheapest in-stock offer per part, the build total, its history and every drop since your last visit."
+      }
+    },
+    "band": {
+      "title": "Start tracking your build.",
+      "body": "Bring a parts list. We'll bring the shops."
+    }
+  },
+  "Kickers": {
+    "dashboard": "01 — Dashboard",
+    "compare": "02 — Compare",
+    "builds": "03 — Builds",
+    "part": "Part",
+    "account": "Your account",
+    "admin": "Admin",
+    "share": "Shared build"
   }
 }

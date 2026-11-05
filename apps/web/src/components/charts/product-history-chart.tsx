@@ -301,7 +301,7 @@ export function ProductHistoryChart(props: ProductHistoryChartProps) {
       )
       .sort((a, b) => a.pt.value - b.pt.value || a.m.name.localeCompare(b.m.name));
     return (
-      <div className="bg-popover text-popover-foreground grid min-w-52 max-w-[min(20rem,86vw)] gap-1.5 rounded-lg border px-3 py-2 text-xs shadow-md">
+      <div className="bg-popover text-popover-foreground grid min-w-52 max-w-[min(20rem,86vw)] gap-1.5 rounded-[6px] border px-3 py-2 text-xs shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]">
         <div className="font-medium">{dateTime(ts)}</div>
         {list.length === 0 && <div className="text-muted-foreground">{t("noOffers")}</div>}
         {list.map(({ m, pt }) => (
@@ -408,7 +408,7 @@ export function ProductHistoryChart(props: ProductHistoryChartProps) {
       {!data && !failed ? (
         <Skeleton className="h-80 w-full" />
       ) : empty ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed px-4 py-10 text-center text-sm">
+        <p className="text-muted-foreground rounded-[6px] border border-dashed px-4 py-10 text-center text-sm">
           {t("empty")}
         </p>
       ) : data ? (
@@ -421,7 +421,7 @@ export function ProductHistoryChart(props: ProductHistoryChartProps) {
               tabIndex={0}
               role="region"
               aria-label={t("tableLabel")}
-              className="focus-visible:ring-ring/50 max-h-96 overflow-auto rounded-xl border outline-none focus-visible:ring-[3px]"
+              className="focus-visible:outline-ring max-h-96 overflow-auto rounded-[6px] border focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               <table className="w-full text-sm">
                 <caption className="sr-only">{summary}</caption>
@@ -713,7 +713,7 @@ export function ProductHistoryChart(props: ProductHistoryChartProps) {
                     onFocus={() => setHighlight(m.id)}
                     onBlur={() => setHighlight(null)}
                     className={cn(
-                      "focus-visible:ring-ring/50 flex items-center gap-1.5 rounded-sm px-1 py-0.5 text-xs outline-none focus-visible:ring-[3px]",
+                      "focus-visible:outline-ring flex items-center gap-1.5 rounded-sm px-1 py-0.5 text-xs focus-visible:outline-2 focus-visible:outline-offset-2",
                       off && "opacity-50",
                     )}
                   >

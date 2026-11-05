@@ -11,8 +11,10 @@ import { getSettings } from "@/lib/admin/queries";
 import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { cn } from "@/lib/utils";
 import { InvitePanel } from "./invite-panel";
+import { PendingPanel } from "./pending-panel";
 import { SignupModeSelect } from "./signup-mode-select";
 import { UsersTable, type UserRow } from "./users-table";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -56,7 +58,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
   if (filter === "admins") where.push(eq(user.role, "admin"));
   if (filter === "banned") where.push(eq(user.banned, true));
 
-  const [rows, total, settings, openInvites] = await Promise.all([
+  const [rows, total, settings, openInvites, waiting] = await Promise.all([
     db
       .select()
       .from(user)
@@ -72,6 +74,18 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
       .from(invites)
       .where(and(isNull(invites.usedAt), gt(invites.expiresAt, new Date())))
       .orderBy(asc(invites.expiresAt)),
+    db
+      .select({
+        id: user.id,
+        name: user.name,
+        username: user.displayUsername,
+        email: user.email,
+        createdAt: user.createdAt,
+      })
+      .from(user)
+      .where(and(eq(user.status, "pending"), eq(user.banned, false)))
+      .orderBy(asc(user.createdAt))
+      .limit(100),
   ]);
 
   const ids = rows.map((r) => r.id);
@@ -108,7 +122,12 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
 
   return (
     <>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        kicker={await kicker("admin")}
+        title={t("title")}
+        description={t("description")}
+      />
+      <PendingPanel users={waiting} />
       <div className="mb-8 grid gap-4 xl:grid-cols-2">
         <SignupModeSelect mode={settings.signupMode} />
         <InvitePanel
@@ -132,7 +151,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
               }}
               aria-current={f === filter ? "page" : undefined}
               className={cn(
-                "hover:bg-muted whitespace-nowrap rounded-md px-3 py-1.5 text-sm",
+                "hover:bg-muted whitespace-nowrap rounded-[4px] px-3 py-1.5 text-sm",
                 f === filter ? "bg-muted font-medium" : "text-muted-foreground",
               )}
             >
@@ -164,7 +183,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
           <div className="flex gap-2">
             {page > 1 && (
               <Link
-                className="hover:bg-muted rounded-md border px-3 py-1.5"
+                className="hover:bg-muted rounded-[4px] border px-3 py-1.5"
                 href={{ pathname: "/admin/users", query: { ...sp, page: String(page - 1) } }}
               >
                 {t("previous")}
@@ -172,7 +191,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
             )}
             {page < pages && (
               <Link
-                className="hover:bg-muted rounded-md border px-3 py-1.5"
+                className="hover:bg-muted rounded-[4px] border px-3 py-1.5"
                 href={{ pathname: "/admin/users", query: { ...sp, page: String(page + 1) } }}
               >
                 {t("next")}

@@ -506,7 +506,7 @@ function ColorField({
       />
       <span
         aria-hidden
-        className="bg-muted mt-[1.625rem] size-8 rounded-lg border"
+        className="bg-muted mt-[1.625rem] size-8 rounded-[6px] border"
         style={valid ? { backgroundColor: value.trim() } : undefined}
       />
     </div>

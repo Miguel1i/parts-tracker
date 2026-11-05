@@ -106,7 +106,7 @@ export function InvitePanel({ invites }: { invites: Invite[] }) {
             <h3 className="text-muted-foreground mb-2 text-xs font-medium uppercase">
               {t("open", { count: invites.length })}
             </h3>
-            <ul className="divide-y rounded-md border">
+            <ul className="divide-y rounded-[4px] border">
               {invites.map((i) => (
                 <li key={i.id} className="flex items-center gap-2 px-3 py-2 text-sm">
                   <span className="min-w-0 flex-1 truncate">{i.email}</span>

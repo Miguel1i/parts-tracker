@@ -17,6 +17,7 @@ import {
 import { Link } from "@/i18n/navigation";
 import { initLocale } from "@/i18n/server";
 import { requireAdmin } from "@/lib/auth/guard";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -70,7 +71,11 @@ export default async function CatalogPage({ searchParams }: PageProps<"/[locale]
 
   return (
     <div>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        kicker={await kicker("admin")}
+        title={t("title")}
+        description={t("description")}
+      />
       <form method="get" className="mb-6 flex flex-wrap items-center gap-3">
         <Input
           name="q"

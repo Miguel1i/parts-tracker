@@ -12,6 +12,7 @@ import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { HealthChart } from "./health-chart";
 import { MerchantForm } from "../merchant-form";
 import { TestPanel } from "../test-panel";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -45,7 +46,7 @@ export default async function EditMerchantPage({
   return (
     <div className="grid gap-8">
       <div>
-        <PageHeader title={m.name} />
+        <PageHeader kicker={await kicker("admin")} title={m.name} />
         <MerchantForm
           merchantId={m.id}
           merchantName={m.name}

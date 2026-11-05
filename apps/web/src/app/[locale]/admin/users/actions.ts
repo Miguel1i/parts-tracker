@@ -51,6 +51,22 @@ export const approveUser = adminAction(userId, async ({ userId: id }, { actor })
   return { status: "active" as const };
 });
 
+/** Turns down a sign-up still waiting for approval: deletes the never-approved account. */
+export const rejectPendingUser = adminAction(userId, async ({ userId: id }, { actor }) => {
+  const before = await target(id);
+  if (before.status !== "pending") throw new ActionError("invalid");
+  notSelf(actor.id, id);
+  await auth.api.removeUser({ body: { userId: id }, headers: await headers() });
+  await writeAudit(getDb(), {
+    actorUserId: actor.id,
+    action: "user.reject",
+    entity: "user",
+    entityId: id,
+    diff: { email: before.email, name: before.name },
+  });
+  return null;
+});
+
 export const setUserRole = adminAction(
   userId.extend({ role: z.enum(["admin", "user"]) }),
   async ({ userId: id, role }, { actor }) => {

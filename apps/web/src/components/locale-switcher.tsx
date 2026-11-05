@@ -1,21 +1,25 @@
 "use client";
 
-import { Check, Languages } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { localeLabels, routing } from "@/i18n/routing";
+import { localeLabels, routing, type Locale } from "@/i18n/routing";
+
+/** Short mono code on the trigger ("EN", "PT") instead of a generic globe icon. */
+const codes: Record<Locale, string> = { en: "EN", "pt-PT": "PT" };
 
 export function LocaleSwitcher({ side = "bottom" }: { side?: "top" | "bottom" | "right" }) {
   const t = useTranslations("Locale");
-  const locale = useLocale();
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
@@ -23,21 +27,30 @@ export function LocaleSwitcher({ side = "bottom" }: { side?: "top" | "bottom" | 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t("change")} disabled={pending}>
-          <Languages className="size-4" />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t("change")}
+          disabled={pending}
+          className="font-mono text-[11px] font-semibold tracking-[0.06em]"
+        >
+          <span aria-hidden>{codes[locale] ?? locale}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side={side}>
-        {routing.locales.map((l) => (
-          <DropdownMenuItem
-            key={l}
-            lang={l}
-            onSelect={() => startTransition(() => router.replace(pathname, { locale: l }))}
-          >
-            {localeLabels[l]}
-            {l === locale && <Check className="ml-auto size-4" aria-hidden />}
-          </DropdownMenuItem>
-        ))}
+      <DropdownMenuContent align="end" side={side} className="min-w-40">
+        <DropdownMenuLabel>{t("change")}</DropdownMenuLabel>
+        <DropdownMenuRadioGroup
+          value={locale}
+          onValueChange={(l) =>
+            startTransition(() => router.replace(pathname, { locale: l as Locale }))
+          }
+        >
+          {routing.locales.map((l) => (
+            <DropdownMenuRadioItem key={l} value={l} lang={l}>
+              {localeLabels[l]}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

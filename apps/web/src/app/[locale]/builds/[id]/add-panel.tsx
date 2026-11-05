@@ -72,7 +72,7 @@ function SearchTab({ buildId }: { buildId: string }) {
       </div>
       {shown && shown.length === 0 && <p className="text-muted-foreground text-sm">{t("none")}</p>}
       {shown && shown.length > 0 && (
-        <ul className="divide-y rounded-md border">
+        <ul className="divide-y rounded-[4px] border">
           {shown.map((h) => (
             <li key={h.id} className="flex items-center gap-2 px-3 py-2 text-sm">
               <span className="min-w-0 flex-1 break-words">{h.name}</span>

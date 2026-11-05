@@ -25,7 +25,7 @@ function SafeLink({ href, children }: { href: string | null; children: React.Rea
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="focus-visible:ring-ring/50 focus-visible:ring-3 inline-flex max-w-full items-center gap-1 break-all rounded underline underline-offset-4 outline-none"
+        className="focus-visible:outline-ring inline-flex max-w-full items-center gap-1 break-all rounded underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
       >
         {children}
         <ExternalLink className="size-3 shrink-0" aria-hidden />
@@ -137,7 +137,7 @@ export function TestPanel({
                 id={selectId}
                 value={productId}
                 onChange={(ev) => setProductId(ev.target.value)}
-                className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 dark:bg-input/30 h-8 w-full min-w-0 rounded-lg border px-2.5 text-sm outline-none"
+                className="border-input bg-background focus-visible:border-ring focus-visible:outline-ring dark:bg-input/30 h-8 w-full min-w-0 rounded-[4px] border px-2.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 <option value="">{t("choose")}</option>
                 {products.map((p) => (
@@ -158,7 +158,7 @@ export function TestPanel({
           <div className="grid gap-2" role="status">
             <p className="text-sm">{t("notDispatched")}</p>
             <div className="flex items-start gap-2">
-              <pre className="bg-muted min-w-0 flex-1 whitespace-pre-wrap break-all rounded-lg p-3 font-mono text-xs">
+              <pre className="bg-muted min-w-0 flex-1 whitespace-pre-wrap break-all rounded-[4px] p-3 font-mono text-xs">
                 {command}
               </pre>
               <Button type="button" variant="outline" size="sm" onClick={copy}>
@@ -209,7 +209,7 @@ export function TestPanel({
                       {l.message}
                     </p>
                     {l.log && (
-                      <pre className="bg-muted max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-lg p-3 font-mono text-xs">
+                      <pre className="bg-muted max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-[4px] p-3 font-mono text-xs">
                         {l.log}
                       </pre>
                     )}
@@ -225,7 +225,7 @@ export function TestPanel({
               {data && data.candidates.length > 0 ? (
                 <ul className="grid gap-2">
                   {data.candidates.map((c) => (
-                    <li key={c.id} className="rounded-lg border p-3 text-sm">
+                    <li key={c.id} className="rounded-[6px] border p-3 text-sm">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge variant="secondary">{c.status}</Badge>
                         <span className="text-muted-foreground tabular-nums">
@@ -259,7 +259,7 @@ export function TestPanel({
               {data && data.points.length > 0 ? (
                 <ul className="grid gap-2">
                   {data.points.map((p) => (
-                    <li key={p.id} className="rounded-lg border p-3 text-sm">
+                    <li key={p.id} className="rounded-[6px] border p-3 text-sm">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-medium tabular-nums">
                           {format.number(p.priceEur, { style: "currency", currency: "EUR" })}

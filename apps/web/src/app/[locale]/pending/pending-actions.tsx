@@ -9,7 +9,7 @@ export function PendingActions() {
   const t = useTranslations("Auth.pending");
   const router = useRouter();
   return (
-    <div className="mt-4 flex justify-center gap-2">
+    <div className="mt-6 flex flex-wrap gap-2">
       <Button variant="outline" onClick={() => router.refresh()}>
         {t("check")}
       </Button>

@@ -110,7 +110,7 @@ export function SessionsSection() {
         {rows === null ? (
           <Skeleton className="h-16 w-full" />
         ) : (
-          <ul className="divide-y rounded-md border">
+          <ul className="divide-y rounded-[4px] border">
             {rows.map((r) => {
               const { browser, os } = describeAgent(r.userAgent);
               const isCurrent = r.token === currentToken;

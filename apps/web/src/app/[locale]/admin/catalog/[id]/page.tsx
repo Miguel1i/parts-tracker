@@ -10,6 +10,7 @@ import { initLocale } from "@/i18n/server";
 import { isHttpUrl } from "@/lib/admin/review";
 import { requireAdmin } from "@/lib/auth/guard";
 import { ArchiveButton, IdentifierActions } from "./controls";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -57,7 +58,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/admin
       >
         <ChevronLeft className="size-4" aria-hidden /> {t("title")}
       </Link>
-      <PageHeader title={product.name} />
+      <PageHeader kicker={await kicker("admin")} title={product.name} />
 
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start">
         {isHttpUrl(product.imageUrl) && (
@@ -66,7 +67,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/admin
             src={product.imageUrl}
             alt=""
             referrerPolicy="no-referrer"
-            className="bg-muted size-24 shrink-0 rounded-lg object-contain"
+            className="bg-muted size-24 shrink-0 rounded-[4px] object-contain"
           />
         )}
         <div className="min-w-0 flex-1">
@@ -104,7 +105,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/admin
       {identifiers.length === 0 ? (
         <p className="text-muted-foreground text-sm">{t("noIdentifiers")}</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
+        <div className="overflow-x-auto rounded-[6px] border">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground text-left">
               <tr>

@@ -56,7 +56,7 @@ export function MerchantsTable({ rows }: { rows: MerchantRow[] }) {
   };
 
   return (
-    <div className="overflow-x-auto rounded-xl border">
+    <div className="overflow-x-auto rounded-[6px] border">
       <Table>
         <TableHeader>
           <TableRow>
@@ -87,7 +87,7 @@ export function MerchantsTable({ rows }: { rows: MerchantRow[] }) {
                     )}
                     <Link
                       href={`/admin/merchants/${m.id}`}
-                      className="focus-visible:ring-ring/50 focus-visible:ring-3 truncate rounded underline-offset-4 outline-none hover:underline"
+                      className="focus-visible:outline-ring truncate rounded underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
                       {m.name}
                     </Link>

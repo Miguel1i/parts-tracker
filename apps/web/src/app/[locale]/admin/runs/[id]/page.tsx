@@ -13,6 +13,7 @@ import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { RerunButton } from "../run-controls";
 import { durationMs, formatDuration, RunStatusBadge, safeGhUrl } from "../run-bits";
 import { resolveScopeNames, scopeParts } from "../scope";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../../layout.tsx).
 export const instant = false;
@@ -85,7 +86,7 @@ export default async function RunDetailPage({ params }: PageProps<"/[locale]/adm
           {t("back")}
         </Link>
         <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
-          <PageHeader title={t("detailTitle")} />
+          <PageHeader kicker={await kicker("admin")} title={t("detailTitle")} />
           <RerunButton runId={run.id} />
         </div>
 
@@ -145,7 +146,7 @@ export default async function RunDetailPage({ params }: PageProps<"/[locale]/adm
         {logs.length === 0 ? (
           <p className="text-muted-foreground text-sm">{t("noLogs")}</p>
         ) : (
-          <ul className="divide-y rounded-lg border">
+          <ul className="divide-y rounded-[6px] border">
             {logs.map((l) => (
               <li key={l.id} className="px-3 py-2 text-sm">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -168,7 +169,7 @@ export default async function RunDetailPage({ params }: PageProps<"/[locale]/adm
                     </summary>
                     <pre
                       tabIndex={0}
-                      className="bg-muted focus-visible:ring-ring/50 mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-md p-2 text-xs outline-none focus-visible:ring-[3px]"
+                      className="bg-muted focus-visible:outline-ring mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-[4px] p-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
                       {l.log}
                     </pre>

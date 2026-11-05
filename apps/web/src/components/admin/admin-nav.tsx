@@ -26,8 +26,8 @@ const sections: { key: AdminSection; icon: LucideIcon }[] = [
 ];
 
 /**
- * The admin area's own section nav: a vertical list on desktop, a horizontally scrolling tab
- * row on mobile. Lives only inside /admin, never in the main sidebar.
+ * The admin area's own section nav: underline tabs across the top (scrolling sideways on
+ * phones), with mono counts for work waiting. Lives only inside /admin, never in the rail.
  */
 export function AdminNav({ counts }: { counts: { pendingUsers: number; pendingReview: number } }) {
   const t = useTranslations("Admin.nav");
@@ -40,9 +40,9 @@ export function AdminNav({ counts }: { counts: { pendingUsers: number; pendingRe
   return (
     <nav
       aria-label={t("label")}
-      className="-mx-4 overflow-x-auto px-4 sm:-mx-6 sm:px-6 xl:mx-0 xl:w-52 xl:shrink-0 xl:overflow-visible xl:px-0"
+      className="border-border -mx-4 overflow-x-auto border-b px-4 sm:-mx-6 sm:px-6 xl:mx-0 xl:px-0"
     >
-      <ul className="flex gap-1 xl:sticky xl:top-20 xl:flex-col">
+      <ul className="flex gap-6">
         {sections.map(({ key, icon: Icon }) => {
           const href = `/admin/${key}` as const;
           const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -53,16 +53,18 @@ export function AdminNav({ counts }: { counts: { pendingUsers: number; pendingRe
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "hover:bg-muted focus-visible:ring-ring/50 flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-[3px]",
-                  active ? "bg-muted text-foreground font-medium" : "text-muted-foreground",
+                  "focus-visible:outline-ring -mb-px flex items-center gap-2 whitespace-nowrap border-b-2 py-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2",
+                  active
+                    ? "border-primary text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground border-transparent",
                 )}
               >
                 <Icon className="size-4 shrink-0" aria-hidden />
                 <span>{t(key)}</span>
                 {n > 0 && (
                   <Badge
-                    variant="secondary"
-                    className="ml-auto tabular-nums"
+                    variant={key === "users" ? "signal" : "secondary"}
+                    className="tabular-nums"
                     aria-label={t("pendingCount", { count: n })}
                   >
                     {n}

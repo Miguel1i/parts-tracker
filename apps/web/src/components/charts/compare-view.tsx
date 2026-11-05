@@ -112,7 +112,7 @@ export function CompareView({
         <div
           role="group"
           aria-label={t("view.label")}
-          className="bg-muted inline-flex rounded-lg p-1"
+          className="border-border inline-flex h-8 overflow-hidden rounded-[4px] border"
         >
           {(["grid", "heatmap"] as const).map((v) => (
             <button
@@ -121,10 +121,10 @@ export function CompareView({
               aria-pressed={view === v}
               onClick={() => changeView(v)}
               className={cn(
-                "focus-visible:ring-ring/50 rounded-md px-3 py-1 text-sm outline-none focus-visible:ring-[3px]",
+                "focus-visible:outline-ring border-border px-3 text-[13px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 [&+&]:border-l",
                 view === v
-                  ? "bg-background font-medium shadow-sm"
-                  : "text-foreground/80 hover:text-foreground",
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
             >
               {t(`view.${v}`)}

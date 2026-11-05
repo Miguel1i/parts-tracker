@@ -73,7 +73,7 @@ export function HealthChart({ days }: { days: DayHealth[] }) {
       </div>
 
       {total === 0 ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed px-4 py-10 text-center text-sm">
+        <p className="text-muted-foreground rounded-[6px] border border-dashed px-4 py-10 text-center text-sm">
           {t("empty")}
         </p>
       ) : table ? (
@@ -81,7 +81,7 @@ export function HealthChart({ days }: { days: DayHealth[] }) {
           tabIndex={0}
           role="region"
           aria-label={t("tableLabel")}
-          className="focus-visible:ring-ring/50 max-h-80 overflow-auto rounded-xl border outline-none focus-visible:ring-[3px]"
+          className="focus-visible:outline-ring max-h-80 overflow-auto rounded-[6px] border focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <table className="w-full text-sm">
             <caption className="sr-only">{summary}</caption>
@@ -147,7 +147,7 @@ export function HealthChart({ days }: { days: DayHealth[] }) {
                 const row = active ? (payload?.[0]?.payload as Row | undefined) : undefined;
                 if (!row) return null;
                 return (
-                  <div className="bg-popover text-popover-foreground grid min-w-44 gap-1.5 rounded-lg border px-3 py-2 text-xs shadow-md">
+                  <div className="bg-popover text-popover-foreground grid min-w-44 gap-1.5 rounded-[6px] border px-3 py-2 text-xs shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]">
                     <div className="font-medium">{dayLabel(row.day, "long")}</div>
                     {row.total === 0 ? (
                       <div className="text-muted-foreground">{t("noChecks")}</div>
@@ -195,7 +195,7 @@ export function HealthChart({ days }: { days: DayHealth[] }) {
                 aria-pressed={!hidden.has(s)}
                 onClick={() => toggle(s)}
                 className={cn(
-                  "focus-visible:ring-ring/50 flex items-center gap-1.5 rounded-sm text-xs outline-none focus-visible:ring-[3px]",
+                  "focus-visible:outline-ring flex items-center gap-1.5 rounded-sm text-xs focus-visible:outline-2 focus-visible:outline-offset-2",
                   hidden.has(s) && "opacity-50",
                 )}
               >

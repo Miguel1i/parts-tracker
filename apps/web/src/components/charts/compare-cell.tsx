@@ -157,7 +157,7 @@ export function CellMenu({ target, url }: { target: CellTarget; url: string | nu
                     </>
                   )}
                 </dl>
-                <pre className="bg-muted max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-md p-3 text-xs">
+                <pre className="bg-muted max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-[4px] p-3 text-xs">
                   {entry.log || t("log.noLog")}
                 </pre>
               </>
