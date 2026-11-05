@@ -202,3 +202,58 @@
     @apply font-sans;
   }
 }
+
+/* Account settings: each section card becomes a two-column row on wider screens. Unlayered so
+   it wins over the card's own utility classes. */
+.settings-sections {
+  display: grid;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .settings-sections {
+    gap: 0;
+  }
+  .settings-sections > [data-slot="card"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    column-gap: 2.5rem;
+    align-items: start;
+    padding: 2rem 0;
+    border: 0;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+  }
+  .settings-sections > [data-slot="card"]:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .settings-sections > [data-slot="card"] > [data-slot="card-header"] {
+    grid-row: 1 / span 3;
+    padding: 0;
+  }
+  .settings-sections > [data-slot="card"] > :not([data-slot="card-header"]) {
+    grid-column: 2;
+    margin: 0;
+    padding: 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+  .settings-sections > [data-slot="card"] > :not([data-slot="card-header"]):nth-child(2) {
+    border-radius: 6px 6px 0 0;
+  }
+  .settings-sections > [data-slot="card"] > :not([data-slot="card-header"]):last-child {
+    border-radius: 0 0 6px 6px;
+  }
+  .settings-sections
+    > [data-slot="card"]
+    > :not([data-slot="card-header"]):nth-child(2):last-child {
+    border-radius: 6px;
+  }
+  .settings-sections
+    > [data-slot="card"]
+    > :not([data-slot="card-header"])
+    + :not([data-slot="card-header"]) {
+    border-top: 0;
+  }
+}

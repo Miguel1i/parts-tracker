@@ -87,7 +87,7 @@ export function MerchantsTable({ rows }: { rows: MerchantRow[] }) {
                     )}
                     <Link
                       href={`/admin/merchants/${m.id}`}
-                      className="focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 truncate rounded underline-offset-4 hover:underline"
+                      className="focus-visible:outline-ring truncate rounded underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
                       {m.name}
                     </Link>

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { initLocale } from "@/i18n/server";
 import { publicBuildByToken } from "@/lib/builds/access";
+import { kicker } from "@/lib/kicker";
 
 // Reads the token param (and the DB) per request.
 export const instant = false;
@@ -85,7 +86,11 @@ export default async function SharedBuildPage({ params }: PageProps<"/[locale]/s
 
   return (
     <div>
-      <PageHeader title={build.name} description={t("sharedBy", { name: ownerName })} />
+      <PageHeader
+        kicker={await kicker("share")}
+        title={build.name}
+        description={t("sharedBy", { name: ownerName })}
+      />
       {lines.length === 0 ? (
         <p className="text-muted-foreground">{t("empty")}</p>
       ) : (

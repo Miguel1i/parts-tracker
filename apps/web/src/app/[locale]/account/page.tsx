@@ -12,6 +12,7 @@ import { PreferencesSection } from "./preferences-section";
 import { PrivacySection } from "./privacy-section";
 import { ProfileSection } from "./profile-section";
 import { SessionsSection } from "./sessions-section";
+import { kicker } from "@/lib/kicker";
 
 // Reads the session at the top level, so it renders on request.
 export const instant = false;
@@ -54,9 +55,15 @@ export default async function AccountPage() {
   const disabled = new Set(choices.filter((c) => !c.enabled).map((c) => c.merchantId));
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <PageHeader title={t("title")} description={t("description")} />
-      <div className="grid gap-6">
+    <div className="mx-auto max-w-5xl">
+      <PageHeader
+        kicker={await kicker("account")}
+        title={t("title")}
+        description={t("description")}
+      />
+      {/* Settings layout (globals.css .settings-sections): title + explanation on the left,
+          the form panel on the right, sections separated by rules; one column on phones. */}
+      <div className="settings-sections">
         <ProfileSection
           name={row?.name ?? actor.name}
           username={row?.displayUsername ?? row?.username ?? ""}

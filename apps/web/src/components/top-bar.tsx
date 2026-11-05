@@ -18,20 +18,27 @@ const iconButton = cn(
   "focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2",
 );
 
-/** "03 — Builds", "Admin", "Profile & settings": where you are, in the desktop top bar. */
+/**
+ * A quiet breadcrumb in the desktop top bar ("Parts Tracker / Builds"). The page itself carries
+ * the numbered kicker, so this doesn't repeat it.
+ */
 function SectionKicker() {
   const t = useTranslations("Nav");
   const ta = useTranslations("Account");
   const pathname = usePathname();
   const section = sectionFor(pathname);
   let label: string | null = null;
-  if (section) label = `${section.num} — ${t(section.key)}`;
+  if (section) label = t(section.key);
   else if (pathname === "/admin" || pathname.startsWith("/admin/")) label = t("admin");
   else if (pathname === "/account" || pathname.startsWith("/account/")) label = ta("profile");
   if (!label) return <span className="hidden md:block" />;
   return (
-    <p className="text-muted-foreground hidden truncate font-mono text-[11px] uppercase tracking-[0.08em] md:block">
-      {label}
+    <p className="text-muted-foreground hidden truncate text-sm md:block">
+      <span>Parts Tracker</span>
+      <span aria-hidden className="mx-2 opacity-50">
+        /
+      </span>
+      <span className="text-foreground font-medium">{label}</span>
     </p>
   );
 }

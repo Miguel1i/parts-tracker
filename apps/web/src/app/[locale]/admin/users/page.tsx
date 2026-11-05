@@ -14,6 +14,7 @@ import { InvitePanel } from "./invite-panel";
 import { PendingPanel } from "./pending-panel";
 import { SignupModeSelect } from "./signup-mode-select";
 import { UsersTable, type UserRow } from "./users-table";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -121,7 +122,11 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
 
   return (
     <>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        kicker={await kicker("admin")}
+        title={t("title")}
+        description={t("description")}
+      />
       <PendingPanel users={waiting} />
       <div className="mb-8 grid gap-4 xl:grid-cols-2">
         <SignupModeSelect mode={settings.signupMode} />

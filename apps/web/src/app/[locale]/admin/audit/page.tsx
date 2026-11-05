@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { initLocale } from "@/i18n/server";
 import { requireAdmin } from "@/lib/auth/guard";
 import { cn } from "@/lib/utils";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -66,7 +67,11 @@ export default async function AuditPage({ searchParams }: PageProps<"/[locale]/a
 
   return (
     <div>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        kicker={await kicker("admin")}
+        title={t("title")}
+        description={t("description")}
+      />
 
       <nav aria-label={t("filter")} className="mb-6 flex flex-wrap gap-2">
         {[undefined, ...ENTITIES].map((e) => (

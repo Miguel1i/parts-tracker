@@ -61,7 +61,7 @@ export function DurationChart({ runs }: { runs: RunDuration[] }) {
           tabIndex={0}
           role="region"
           aria-label={t("tableLabel")}
-          className="focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 max-h-80 overflow-auto rounded-[6px] border"
+          className="focus-visible:outline-ring max-h-80 overflow-auto rounded-[6px] border focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <table className="w-full text-sm">
             <caption className="sr-only">{summary}</caption>

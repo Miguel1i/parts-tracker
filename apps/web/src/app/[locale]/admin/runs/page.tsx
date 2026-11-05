@@ -14,6 +14,7 @@ import { DurationChart } from "./duration-chart";
 import { CheckAllButton, CronIntervalSelect } from "./run-controls";
 import { durationMs, formatDuration, RunStatusBadge, safeGhUrl } from "./run-bits";
 import { resolveScopeNames, scopeParts } from "./scope";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -76,7 +77,11 @@ export default async function RunsPage({ searchParams }: PageProps<"/[locale]/ad
   return (
     <div className="grid gap-8">
       <div>
-        <PageHeader title={t("title")} description={t("description")} />
+        <PageHeader
+          kicker={await kicker("admin")}
+          title={t("title")}
+          description={t("description")}
+        />
         <div className="flex flex-wrap items-end justify-between gap-4">
           <CronIntervalSelect hours={settings.cronIntervalHours} />
           <CheckAllButton />

@@ -12,6 +12,7 @@ import { requireUser } from "@/lib/auth/guard";
 import { listBuilds } from "@/lib/builds/queries";
 import { parseHide } from "@/lib/charts/compare";
 import { loadCompare } from "@/lib/charts/compare-data";
+import { kicker } from "@/lib/kicker";
 
 // Reads the session at the top level: render on request.
 export const instant = false;
@@ -36,7 +37,13 @@ export default async function ComparePage({
   const db = getDb();
   const builds = await listBuilds(db, user.id);
 
-  const header = <PageHeader title={t("title")} description={t("description")} />;
+  const header = (
+    <PageHeader
+      kicker={await kicker("compare")}
+      title={t("title")}
+      description={t("description")}
+    />
+  );
 
   if (builds.length === 0) {
     return (

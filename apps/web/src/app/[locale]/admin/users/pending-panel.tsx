@@ -41,7 +41,7 @@ export function PendingPanel({ users }: { users: PendingUser[] }) {
             <li key={u.id} className="flex flex-col gap-3 px-5 py-3 sm:flex-row sm:items-center">
               <div className="min-w-0 flex-1">
                 <div className="truncate font-medium">
-                  {u.name}
+                  {u.name || u.email}
                   {u.username && (
                     <span className="text-muted-foreground ml-2 font-mono text-xs">
                       @{u.username}

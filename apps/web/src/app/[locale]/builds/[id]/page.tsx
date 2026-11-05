@@ -15,6 +15,7 @@ import { AddPanel } from "./add-panel";
 import { CheckButton } from "./check-button";
 import { ItemsTable } from "./items-table";
 import { SharePanel } from "./share-panel";
+import { kicker } from "@/lib/kicker";
 
 // Reads the session at the top level: render on request.
 export const instant = false;
@@ -40,10 +41,13 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
         <ChevronLeft className="size-4" aria-hidden />
         {t("back")}
       </Link>
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+      <div className="border-border mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-6">
         <div className="min-w-0">
+          <p className="text-primary mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em]">
+            {await kicker("builds")}
+          </p>
           <div className="flex items-center gap-2">
-            <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">
+            <h1 className="break-words text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[40px]">
               {build.name}
             </h1>
             <BuildMenu buildId={build.id} name={build.name} redirectOnDelete />
@@ -59,7 +63,7 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
         <div className="text-right">
-          <p className="text-3xl font-semibold tabular-nums">
+          <p className="font-mono text-[28px] font-semibold tabular-nums">
             {format.number(build.total, "price")}
           </p>
           <p className="text-muted-foreground text-xs">

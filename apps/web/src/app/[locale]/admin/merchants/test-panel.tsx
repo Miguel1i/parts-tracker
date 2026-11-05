@@ -25,7 +25,7 @@ function SafeLink({ href, children }: { href: string | null; children: React.Rea
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 inline-flex max-w-full items-center gap-1 break-all rounded underline underline-offset-4"
+        className="focus-visible:outline-ring inline-flex max-w-full items-center gap-1 break-all rounded underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2"
       >
         {children}
         <ExternalLink className="size-3 shrink-0" aria-hidden />
@@ -137,7 +137,7 @@ export function TestPanel({
                 id={selectId}
                 value={productId}
                 onChange={(ev) => setProductId(ev.target.value)}
-                className="border-input bg-background focus-visible:border-ring focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-input/30 h-8 w-full min-w-0 rounded-[4px] border px-2.5 text-sm"
+                className="border-input bg-background focus-visible:border-ring focus-visible:outline-ring dark:bg-input/30 h-8 w-full min-w-0 rounded-[4px] border px-2.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 <option value="">{t("choose")}</option>
                 {products.map((p) => (

@@ -1242,5 +1242,14 @@
       "title": "Start tracking your build.",
       "body": "Bring a parts list. We'll bring the shops."
     }
+  },
+  "Kickers": {
+    "dashboard": "01 — Dashboard",
+    "compare": "02 — Compare",
+    "builds": "03 — Builds",
+    "part": "Part",
+    "account": "Your account",
+    "admin": "Admin",
+    "share": "Shared build"
   }
 }

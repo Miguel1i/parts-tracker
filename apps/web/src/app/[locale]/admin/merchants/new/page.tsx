@@ -6,6 +6,7 @@ import { initLocale } from "@/i18n/server";
 import { emptyAdapterFields } from "@/lib/admin/adapter-schema";
 import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { MerchantForm } from "../merchant-form";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -25,7 +26,7 @@ export default async function NewMerchantPage() {
   const t = await getTranslations("Admin.merchants");
   return (
     <div>
-      <PageHeader title={t("newTitle")} />
+      <PageHeader kicker={await kicker("admin")} title={t("newTitle")} />
       <MerchantForm
         initial={{
           name: "",

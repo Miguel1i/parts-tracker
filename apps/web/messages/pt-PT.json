@@ -1242,5 +1242,14 @@
       "title": "Comece a acompanhar a sua configuração.",
       "body": "Traga a lista de peças. Nós trazemos as lojas."
     }
+  },
+  "Kickers": {
+    "dashboard": "01 — Painel",
+    "compare": "02 — Comparar",
+    "builds": "03 — Configurações",
+    "part": "Peça",
+    "account": "A sua conta",
+    "admin": "Administração",
+    "share": "Configuração partilhada"
   }
 }

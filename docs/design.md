@@ -5,11 +5,13 @@ Avoid: Geist/Inter-only look, grey-on-grey cards with big rounded corners, gradi
 "shadow-sm rounded-xl border" everywhere, centered generic hero with three icon cards.
 
 ## Concept: "the price tag & the receipt"
+
 Parts Tracker watches PC-part prices. The language borrows from shop price tags, till receipts and
 component datasheets: warm paper, black ink, one signal colour, monospaced figures, hairline rules,
 perforated/dashed separators used sparingly, square-ish corners (radius 2–6px), tight uppercase labels.
 
 ## Type (next/font/google)
+
 - Display + UI: **Schibsted Grotesk** (weights 400/500/600/700/800) — `--font-sans`.
 - Figures, prices, codes, labels: **IBM Plex Mono** (400/500/600) — `--font-mono`. All prices, deltas,
   table numbers, KPI values use mono with `font-variant-numeric: tabular-nums`.
@@ -18,21 +20,24 @@ perforated/dashed separators used sparingly, square-ish corners (radius 2–6px)
 - Headings: tight tracking (-0.02em), weight 700/800. No sentence-case title bars in grey.
 
 ## Colour tokens (CSS vars, light / dark). Keep the existing token NAMES used by components
+
 (--background, --foreground, --card, --card-foreground, --popover, --popover-foreground, --primary,
 --primary-foreground, --secondary, --secondary-foreground, --muted, --muted-foreground, --accent,
 --accent-foreground, --destructive, --border, --input, --ring, --sidebar-*) but with these values:
+
 - paper (background): light #F3EFE6 · dark #141311
 - surface (card/popover): light #FBF9F4 · dark #1C1A17
 - ink (foreground): light #16140F · dark #F1ECE1
-- muted text: light #5E584C · dark #A69F90  (AA on paper and surface)
+- muted text: light #5E584C · dark #A69F90 (AA on paper and surface)
 - rule (border/input): light #D8D1C2 · dark #34302A
 - muted fill (muted/secondary): light #EAE4D7 · dark #24211D
 - signal (primary/ring): light #C03D14 (tag orange-red, AA with paper text) · dark #F0643A; primary-foreground #FFF8F0
 - drop/good (success): light #1F6B4F · dark #4FB58A ; rise/bad uses --destructive light #B42318 · dark #F2705E
 - accent (hover wash): light #EDE6D6 · dark #2A2621
-Charts keep their validated palette vars (--chart-*); only set --chart-grid to the rule colour.
+  Charts keep their validated palette vars (--chart-*); only set --chart-grid to the rule colour.
 
 ## Shape & surface
+
 - Radius: --radius: 4px (buttons/inputs 4px, panels 6px, tags 2px). No rounded-xl/2xl anywhere.
 - Borders: 1px solid rule. Panels: surface + 1px rule, NO drop shadow (a 1px inner highlight at most).
   Popovers/menus/dialogs: surface + 1px rule + one crisp shadow `0 8px 24px -12px rgb(0 0 0 / .25)`.
@@ -40,6 +45,7 @@ Charts keep their validated palette vars (--chart-*); only set --chart-grid to t
 - Focus: 2px solid signal outline, 2px offset (no blurry rings).
 
 ## Components (same export names/props as today's src/components/ui so pages keep working)
+
 - **Button** variants: default = ink fill/paper text (dark: paper fill/ink text); `signal` maybe via
   variant "default"? keep variants default|secondary|outline|ghost|link|destructive and sizes default|sm|lg|icon|icon-sm.
   Height 36 (sm 30, lg 44), radius 4, weight 600, no shadow; hover = slight lift in contrast (not opacity).
@@ -59,12 +65,14 @@ Charts keep their validated palette vars (--chart-*); only set --chart-grid to t
 - **Avatar**: square-ish (radius 4) initials in mono.
 
 ## Brand
+
 - **Logo mark** (SVG, currentColor + signal): a price tag silhouette (rectangle with a cut corner) whose
   punched hole is a square IC pad with two pins — reads as "tag" and "chip". Wordmark "Parts Tracker" in
   Schibsted Grotesk 800 with "Tracker" in signal or a mono "/tracker". Provide <LogoMark/> and <Logo/> in
   src/components/brand/logo.tsx, and app/icon.svg (favicon) + app/apple-icon (png optional).
 
 ## Layout / IA (web-designer structure)
+
 - **App shell**: own implementation (no shadcn sidebar). Desktop: fixed left rail 232px with the logo at top,
   numbered nav ("01 Dashboard", "02 Compare", "03 Builds") in mono numerals + sans labels, active item =
   ink bar on the left + bold; footer of rail: account, theme, language. Rail collapses to 64px icon rail

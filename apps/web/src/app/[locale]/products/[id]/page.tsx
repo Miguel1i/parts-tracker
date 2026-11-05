@@ -19,6 +19,7 @@ import {
   loadProductOffers,
 } from "@/lib/charts/product-detail";
 import { parseViewState } from "@/lib/charts/product-view";
+import { kicker } from "@/lib/kicker";
 
 // Reads the session at the top level: render on request.
 export const instant = false;
@@ -71,9 +72,12 @@ export default async function ProductPage({
         {t("back")}
       </Link>
 
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div className="border-border mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-6">
         <div className="min-w-0">
-          <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">
+          <p className="text-primary mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em]">
+            {await kicker("part")}
+          </p>
+          <h1 className="break-words text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[40px]">
             {head.name}
           </h1>
           <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-2 text-sm">
@@ -94,8 +98,10 @@ export default async function ProductPage({
         </div>
         <dl className="flex gap-6 text-right">
           <div>
-            <dt className="text-muted-foreground text-xs">{t("bestPrice")}</dt>
-            <dd className="text-3xl font-semibold tabular-nums">
+            <dt className="text-muted-foreground font-mono text-[11px] uppercase tracking-[0.08em]">
+              {t("bestPrice")}
+            </dt>
+            <dd className="font-mono text-[28px] font-semibold tabular-nums">
               {offer ? format.number(offer.unitTotal, "price") : "–"}
             </dd>
             <dd className="text-muted-foreground text-xs">
@@ -105,8 +111,10 @@ export default async function ProductPage({
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-xs">{t("refPrice")}</dt>
-            <dd className="text-3xl font-semibold tabular-nums">
+            <dt className="text-muted-foreground font-mono text-[11px] uppercase tracking-[0.08em]">
+              {t("refPrice")}
+            </dt>
+            <dd className="font-mono text-[28px] font-semibold tabular-nums">
               {head.refPrice != null ? format.number(head.refPrice, "price") : "–"}
             </dd>
             {vsRef != null && (

@@ -1,5 +1,5 @@
 import { getDb } from "@parts/db";
-import { Activity, Euro, PackageOpen, PiggyBank, Store } from "lucide-react";
+import { PackageOpen } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { BuildTotalChartLazy, MoversChartLazy } from "@/components/charts/dash-build-chart-lazy";
@@ -12,6 +12,7 @@ import { getSession, requireUser } from "@/lib/auth/guard";
 import { loadDashboard } from "@/lib/charts/dashboard";
 import { CheckButton } from "./builds/[id]/check-button";
 import { Landing } from "./landing";
+import { kicker } from "@/lib/kicker";
 
 export async function DashboardBody() {
   const session = await getSession();
@@ -25,7 +26,13 @@ async function SignedIn({ userId }: { userId: string }) {
   const ts = await getTranslations("Charts.spark");
   const format = await getFormatter();
   const d = await loadDashboard(getDb(), userId);
-  const header = <PageHeader title={t("title")} description={t("description")} />;
+  const header = (
+    <PageHeader
+      kicker={await kicker("dashboard")}
+      title={t("title")}
+      description={t("description")}
+    />
+  );
 
   if (!d.build) {
     return (
@@ -60,9 +67,12 @@ async function SignedIn({ userId }: { userId: string }) {
           <CheckButton buildId={d.build.id} label={t("checkAll")} />
         </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <Tile icon={Euro} title={t("kpi.buildTotal")}>
-            <p className="text-2xl font-semibold tabular-nums">{format.number(d.total, "price")}</p>
+        {/* One ruled strip of figures (hairlines between cells), not four floating cards. */}
+        <div className="bg-border grid grid-cols-2 gap-px overflow-hidden rounded-[6px] border lg:grid-cols-4">
+          <Tile title={t("kpi.buildTotal")}>
+            <p className="font-mono text-[26px] font-semibold tabular-nums leading-none">
+              {format.number(d.total, "price")}
+            </p>
             <p className="text-muted-foreground text-xs">
               {d.withShipping ? t("withShipping") : t("withoutShipping")}
               {d.missing > 0 && ` · ${t("missing", { count: d.missing })}`}
@@ -74,20 +84,22 @@ async function SignedIn({ userId }: { userId: string }) {
               />
             )}
           </Tile>
-          <Tile icon={PiggyBank} title={t("kpi.savings")}>
-            <p className="text-2xl font-semibold tabular-nums">
+          <Tile title={t("kpi.savings")}>
+            <p className="font-mono text-[26px] font-semibold tabular-nums leading-none">
               {d.savings == null ? "–" : format.number(d.savings, "price")}
             </p>
             <p className="text-muted-foreground text-xs">
               {d.savings == null ? t("savingsNone") : t("savingsHint")}
             </p>
           </Tile>
-          <Tile icon={Store} title={t("kpi.merchants")}>
-            <p className="text-2xl font-semibold tabular-nums">{d.merchantCount}</p>
+          <Tile title={t("kpi.merchants")}>
+            <p className="font-mono text-[26px] font-semibold tabular-nums leading-none">
+              {d.merchantCount}
+            </p>
             <p className="text-muted-foreground text-xs">{t("merchantsHint")}</p>
           </Tile>
-          <Tile icon={Activity} title={t("kpi.lastRun")}>
-            <p className="text-2xl font-semibold">{runStatus ?? "–"}</p>
+          <Tile title={t("kpi.lastRun")}>
+            <p className="text-[22px] font-bold leading-none">{runStatus ?? "–"}</p>
             <p className="text-muted-foreground text-xs">
               {d.lastRun?.at ? format.relativeTime(d.lastRun.at) : t("noRuns")}
             </p>
@@ -140,24 +152,13 @@ async function SignedIn({ userId }: { userId: string }) {
   );
 }
 
-function Tile({
-  icon: Icon,
-  title,
-  children,
-}: {
-  icon: typeof Euro;
-  title: string;
-  children: ReactNode;
-}) {
+function Tile({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardDescription className="flex items-center gap-2">
-          <Icon className="size-4 shrink-0" aria-hidden />
-          {title}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-1">{children}</CardContent>
-    </Card>
+    <div className="bg-card flex min-w-0 flex-col gap-2 p-4 sm:p-5">
+      <p className="text-muted-foreground font-mono text-[11px] uppercase tracking-[0.08em]">
+        {title}
+      </p>
+      {children}
+    </div>
   );
 }

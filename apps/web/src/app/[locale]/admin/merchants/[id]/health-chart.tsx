@@ -81,7 +81,7 @@ export function HealthChart({ days }: { days: DayHealth[] }) {
           tabIndex={0}
           role="region"
           aria-label={t("tableLabel")}
-          className="focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 max-h-80 overflow-auto rounded-[6px] border"
+          className="focus-visible:outline-ring max-h-80 overflow-auto rounded-[6px] border focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           <table className="w-full text-sm">
             <caption className="sr-only">{summary}</caption>
@@ -195,7 +195,7 @@ export function HealthChart({ days }: { days: DayHealth[] }) {
                 aria-pressed={!hidden.has(s)}
                 onClick={() => toggle(s)}
                 className={cn(
-                  "focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 flex items-center gap-1.5 rounded-sm text-xs",
+                  "focus-visible:outline-ring flex items-center gap-1.5 rounded-sm text-xs focus-visible:outline-2 focus-visible:outline-offset-2",
                   hidden.has(s) && "opacity-50",
                 )}
               >

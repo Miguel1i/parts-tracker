@@ -11,6 +11,7 @@ import { isHttpUrl, isReport } from "@/lib/admin/review";
 import { requireAdmin } from "@/lib/auth/guard";
 import { cn } from "@/lib/utils";
 import { DecisionButtons } from "./decision-buttons";
+import { kicker } from "@/lib/kicker";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -111,7 +112,11 @@ export default async function ReviewPage({ searchParams }: PageProps<"/[locale]/
 
   return (
     <div>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        kicker={await kicker("admin")}
+        title={t("title")}
+        description={t("description")}
+      />
 
       <nav aria-label={t("filter")} className="mb-6 flex flex-wrap gap-2">
         {STATUSES.map((s) => (
@@ -294,7 +299,10 @@ export default async function ReviewPage({ searchParams }: PageProps<"/[locale]/
                           </summary>
                           <ul className="mt-2 flex flex-col gap-1">
                             {s.results.map((r, i) => (
-                              <li key={`${r.rule}-${i}`} className="bg-muted rounded-[4px] px-2 py-1">
+                              <li
+                                key={`${r.rule}-${i}`}
+                                className="bg-muted rounded-[4px] px-2 py-1"
+                              >
                                 <span className="font-medium">{r.rule}</span>{" "}
                                 <span className={cn("text-xs uppercase", verdictClass[r.verdict])}>
                                   {r.verdict}

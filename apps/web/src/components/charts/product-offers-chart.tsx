@@ -216,7 +216,7 @@ export function ProductOffersChart({
             role="region"
             aria-label={t("tableLabel")}
             className={cn(
-              "focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 overflow-x-auto rounded-[6px] border",
+              "focus-visible:outline-ring overflow-x-auto rounded-[6px] border focus-visible:outline-2 focus-visible:outline-offset-2",
               !table && "mt-1",
             )}
           >
