@@ -72,10 +72,7 @@ function MobileMenu() {
               <X aria-hidden className="size-5" />
             </Dialog.Close>
           </div>
-          <nav aria-label={t("main")} className="flex-1 overflow-y-auto py-5 pr-4">
-            <p className="text-muted-foreground mb-2 pl-4 font-mono text-[11px] uppercase tracking-[0.08em]">
-              {t("main")}
-            </p>
+          <nav aria-label={t("main")} className="flex-1 overflow-y-auto px-3 py-5">
             <NavList onNavigate={close} />
           </nav>
           <div className="shrink-0 border-t p-3">

@@ -30,6 +30,7 @@ export type CompareCellData = RawCell & {
 export type CompareRow = {
   productId: string;
   name: string;
+  image: string | null;
   cells: Record<string, CompareCellData | undefined>;
   bestTotal: number | null;
   /** All merchants tied at the best total. */
@@ -38,7 +39,7 @@ export type CompareRow = {
 
 /** Rows for the given (visible) merchants. Best is computed among those merchants only. */
 export function buildCompareRows(
-  products: { id: string; name: string }[],
+  products: { id: string; name: string; image?: string | null }[],
   merchantIds: string[],
   cells: RawCell[],
 ): CompareRow[] {
@@ -61,7 +62,14 @@ export function buildCompareRows(
       if (isBest) bestMerchantIds.push(m);
       out[m] = { ...c, inStock, pct: pcts[i] ?? null, isBest };
     });
-    return { productId: p.id, name: p.name, cells: out, bestTotal, bestMerchantIds };
+    return {
+      productId: p.id,
+      name: p.name,
+      image: p.image && /^https?:\/\//i.test(p.image) ? p.image : null,
+      cells: out,
+      bestTotal,
+      bestMerchantIds,
+    };
   });
 }
 

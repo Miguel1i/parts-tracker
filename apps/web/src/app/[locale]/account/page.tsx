@@ -55,7 +55,7 @@ export default async function AccountPage() {
   const disabled = new Set(choices.filter((c) => !c.enabled).map((c) => c.merchantId));
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="max-w-5xl">
       <PageHeader
         kicker={await kicker("account")}
         title={t("title")}

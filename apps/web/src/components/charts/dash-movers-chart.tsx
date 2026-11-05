@@ -3,40 +3,19 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Rectangle,
-  ReferenceLine,
-  Tooltip,
-  XAxis,
-  YAxis,
-  type RectangleProps,
-} from "recharts";
 import { Button } from "@/components/ui/button";
-import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
+import { Link } from "@/i18n/navigation";
 import type { Mover } from "@/lib/charts/transforms";
 import { cn } from "@/lib/utils";
 
 type Days = "7" | "30";
-const config = { pct: { label: "%", color: "var(--chart-div-neg)" } } satisfies ChartConfig;
 
-function short(name: string, max = 24) {
-  return name.length > max ? `${name.slice(0, max - 1).trimEnd()}…` : name;
-}
-
-/** Bars round only at the data end (left for drops, right for rises). */
-function MoverBar(props: RectangleProps & { payload?: Mover }) {
-  const pct = props.payload?.pct ?? 0;
-  const fill =
-    Math.abs(pct) < 0.05
-      ? "var(--chart-div-mid)"
-      : pct < 0
-        ? "var(--chart-div-neg)"
-        : "var(--chart-div-pos)";
-  const radius: [number, number, number, number] = pct < 0 ? [4, 0, 0, 4] : [0, 4, 4, 0];
-  return <Rectangle {...props} fill={fill} radius={radius} />;
+function barColor(pct: number) {
+  return Math.abs(pct) < 0.05
+    ? "var(--chart-div-mid)"
+    : pct < 0
+      ? "var(--chart-div-neg)"
+      : "var(--chart-div-pos)";
 }
 
 export function MoversChart({ data }: { data: Record<Days, Mover[]> }) {
@@ -147,67 +126,53 @@ export function MoversChart({ data }: { data: Record<Days, Mover[]> }) {
           </table>
         </div>
       ) : (
-        <ChartContainer
-          config={config}
-          role="figure"
-          aria-label={summary}
-          className="aspect-auto w-full justify-start"
-          style={{ height: Math.max(120, rows.length * 32 + 40) }}
-        >
-          <BarChart
-            data={rows}
-            layout="vertical"
-            margin={{ top: 4, right: 12, bottom: 0, left: 0 }}
-            barSize={18}
-          >
-            <CartesianGrid horizontal={false} stroke="var(--border)" strokeWidth={1} />
-            <XAxis
-              type="number"
-              domain={[-bound, bound]}
-              tickLine={false}
-              axisLine={{ stroke: "var(--border)" }}
-              tickFormatter={(v: number) => pct(v)}
-              tickCount={5}
-            />
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={120}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(v: string) => short(v)}
-            />
-            <ReferenceLine x={0} stroke="var(--chart-axis)" strokeWidth={1} />
-            <Tooltip
-              cursor={{ fill: "var(--muted)", opacity: 0.5 }}
-              content={({ active, payload }) => {
-                const m = active ? (payload?.[0]?.payload as Mover | undefined) : undefined;
-                if (!m) return null;
-                const drop = m.pct < 0;
-                return (
-                  <div className="bg-popover text-popover-foreground grid max-w-64 gap-1 rounded-[6px] border px-3 py-2 text-xs shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]">
-                    <div className="break-words font-medium">{m.name}</div>
-                    <div className="flex items-center gap-1.5 text-sm font-semibold tabular-nums">
-                      {drop ? (
-                        <ArrowDown className="size-3.5" aria-hidden />
-                      ) : (
-                        <ArrowUp className="size-3.5" aria-hidden />
+        /*
+         * A diverging bar list in HTML rather than an SVG chart: every product name is shown in
+         * full (SVG axis labels had to be cut to a few characters), with the change and the
+         * before → now prices written beside each bar. Bars grow from the centre line.
+         */
+        <ul role="list" aria-label={summary} className="grid gap-3">
+          {rows.map((m) => {
+            const drop = m.pct < 0;
+            const width = `${Math.min(50, (Math.abs(m.pct) / bound) * 50)}%`;
+            return (
+              <li key={m.productId} className="grid gap-1.5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <Link
+                    href={`/products/${m.productId}`}
+                    className="line-clamp-2 min-w-0 text-sm font-medium hover:underline"
+                  >
+                    {m.name}
+                  </Link>
+                  <span className="flex shrink-0 items-center gap-1 font-mono text-sm font-semibold tabular-nums">
+                    {drop ? (
+                      <ArrowDown className="size-3.5" aria-hidden />
+                    ) : (
+                      <ArrowUp className="size-3.5" aria-hidden />
+                    )}
+                    {pct(m.pct)}
+                    <span className="sr-only">{drop ? t("drop") : t("rise")}</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div aria-hidden className="bg-muted relative h-2.5 flex-1 rounded-full">
+                    <span className="absolute inset-y-[-3px] left-1/2 w-px bg-[var(--chart-axis)]" />
+                    <span
+                      className={cn(
+                        "absolute inset-y-0 rounded-full",
+                        drop ? "right-1/2 rounded-r-none" : "left-1/2 rounded-l-none",
                       )}
-                      {pct(m.pct)}
-                      <span className="text-muted-foreground text-xs font-normal">
-                        {drop ? t("drop") : t("rise")}
-                      </span>
-                    </div>
-                    <div className="text-muted-foreground tabular-nums">
-                      {price(m.from)} → {price(m.to)}
-                    </div>
+                      style={{ width, background: barColor(m.pct) }}
+                    />
                   </div>
-                );
-              }}
-            />
-            <Bar dataKey="pct" shape={<MoverBar />} isAnimationActive={false} />
-          </BarChart>
-        </ChartContainer>
+                  <span className="text-muted-foreground w-40 shrink-0 text-right font-mono text-xs tabular-nums">
+                    {price(m.from)} → {price(m.to)}
+                  </span>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
 
       {all.length > 0 && !table && (

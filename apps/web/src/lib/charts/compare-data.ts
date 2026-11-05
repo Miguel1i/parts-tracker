@@ -10,7 +10,7 @@ type Conn = Pick<Db, "select">;
 export type CompareMerchant = { id: string; name: string; color: string; dash?: string };
 
 export type CompareData = {
-  products: { id: string; name: string }[];
+  products: { id: string; name: string; image: string | null }[];
   merchants: CompareMerchant[];
   cells: RawCell[];
   withShipping: boolean;
@@ -21,7 +21,7 @@ const CHUNK = 500;
 /** A build's products against the merchants this user compares. Ownership is checked by the caller. */
 export async function loadCompare(db: Conn, userId: string, buildId: string): Promise<CompareData> {
   const items = await db
-    .select({ id: products.id, name: products.name })
+    .select({ id: products.id, name: products.name, image: products.imageUrl })
     .from(buildItems)
     .innerJoin(products, eq(products.id, buildItems.productId))
     .where(eq(buildItems.buildId, buildId))

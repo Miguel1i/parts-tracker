@@ -23,7 +23,7 @@ import {
   type CandidateSignals,
   type ScrapeStatus,
 } from "@parts/db";
-import { and, eq, gte, inArray, or } from "drizzle-orm";
+import { and, eq, gte, inArray, isNull, or } from "drizzle-orm";
 import type { PairInput, PairMerchant, PairOutcome, PairState } from "./pair";
 import { productAsin } from "./queries";
 
@@ -317,6 +317,15 @@ async function writePair(
       title: accepted.offer.title ?? null,
       runId,
     });
+    // The first accepted product page with a picture gives the product its image (an admin
+    // can still change it in the catalog; it's never overwritten here).
+    const image = accepted.offer.image;
+    if (image && /^https:\/\//i.test(image) && image.length <= 1000) {
+      await db
+        .update(products)
+        .set({ imageUrl: image })
+        .where(and(eq(products.id, productId), isNull(products.imageUrl)));
+    }
   }
 
   if (outcome.review) {

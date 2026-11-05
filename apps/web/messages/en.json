@@ -849,6 +849,17 @@
         "reject": "Reject",
         "approved": "{name} can now use Parts Tracker",
         "rejected": "{name}'s sign-up was turned down"
+      },
+      "resets": {
+        "title": "Password reset requests",
+        "count": "{count, plural, one {# request} other {# requests}}",
+        "help": "These people asked to reset their password. Copy the link and send it to them yourself (it works once and expires after 24 hours), or dismiss the request.",
+        "requested": "asked {when}, valid until {until}",
+        "copy": "Copy link",
+        "copied": "Reset link copied",
+        "dismiss": "Dismiss",
+        "dismissed": "Request dismissed",
+        "linkLabel": "Reset link for {email}"
       }
     },
     "runs": {
@@ -945,7 +956,7 @@
       "passwordHelp": "At least 8 characters.",
       "submitSignIn": "Sign in",
       "submitSignUp": "Create account",
-      "forgot": "Forgot your password? Ask an admin to set a new one.",
+      "forgot": "Forgot your password?",
       "invited": "You've been invited. Create your account with the email the invite was sent to.",
       "errors": {
         "badCredentials": "Wrong email, username or password.",
@@ -963,6 +974,32 @@
       "body": "Your account ({email}) was created. An admin needs to approve it before you can use Parts Tracker; you'll be able to sign in normally once that happens.",
       "check": "Check again",
       "signOut": "Sign out"
+    },
+    "forgot": {
+      "title": "Forgot your password?",
+      "description": "Enter the email of your account and we'll prepare a link to choose a new password.",
+      "email": "Email",
+      "submit": "Request a reset link",
+      "sent": "If that email has an account, a reset request was made. An admin will send you the link (or check your inbox if email is set up). It works once and expires in 24 hours.",
+      "back": "Back to sign in",
+      "error": "That didn't work. Wait a minute and try again."
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "description": "Pick a password you don't use anywhere else.",
+      "new": "New password",
+      "help": "At least 8 characters.",
+      "confirm": "Repeat the new password",
+      "submit": "Save new password",
+      "done": "Your password was changed and you were signed out everywhere. Sign in with the new password.",
+      "signIn": "Sign in",
+      "invalid": "This reset link is invalid, already used or expired.",
+      "again": "Request a new link",
+      "errors": {
+        "mismatch": "The two passwords don't match.",
+        "expired": "This reset link is invalid, already used or expired.",
+        "generic": "That didn't work. Try again."
+      }
     }
   },
   "Email": {
@@ -1060,7 +1097,10 @@
       "emptySingle": "No single shop has every part in stock in this range.",
       "summary": "Build total, {mode}: {price} now, {dir, select, down {down {pct}%} up {up {pct}%} other {unchanged}} over the range shown.",
       "summaryNone": "Build total, {mode}: no price data yet.",
-      "summaryRef": "Reference prices total {ref}."
+      "summaryRef": "Reference prices total {ref}.",
+      "view": "Chart view",
+      "viewTotal": "Total",
+      "viewCategory": "By category"
     },
     "movers": {
       "title": "Biggest movers",

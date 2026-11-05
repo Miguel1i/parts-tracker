@@ -10,6 +10,7 @@ import {
   type Db,
 } from "@parts/db";
 import { and, asc, desc, eq, inArray, isNotNull, isNull, or, sql } from "@parts/db/orm";
+import { safeHttpUrl } from "@/lib/charts/product-view";
 
 type Conn = Pick<Db, "select">;
 
@@ -202,6 +203,7 @@ export async function listBuilds(db: Conn, userId: string): Promise<BuildSummary
 export type BuildItemView = {
   productId: string;
   name: string;
+  image: string | null;
   quantity: number;
   bought: { at: number; price: number | null; merchantId: string | null } | null;
   offer: Offer | null;
@@ -233,6 +235,7 @@ export async function getBuildView(
     .select({
       productId: buildItems.productId,
       name: products.name,
+      imageUrl: products.imageUrl,
       quantity: buildItems.quantity,
       boughtAt: buildItems.boughtAt,
       boughtPrice: buildItems.boughtPrice,
@@ -256,6 +259,7 @@ export async function getBuildView(
     return {
       productId: r.productId,
       name: r.name,
+      image: safeHttpUrl(r.imageUrl),
       quantity: r.quantity,
       bought: r.boughtAt
         ? { at: r.boughtAt.getTime(), price: r.boughtPrice, merchantId: r.boughtMerchantId }

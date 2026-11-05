@@ -1,25 +1,49 @@
-import { Gauge, LayoutGrid, Package, type LucideIcon } from "lucide-react";
+import {
+  Activity,
+  LayoutDashboard,
+  ListChecks,
+  PackageSearch,
+  PcCase,
+  Scale,
+  ScrollText,
+  Store,
+  UsersRound,
+  type LucideIcon,
+} from "lucide-react";
 
-// Public navigation only. Admin is reached from the account menu, for admins only.
 export type NavItem = {
   href: "/" | "/compare" | "/builds";
   key: "dashboard" | "compare" | "builds";
-  /** Two-digit section number shown in mono before the label ("01 Dashboard"). */
-  num: string;
   icon: LucideIcon;
 };
 
 export const mainNav: NavItem[] = [
-  { href: "/", key: "dashboard", num: "01", icon: Gauge },
-  { href: "/compare", key: "compare", num: "02", icon: LayoutGrid },
-  { href: "/builds", key: "builds", num: "03", icon: Package },
+  { href: "/", key: "dashboard", icon: LayoutDashboard },
+  { href: "/compare", key: "compare", icon: Scale },
+  { href: "/builds", key: "builds", icon: PcCase },
+];
+
+export type AdminSection = "users" | "merchants" | "catalog" | "review" | "runs" | "audit";
+
+/** Admin sections: shown as a second rail group, only while inside /admin (which is gated). */
+export const adminNav: { key: AdminSection; href: `/admin/${AdminSection}`; icon: LucideIcon }[] = [
+  { key: "users", href: "/admin/users", icon: UsersRound },
+  { key: "merchants", href: "/admin/merchants", icon: Store },
+  { key: "catalog", href: "/admin/catalog", icon: PackageSearch },
+  { key: "review", href: "/admin/review", icon: ListChecks },
+  { key: "runs", href: "/admin/runs", icon: Activity },
+  { key: "audit", href: "/admin/audit", icon: ScrollText },
 ];
 
 export function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** The nav section a path belongs to (for the top-bar kicker), if any. */
+export function inAdmin(pathname: string) {
+  return isActive(pathname, "/admin");
+}
+
+/** The nav section a path belongs to (for the top-bar breadcrumb), if any. */
 export function sectionFor(pathname: string): NavItem | undefined {
   return mainNav.find((item) => isActive(pathname, item.href));
 }

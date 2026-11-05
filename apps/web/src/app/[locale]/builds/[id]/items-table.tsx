@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
+import { ProductThumb } from "@/components/product-thumb";
 import { Link } from "@/i18n/navigation";
 import { useServerAction } from "@/components/admin/use-admin-action";
 import { Badge } from "@/components/ui/badge";
@@ -505,6 +506,7 @@ export function ItemsTable({
         {items.map((item, index) => (
           <li key={item.productId} className="grid gap-3 rounded-[6px] border p-3">
             <div className="flex items-start gap-2">
+              <ProductThumb src={item.image} size="md" />
               <div className="min-w-0 flex-1">
                 <ProductLink id={item.productId} name={item.name} />
                 <BoughtBadge item={item} merchants={merchants} />
@@ -546,9 +548,14 @@ export function ItemsTable({
           <TableBody>
             {items.map((item, index) => (
               <TableRow key={item.productId}>
-                <TableCell className="max-w-72 whitespace-normal align-top">
-                  <ProductLink id={item.productId} name={item.name} />
-                  <BoughtBadge item={item} merchants={merchants} />
+                <TableCell className="min-w-56 whitespace-normal align-top">
+                  <div className="flex items-start gap-3">
+                    <ProductThumb src={item.image} size="md" />
+                    <div className="min-w-0">
+                      <ProductLink id={item.productId} name={item.name} />
+                      <BoughtBadge item={item} merchants={merchants} />
+                    </div>
+                  </div>
                 </TableCell>
                 <TableCell className="align-top">
                   <Quantity buildId={buildId} item={item} run={run} />

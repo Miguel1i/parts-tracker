@@ -4,11 +4,12 @@ import { randomBytes } from "node:crypto";
 import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
-import { appSettings, getDb, invites, signupModes, user } from "@parts/db";
-import { and, eq, isNull } from "@parts/db/orm";
+import { appSettings, getDb, invites, signupModes, user, verification } from "@parts/db";
+import { and, eq, gt, isNull, like } from "@parts/db/orm";
 import { getPathname } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { writeAudit } from "@/lib/admin/audit";
+import { RESET_PREFIX } from "@/lib/admin/queries";
 import { ActionError, adminAction } from "@/lib/auth/guard";
 import { auth } from "@/lib/auth/server";
 import { normalizeEmail } from "@/lib/auth/signup";
@@ -308,3 +309,53 @@ export const revokeInvite = adminAction(
     return null;
   },
 );
+
+const resetInput = z.object({ resetId: z.string().min(1) });
+
+async function openReset(id: string) {
+  const [row] = await getDb()
+    .select()
+    .from(verification)
+    .where(
+      and(
+        eq(verification.id, id),
+        like(verification.identifier, `${RESET_PREFIX}%`),
+        gt(verification.expiresAt, new Date()),
+      ),
+    );
+  if (!row) throw new ActionError("notFound");
+  return row;
+}
+
+/** The one-time reset link of an open request, for the admin to pass on to its owner. */
+export const resetLink = adminAction(
+  resetInput.extend({ locale: z.enum(routing.locales).default(routing.defaultLocale) }),
+  async ({ resetId, locale }, { actor }) => {
+    const row = await openReset(resetId);
+    const token = row.identifier.slice(RESET_PREFIX.length);
+    const path = getPathname({ href: { pathname: "/reset-password", query: { token } }, locale });
+    await writeAudit(getDb(), {
+      actorUserId: actor.id,
+      action: "user.reset-link",
+      entity: "user",
+      entityId: row.value,
+    });
+    return { url: `${siteUrl()}${path}` };
+  },
+);
+
+/** Drops a reset request (its link stops working). */
+export const dismissReset = adminAction(resetInput, async ({ resetId }, { actor }) => {
+  const row = await openReset(resetId);
+  const db = getDb();
+  await db.transaction(async (tx) => {
+    await tx.delete(verification).where(eq(verification.id, row.id));
+    await writeAudit(tx, {
+      actorUserId: actor.id,
+      action: "user.reset-dismiss",
+      entity: "user",
+      entityId: row.value,
+    });
+  });
+  return null;
+});

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { AdminNav } from "@/components/admin/admin-nav";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
 import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { getAdminCounts } from "@/lib/admin/queries";
+import { PublishAdminCounts } from "@/lib/admin-counts";
 
 /*
  * The guard runs at the top of the layout, before anything streams, so non-admins get a real
@@ -33,9 +33,10 @@ export default async function AdminLayout({ children }: LayoutProps<"/[locale]/a
   const counts = await getAdminCounts();
 
   return (
-    <div className="flex flex-col gap-8">
-      <AdminNav counts={counts} />
-      <div className="min-w-0 flex-1">{children}</div>
-    </div>
+    <>
+      {/* Section links live in the rail's Admin group; this feeds its badges. */}
+      <PublishAdminCounts counts={counts} />
+      {children}
+    </>
   );
 }

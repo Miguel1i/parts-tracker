@@ -19,6 +19,7 @@ import {
   loadProductOffers,
 } from "@/lib/charts/product-detail";
 import { parseViewState } from "@/lib/charts/product-view";
+import { ProductThumb } from "@/components/product-thumb";
 import { kicker } from "@/lib/kicker";
 
 // Reads the session at the top level: render on request.
@@ -73,27 +74,30 @@ export default async function ProductPage({
       </Link>
 
       <div className="border-border mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-6">
-        <div className="min-w-0">
-          <p className="text-primary mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em]">
-            {await kicker("part")}
-          </p>
-          <h1 className="break-words text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[40px]">
-            {head.name}
-          </h1>
-          <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-2 text-sm">
-            {head.brand && <span>{head.brand}</span>}
-            {head.category && <Badge variant="secondary">{head.category}</Badge>}
-            {head.refUrl && (
-              <a
-                href={head.refUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground inline-flex items-center gap-1 underline underline-offset-2"
-              >
-                {t("referencePage")}
-                <ExternalLink className="size-3" aria-hidden />
-              </a>
-            )}
+        <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-end">
+          <ProductThumb src={head.image} size="lg" />
+          <div className="min-w-0">
+            <p className="text-primary mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em]">
+              {await kicker("part")}
+            </p>
+            <h1 className="break-words text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[40px]">
+              {head.name}
+            </h1>
+            <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-2 text-sm">
+              {head.brand && <span>{head.brand}</span>}
+              {head.category && <Badge variant="secondary">{head.category}</Badge>}
+              {head.refUrl && (
+                <a
+                  href={head.refUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground inline-flex items-center gap-1 underline underline-offset-2"
+                >
+                  {t("referencePage")}
+                  <ExternalLink className="size-3" aria-hidden />
+                </a>
+              )}
+            </div>
           </div>
         </div>
         <dl className="flex gap-6 text-right">

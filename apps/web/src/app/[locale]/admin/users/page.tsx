@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
-import { getSettings } from "@/lib/admin/queries";
+import { getResetRequests, getSettings } from "@/lib/admin/queries";
 import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { cn } from "@/lib/utils";
 import { InvitePanel } from "./invite-panel";
 import { PendingPanel } from "./pending-panel";
+import { ResetPanel } from "./reset-panel";
 import { SignupModeSelect } from "./signup-mode-select";
 import { UsersTable, type UserRow } from "./users-table";
 import { kicker } from "@/lib/kicker";
@@ -58,7 +59,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
   if (filter === "admins") where.push(eq(user.role, "admin"));
   if (filter === "banned") where.push(eq(user.banned, true));
 
-  const [rows, total, settings, openInvites, waiting] = await Promise.all([
+  const [rows, total, settings, openInvites, waiting, resets] = await Promise.all([
     db
       .select()
       .from(user)
@@ -86,6 +87,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
       .where(and(eq(user.status, "pending"), eq(user.banned, false)))
       .orderBy(asc(user.createdAt))
       .limit(100),
+    getResetRequests(),
   ]);
 
   const ids = rows.map((r) => r.id);
@@ -128,6 +130,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
         description={t("description")}
       />
       <PendingPanel users={waiting} />
+      <ResetPanel requests={resets} />
       <div className="mb-8 grid gap-4 xl:grid-cols-2">
         <SignupModeSelect mode={settings.signupMode} />
         <InvitePanel

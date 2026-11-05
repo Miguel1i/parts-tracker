@@ -849,6 +849,17 @@
         "reject": "Recusar",
         "approved": "{name} já pode usar o Parts Tracker",
         "rejected": "O registo de {name} foi recusado"
+      },
+      "resets": {
+        "title": "Pedidos de reposição de palavra-passe",
+        "count": "{count, plural, one {# pedido} other {# pedidos}}",
+        "help": "Estas pessoas pediram para repor a palavra-passe. Copie a ligação e envie-lha (funciona uma vez e expira após 24 horas), ou dispense o pedido.",
+        "requested": "pedido {when}, válido até {until}",
+        "copy": "Copiar ligação",
+        "copied": "Ligação copiada",
+        "dismiss": "Dispensar",
+        "dismissed": "Pedido dispensado",
+        "linkLabel": "Ligação de reposição para {email}"
       }
     },
     "runs": {
@@ -945,7 +956,7 @@
       "passwordHelp": "Pelo menos 8 caracteres.",
       "submitSignIn": "Iniciar sessão",
       "submitSignUp": "Criar conta",
-      "forgot": "Esqueceu-se da palavra-passe? Peça a um administrador para definir uma nova.",
+      "forgot": "Esqueceu-se da palavra-passe?",
       "invited": "Recebeu um convite. Crie a conta com o email para onde o convite foi enviado.",
       "errors": {
         "badCredentials": "Email, nome de utilizador ou palavra-passe errados.",
@@ -963,6 +974,32 @@
       "body": "A sua conta ({email}) foi criada. Um administrador tem de a aprovar antes de poder usar o Parts Tracker; depois disso, pode iniciar sessão normalmente.",
       "check": "Verificar novamente",
       "signOut": "Terminar sessão"
+    },
+    "forgot": {
+      "title": "Esqueceu-se da palavra-passe?",
+      "description": "Introduza o email da sua conta e preparamos uma ligação para escolher uma nova palavra-passe.",
+      "email": "Email",
+      "submit": "Pedir ligação de reposição",
+      "sent": "Se esse email tiver conta, foi criado um pedido de reposição. Um administrador vai enviar-lhe a ligação (ou veja o seu email, se estiver configurado). Funciona uma vez e expira em 24 horas.",
+      "back": "Voltar ao início de sessão",
+      "error": "Não foi possível. Aguarde um minuto e tente novamente."
+    },
+    "reset": {
+      "title": "Escolha uma nova palavra-passe",
+      "description": "Escolha uma palavra-passe que não use noutro lado.",
+      "new": "Nova palavra-passe",
+      "help": "Pelo menos 8 caracteres.",
+      "confirm": "Repita a nova palavra-passe",
+      "submit": "Guardar nova palavra-passe",
+      "done": "A palavra-passe foi alterada e todas as sessões foram terminadas. Inicie sessão com a nova palavra-passe.",
+      "signIn": "Iniciar sessão",
+      "invalid": "Esta ligação de reposição é inválida, já foi usada ou expirou.",
+      "again": "Pedir nova ligação",
+      "errors": {
+        "mismatch": "As duas palavras-passe não coincidem.",
+        "expired": "Esta ligação de reposição é inválida, já foi usada ou expirou.",
+        "generic": "Não foi possível. Tente novamente."
+      }
     }
   },
   "Email": {
@@ -1060,7 +1097,10 @@
       "emptySingle": "Nenhuma loja tem todos os componentes em stock neste intervalo.",
       "summary": "Total da configuração, {mode}: {price} agora, {dir, select, down {desceu {pct}%} up {subiu {pct}%} other {sem alteração}} no intervalo apresentado.",
       "summaryNone": "Total da configuração, {mode}: ainda sem dados de preço.",
-      "summaryRef": "Os preços de referência somam {ref}."
+      "summaryRef": "Os preços de referência somam {ref}.",
+      "view": "Vista do gráfico",
+      "viewTotal": "Total",
+      "viewCategory": "Por categoria"
     },
     "movers": {
       "title": "Maiores variações",

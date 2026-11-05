@@ -20,6 +20,7 @@ const RANGES = [
 ] as const;
 type RangeKey = (typeof RANGES)[number]["key"];
 type Mode = "anywhere" | "single";
+type View = "total" | "category";
 const REF = "__ref";
 
 export function BuildTotalChart({ data }: { data: BuildChartData }) {
@@ -29,6 +30,8 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
   const [range, setRange] = useState<RangeKey>("90d");
   const [mode, setMode] = useState<Mode>("anywhere");
   const [table, setTable] = useState(false);
+  // One clear line by default; the stacked per-category breakdown is opt-in.
+  const [view, setView] = useState<View>("total");
   const [hidden, setHidden] = useState<Set<string>>(new Set());
 
   const catLabel = (key: string) => tc(key as "cpu");
@@ -80,6 +83,23 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
     data.categories.map((c) => [c.key, { label: catLabel(c.key), color: categoryColor(c.slot) }]),
   );
   const maxY = Math.max(0, ...rows.map((r) => Math.max(r.total ?? 0, data.refTotal ?? 0)));
+  // The total line zooms to its own range so day-to-day changes are visible; the stacked view
+  // keeps a zero baseline (stacked areas must start at 0).
+  const totals = priced.map((r) => r.total!).concat(data.refTotal != null ? [data.refTotal] : []);
+  const minY = totals.length ? Math.min(...totals) : 0;
+  const lo = view === "total" ? minY : 0;
+  // Round tick steps (1, 2, 2.5 or 5 × 10^n) so the axis reads €1,500 / €2,000, not €1,257.
+  const span = Math.max(maxY - lo, maxY * 0.04, 1);
+  const raw = span / 4;
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  const step = ([1, 2, 2.5, 5, 10].find((m) => m * mag >= raw) ?? 10) * mag;
+  const yMin = Math.max(0, Math.floor(lo / step) * step - (view === "total" ? step : 0));
+  const yMax = Math.ceil((maxY * 1.02) / step) * step;
+  const yDomain: [number, number] = [yMin, yMax];
+  const yTicks = Array.from(
+    { length: Math.round((yMax - yMin) / step) + 1 },
+    (_, i) => yMin + i * step,
+  );
 
   function toggle(key: string) {
     setHidden((prev) => {
@@ -129,6 +149,19 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
               onClick={() => setRange(r.key)}
             >
               {t(`range_${r.key}`)}
+            </Button>
+          ))}
+        </div>
+        <div role="group" aria-label={t("view")} className="flex flex-wrap gap-1">
+          {(["total", "category"] as const).map((v) => (
+            <Button
+              key={v}
+              size="sm"
+              variant={view === v ? "secondary" : "ghost"}
+              aria-pressed={view === v}
+              onClick={() => setView(v)}
+            >
+              {t(v === "total" ? "viewTotal" : "viewCategory")}
             </Button>
           ))}
         </div>
@@ -199,7 +232,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
           config={config}
           role="figure"
           aria-label={summary}
-          className="aspect-auto h-72 w-full justify-start"
+          className="aspect-auto h-80 w-full justify-start md:h-96"
         >
           <ComposedChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke="var(--border)" strokeWidth={1} />
@@ -217,7 +250,9 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
               width={56}
               tickLine={false}
               axisLine={false}
-              domain={[0, Math.ceil(maxY * 1.05)]}
+              domain={yDomain}
+              ticks={yTicks}
+              allowDataOverflow
               tickFormatter={(v: number) => axisPrice(v)}
             />
             <Tooltip
@@ -268,7 +303,28 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
                 );
               }}
             />
-            {shownCats.map((c) => (
+            {view === "total" && (
+              <defs>
+                <linearGradient id="build-total-fill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--chart-merchant-1)" stopOpacity={0.28} />
+                  <stop offset="100%" stopColor="var(--chart-merchant-1)" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+            )}
+            {view === "total" && (
+              <Area
+                dataKey="total"
+                type="stepAfter"
+                stroke="var(--chart-merchant-1)"
+                strokeWidth={2.5}
+                fill="url(#build-total-fill)"
+                baseValue="dataMin"
+                connectNulls={false}
+                isAnimationActive={false}
+                activeDot={{ r: 5, stroke: "var(--card)", strokeWidth: 2 }}
+              />
+            )}
+            {(view === "category" ? shownCats : []).map((c) => (
               <Area
                 key={c.key}
                 dataKey={c.key}
@@ -302,7 +358,17 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
 
       {priced.length > 0 && !table && (
         <ul className="flex flex-wrap gap-x-4 gap-y-1" aria-label={t("legend")}>
-          {data.categories.map((c) => (
+          {view === "total" && (
+            <li className="flex items-center gap-1.5 text-xs">
+              <span
+                aria-hidden
+                className="h-[3px] w-3 rounded"
+                style={{ background: "var(--chart-merchant-1)" }}
+              />
+              {t("total")}
+            </li>
+          )}
+          {(view === "category" ? data.categories : []).map((c) => (
             <LegendItem
               key={c.key}
               off={hidden.has(c.key)}

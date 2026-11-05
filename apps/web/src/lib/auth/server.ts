@@ -6,6 +6,7 @@ import { nextCookies } from "better-auth/next-js";
 import { admin, username } from "better-auth/plugins";
 import { account, appSettings, getDb, invites, session, user, verification } from "@parts/db";
 import { and, eq, gt, isNull, ne } from "@parts/db/orm";
+import { linkEmail, sendEmail } from "@/lib/email";
 import { siteUrl } from "@/lib/site-url";
 import { decideSignup, normalizeEmail, usableInvite } from "./signup";
 
@@ -34,6 +35,9 @@ async function signupContext(email: string, token: string | undefined) {
   };
 }
 
+/** How long a password-reset link stays valid (long enough for an admin to pass it on). */
+export const RESET_TOKEN_HOURS = 24;
+
 export const auth = betterAuth({
   appName: "Parts Tracker",
   baseURL: siteUrl(),
@@ -53,6 +57,28 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     maxPasswordLength: 128,
     autoSignIn: true,
+    // Forgotten passwords: Better Auth stores a one-time token (verification row
+    // `reset-password:<token>`). With Resend configured the link is emailed; either way the
+    // request shows on /admin/users, where an admin can copy the link and pass it on.
+    resetPasswordTokenExpiresIn: RESET_TOKEN_HOURS * 60 * 60,
+    revokeSessionsOnPasswordReset: true,
+    async sendResetPassword({ user: u, url }) {
+      try {
+        await sendEmail({
+          to: u.email,
+          subject: "Reset your Parts Tracker password",
+          ...linkEmail({
+            heading: "Reset your password",
+            body: "Someone asked to reset the password of your Parts Tracker account. If it wasn't you, ignore this email.",
+            cta: "Choose a new password",
+            url,
+            footer: `The link works once and expires in ${RESET_TOKEN_HOURS} hours.`,
+          }),
+        });
+      } catch (e) {
+        console.error("[reset email]", e);
+      }
+    },
   },
   user: {
     // Account deletion from /account; Better Auth asks for the password. Builds, preferences and

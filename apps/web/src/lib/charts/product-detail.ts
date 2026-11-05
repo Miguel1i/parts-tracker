@@ -23,6 +23,7 @@ export type ProductHead = {
   category: string | null;
   refPrice: number | null;
   refUrl: string | null;
+  image: string | null;
 };
 
 export async function loadProductHead(db: Conn, id: string): Promise<ProductHead | null> {
@@ -34,12 +35,21 @@ export async function loadProductHead(db: Conn, id: string): Promise<ProductHead
       category: products.category,
       refPrice: products.refPrice,
       refUrl: products.refUrl,
+      imageUrl: products.imageUrl,
       archived: products.archived,
     })
     .from(products)
     .where(eq(products.id, id));
   if (!p || p.archived) return null;
-  return { ...p, refUrl: safeHttpUrl(p.refUrl) };
+  return {
+    id: p.id,
+    name: p.name,
+    brand: p.brand,
+    category: p.category,
+    refPrice: p.refPrice,
+    refUrl: safeHttpUrl(p.refUrl),
+    image: safeHttpUrl(p.imageUrl),
+  };
 }
 
 export type OfferRowView = {
