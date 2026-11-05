@@ -1,7 +1,6 @@
-import { Clock } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { EmptyState } from "@/components/empty-state";
+import { Logo } from "@/components/brand/logo";
 import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
@@ -27,9 +26,17 @@ export default async function PendingPage() {
   const t = await getTranslations("Auth.pending");
 
   return (
-    <EmptyState icon={Clock} title={t("title")}>
-      <p>{t("body", { email: session!.user.email })}</p>
-      <PendingActions />
-    </EmptyState>
+    <div className="mx-auto w-full max-w-[28rem] py-4 sm:py-10">
+      <Logo className="mb-8" />
+      <div className="bg-card text-card-foreground rounded-[6px] border border-dashed p-6 sm:p-8">
+        <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em]">
+          {t("title")}
+        </h1>
+        <p className="text-muted-foreground mt-3 text-[15px] leading-6">
+          {t("body", { email: session!.user.email })}
+        </p>
+        <PendingActions />
+      </div>
+    </div>
   );
 }

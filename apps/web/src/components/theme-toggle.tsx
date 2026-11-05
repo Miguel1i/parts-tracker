@@ -1,21 +1,19 @@
 "use client";
 
-import { Check, Monitor, Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const options = [
-  { value: "light", icon: Sun },
-  { value: "dark", icon: Moon },
-  { value: "system", icon: Monitor },
-] as const;
+const options = ["light", "dark", "system"] as const;
 
 export function ThemeToggle({ side = "bottom" }: { side?: "top" | "bottom" | "right" }) {
   const t = useTranslations("Theme");
@@ -24,19 +22,26 @@ export function ThemeToggle({ side = "bottom" }: { side?: "top" | "bottom" | "ri
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t("change")}>
-          <Sun className="size-4 rotate-0 scale-100 transition-transform motion-reduce:transition-none dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute size-4 rotate-90 scale-0 transition-transform motion-reduce:transition-none dark:rotate-0 dark:scale-100" />
+        <Button variant="ghost" size="icon" aria-label={t("change")} className="relative">
+          <Sun
+            aria-hidden
+            className="size-4 transition-transform motion-reduce:transition-none dark:scale-0"
+          />
+          <Moon
+            aria-hidden
+            className="absolute size-4 scale-0 transition-transform motion-reduce:transition-none dark:scale-100"
+          />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side={side}>
-        {options.map(({ value, icon: Icon }) => (
-          <DropdownMenuItem key={value} onSelect={() => setTheme(value)}>
-            <Icon className="size-4" />
-            {t(value)}
-            {theme === value && <Check className="ml-auto size-4" aria-hidden />}
-          </DropdownMenuItem>
-        ))}
+      <DropdownMenuContent align="end" side={side} className="min-w-40">
+        <DropdownMenuLabel>{t("change")}</DropdownMenuLabel>
+        <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+          {options.map((value) => (
+            <DropdownMenuRadioItem key={value} value={value}>
+              {t(value)}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

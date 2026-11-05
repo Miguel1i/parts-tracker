@@ -4,6 +4,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Skeleton: diagonal stripes drifting sideways (one 16px tile per cycle, so it loops seamlessly). */
+@theme {
+  --animate-stripes: stripes 1.1s linear infinite;
+  @keyframes stripes {
+    from {
+      background-position: 16px 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

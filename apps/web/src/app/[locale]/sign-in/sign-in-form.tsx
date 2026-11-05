@@ -49,7 +49,9 @@ export function SignInForm() {
   const next = safeNextPath(params.get("next"));
   const inviteToken = params.get("invite") ?? undefined;
 
-  const [mode, setMode] = useState<Mode>(inviteToken ? "signUp" : "signIn");
+  const [mode, setMode] = useState<Mode>(
+    inviteToken || params.get("mode") === "signup" ? "signUp" : "signIn",
+  );
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState(params.get("email") ?? "");
   const [username, setUsername] = useState("");
@@ -114,10 +116,10 @@ export function SignInForm() {
         setError(null);
       }}
       className={cn(
-        "focus-visible:ring-ring/50 flex-1 rounded-md px-3 py-1.5 text-sm outline-none focus-visible:ring-[3px]",
+        "focus-visible:outline-ring -mb-px flex-1 border-b-2 px-1 pb-2.5 pt-1 text-left text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none",
         mode === m
-          ? "bg-background font-medium shadow-sm"
-          : "text-foreground/80 hover:text-foreground",
+          ? "border-primary text-foreground font-semibold"
+          : "text-muted-foreground hover:text-foreground border-transparent",
       )}
     >
       {m === "signIn" ? t("tabSignIn") : t("tabSignUp")}
@@ -126,19 +128,24 @@ export function SignInForm() {
 
   return (
     <div className="space-y-4">
-      <div role="tablist" className="bg-muted flex gap-1 rounded-lg p-1">
+      <div role="tablist" className="flex gap-4 border-b">
         {tab("signIn")}
         {tab("signUp")}
       </div>
       {inviteToken && mode === "signUp" && (
-        <p className="bg-muted rounded-md p-3 text-sm">{t("invited")}</p>
+        <p className="border-primary bg-muted rounded-[4px] border-l-[3px] p-3 text-sm">
+          {t("invited")}
+        </p>
       )}
       {error && (
-        <p role="alert" className="text-destructive text-sm">
+        <p
+          role="alert"
+          className="border-destructive text-destructive rounded-[4px] border-l-[3px] py-1 pl-3 text-sm"
+        >
           {error}
         </p>
       )}
-      <form onSubmit={submit} className="grid gap-3">
+      <form onSubmit={submit} className="grid gap-4">
         {mode === "signIn" ? (
           <div className="grid gap-1.5">
             <Label htmlFor="login">{t("login")}</Label>
@@ -201,7 +208,7 @@ export function SignInForm() {
             </p>
           )}
         </div>
-        <Button type="submit" disabled={busy}>
+        <Button type="submit" disabled={busy} size="lg" className="mt-1 w-full">
           {busy && <Loader2 className="size-4 animate-spin" />}
           {mode === "signIn" ? t("submitSignIn") : t("submitSignUp")}
         </Button>

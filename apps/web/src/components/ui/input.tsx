@@ -1,5 +1,16 @@
 import * as React from "react";
-import { cn } from "cn";
+
+import { cn } from "@/lib/utils";
+
+/** Shared look for text fields: a ruled surface box with a signal outline on focus. */
+const fieldBoxClass = cn(
+  "w-full min-w-0 rounded-[4px] border border-input bg-card text-[15px] text-foreground md:text-sm",
+  "placeholder:text-muted-foreground transition-[border-color] duration-150 motion-reduce:transition-none",
+  "hover:border-[color-mix(in_oklab,var(--input),var(--foreground)_25%)]",
+  "focus-visible:border-foreground/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+  "aria-invalid:border-destructive aria-invalid:focus-visible:outline-destructive",
+  "disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60",
+);
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -7,7 +18,10 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       type={type}
       data-slot="input"
       className={cn(
-        "border-input file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:bg-input/50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-8 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-base outline-none transition-colors file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        fieldBoxClass,
+        "h-[38px] px-3 py-1",
+        "[&[type=number]]:font-mono [&[type=number]]:tabular-nums",
+        "file:text-foreground file:mr-3 file:h-full file:border-0 file:bg-transparent file:font-mono file:text-[11px] file:font-medium file:uppercase file:tracking-[0.08em]",
         className,
       )}
       {...props}
@@ -15,4 +29,4 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   );
 }
 
-export { Input };
+export { Input, fieldBoxClass };

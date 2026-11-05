@@ -36,11 +36,11 @@ export function AccountMenu({ side = "bottom" }: { side?: "top" | "bottom" | "ri
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={t("menu")} disabled={isPending}>
-            <UserRound className="size-4" />
+            <UserRound aria-hidden className="size-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" side={side} className="w-56">
-          <DropdownMenuLabel className="text-muted-foreground font-normal">
+          <DropdownMenuLabel className="text-muted-foreground font-sans text-sm normal-case tracking-normal">
             {t("signedOut")}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -61,17 +61,25 @@ export function AccountMenu({ side = "bottom" }: { side?: "top" | "bottom" | "ri
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t("menu")} className="rounded-full">
-          <Avatar className="size-7">
-            {user.image && <AvatarImage src={user.image} alt="" />}
-            <AvatarFallback className="text-xs">{initials(user.name || user.email)}</AvatarFallback>
+        <Button variant="ghost" size="icon" aria-label={t("menu")} className="relative">
+          <Avatar className="size-7 rounded-[4px] after:rounded-[4px]">
+            {user.image && <AvatarImage src={user.image} alt="" className="rounded-[4px]" />}
+            <AvatarFallback className="bg-foreground text-background rounded-[4px] font-mono text-[11px] font-semibold">
+              {initials(user.name || user.email)}
+            </AvatarFallback>
           </Avatar>
+          {isPendingApproval && (
+            <span
+              aria-hidden
+              className="bg-primary ring-background absolute right-1 top-1 size-2 rounded-[1px] ring-2"
+            />
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side={side} className="w-60">
-        <DropdownMenuLabel className="font-normal">
-          <div className="truncate text-sm font-medium">{user.name}</div>
-          <div className="text-muted-foreground truncate text-xs">{user.email}</div>
+        <DropdownMenuLabel className="text-foreground font-sans normal-case tracking-normal">
+          <div className="truncate text-sm font-semibold">{user.name}</div>
+          <div className="text-muted-foreground truncate font-mono text-xs">{user.email}</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {isPendingApproval && (

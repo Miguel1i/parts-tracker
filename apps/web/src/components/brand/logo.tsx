@@ -18,7 +18,12 @@ export function LogoMark({ className, title }: { className?: string; title?: str
       <path d="M11 3h17a1 1 0 0 1 1 1v24a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V11Z" fill="currentColor" />
       {/* chip pad hole with pins */}
       <rect x="8" y="8" width="5" height="5" rx="0.6" fill="var(--background)" />
-      <path d="M9.5 8V6.4M11.5 8V6.4M8 9.5H6.4M8 11.5H6.4" stroke="var(--background)" strokeWidth="1.1" strokeLinecap="round" />
+      <path
+        d="M9.5 8V6.4M11.5 8V6.4M8 9.5H6.4M8 11.5H6.4"
+        stroke="var(--background)"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+      />
       {/* price trace: steps down */}
       <path
         d="M8 18.5h6v3.5h5v3h5.5"
@@ -36,12 +41,12 @@ export function LogoMark({ className, title }: { className?: string; title?: str
 /** Mark + wordmark. `compact` hides the wordmark (collapsed rail). */
 export function Logo({ compact = false, className }: { compact?: boolean; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5 text-foreground", className)}>
+    <span className={cn("text-foreground inline-flex items-center gap-2.5", className)}>
       <LogoMark className="size-7" />
       {!compact && (
         <span className="leading-none">
           <span className="block text-[15px] font-extrabold tracking-[-0.02em]">Parts Tracker</span>
-          <span className="text-muted-foreground mt-0.5 block font-mono text-[10px] tracking-[0.12em] uppercase">
+          <span className="text-muted-foreground mt-0.5 block font-mono text-[10px] uppercase tracking-[0.12em]">
             price watch
           </span>
         </span>

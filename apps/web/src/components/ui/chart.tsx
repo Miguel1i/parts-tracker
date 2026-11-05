@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "cn";
 import * as RechartsPrimitive from "recharts";
 import type { TooltipValueType } from "recharts";
+
+import { cn } from "@/lib/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -62,7 +63,13 @@ function ChartContainer({
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-surface]:outline-hidden flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-sector[stroke='#fff']]:stroke-transparent",
+          "flex aspect-video justify-center text-xs",
+          // Axis figures are set in mono like every other number on the site.
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-axis-tick_text]:font-mono",
+          "[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-(--chart-grid) [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-(--chart-grid) [&_.recharts-reference-line_[stroke='#ccc']]:stroke-input",
+          "[&_.recharts-curve.recharts-tooltip-cursor]:stroke-foreground/40 [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-accent [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-curve.recharts-tooltip-cursor]:[stroke-dasharray:3_3]",
+          "[&_.recharts-dot[stroke='#fff']]:stroke-card [&_.recharts-sector[stroke='#fff']]:stroke-transparent",
+          "[&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-surface]:outline-hidden",
           className,
         )}
         {...props}
@@ -107,6 +114,10 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+/* The tooltip heading reads like a receipt line: mono micro-caps over a dashed rule. */
+const tooltipLabelClass =
+  "border-b border-dashed border-border pb-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-muted-foreground";
+
 function ChartTooltipContent({
   active,
   payload,
@@ -147,7 +158,9 @@ function ChartTooltipContent({
 
     if (labelFormatter) {
       return (
-        <div className={cn("font-medium", labelClassName)}>{labelFormatter(value, payload)}</div>
+        <div className={cn(tooltipLabelClass, labelClassName)}>
+          {labelFormatter(value, payload)}
+        </div>
       );
     }
 
@@ -155,7 +168,7 @@ function ChartTooltipContent({
       return null;
     }
 
-    return <div className={cn("font-medium", labelClassName)}>{value}</div>;
+    return <div className={cn(tooltipLabelClass, labelClassName)}>{value}</div>;
   }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
   if (!active || !payload?.length) {
@@ -167,7 +180,7 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "border-border/50 bg-background grid min-w-32 items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
+        "border-border bg-popover text-popover-foreground grid min-w-36 items-start gap-2 rounded-[4px] border px-3 py-2 text-xs shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]",
         className,
       )}
     >
@@ -198,7 +211,7 @@ function ChartTooltipContent({
                       !hideIndicator && (
                         <div
                           className={cn(
-                            "border-(--color-border) bg-(--color-bg) shrink-0 rounded-[2px]",
+                            "border-(--color-border) bg-(--color-bg) shrink-0 rounded-[1px]",
                             {
                               "h-2.5 w-2.5": indicator === "dot",
                               "w-1": indicator === "line",
@@ -229,7 +242,7 @@ function ChartTooltipContent({
                         </span>
                       </div>
                       {item.value != null && (
-                        <span className="text-foreground font-mono font-medium tabular-nums">
+                        <span className="text-foreground font-mono font-semibold tabular-nums">
                           {typeof item.value === "number"
                             ? item.value.toLocaleString()
                             : String(item.value)}
@@ -267,7 +280,7 @@ function ChartLegendContent({
   return (
     <div
       className={cn(
-        "flex items-center justify-center gap-4",
+        "flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5",
         verticalAlign === "top" ? "pb-3" : "pt-3",
         className,
       )}
@@ -282,14 +295,14 @@ function ChartLegendContent({
             <div
               key={index}
               className={cn(
-                "[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3",
+                "text-muted-foreground flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.06em] [&>svg]:h-3 [&>svg]:w-3",
               )}
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
                 <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
+                  className="size-2 shrink-0 rounded-[1px]"
                   style={{
                     backgroundColor: item.color,
                   }}

@@ -10,7 +10,13 @@
     "admin": "Administração",
     "toggleSidebar": "Mostrar/ocultar barra lateral",
     "main": "Principal",
-    "skipToContent": "Saltar para o conteúdo"
+    "skipToContent": "Saltar para o conteúdo",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "menu": "Menu",
+    "home": "Início do Parts Tracker",
+    "collapse": "Recolher barra lateral",
+    "expand": "Expandir barra lateral"
   },
   "Theme": {
     "change": "Mudar tema",
@@ -833,6 +839,16 @@
         "description": "Pode usá-la de imediato; os outros dispositivos mantêm a sessão até a terminar.",
         "label": "Nova palavra-passe",
         "help": "Pelo menos 8 caracteres. Comunique-a por um canal seguro."
+      },
+      "pending": {
+        "title": "A aguardar aprovação",
+        "count": "{count, plural, =0 {nenhuma} one {# conta} other {# contas}}",
+        "none": "Não há registos à espera. As contas novas aparecem aqui quando o modo de registo é “Requer aprovação”.",
+        "signedUp": "registou-se {when}",
+        "approve": "Aprovar",
+        "reject": "Recusar",
+        "approved": "{name} já pode usar o Parts Tracker",
+        "rejected": "O registo de {name} foi recusado"
       }
     },
     "runs": {
@@ -1170,6 +1186,61 @@
         "blocked": "Bloqueado",
         "error": "Erro"
       }
+    }
+  },
+  "Ui": {
+    "close": "Fechar",
+    "toast": {
+      "success": "Feito",
+      "error": "Erro",
+      "info": "Info",
+      "warning": "Aviso",
+      "loading": "A processar"
+    }
+  },
+  "Landing": {
+    "kicker": "Vigilância de preços de peças de PC",
+    "headline1": "Todas as lojas.",
+    "headline2": "Uma só etiqueta.",
+    "subline": "O Parts Tracker verifica as lojas que o PCPartPicker não cobre, associa cada anúncio à peça exata e mantém o preço mais baixo em stock no topo da sua configuração.",
+    "create": "Criar conta",
+    "signIn": "Iniciar sessão",
+    "note": "Gratuito. As contas novas podem precisar de aprovação de um administrador.",
+    "receipt": {
+      "label": "Exemplo de verificação de preços",
+      "title": "Verificação de preços",
+      "sample": "Exemplo",
+      "part": "AMD Ryzen 7 9800X3D",
+      "code": "CPU · AM5 · 8 núcleos",
+      "shop": "Loja",
+      "price": "Preço",
+      "cheapest": "Mais barato",
+      "inStock": "Em stock",
+      "outOfStock": "Esgotado",
+      "low30": "Mínimo em 30 dias",
+      "spread": "Diferença entre lojas",
+      "checked": "4 lojas verificadas · 06:00",
+      "caption": "Exemplo ilustrativo. Lojas e preços são fictícios."
+    },
+    "how": {
+      "label": "Como funciona",
+      "title": "Três passos e depois funciona sozinho.",
+      "step1": {
+        "title": "Liste as suas peças",
+        "body": "Adicione as peças da sua configuração. Cada uma é identificada pelo código de barras e por um nome limpo, para que as variantes não se confundam."
+      },
+      "step2": {
+        "title": "Nós verificamos as lojas",
+        "body": "Periodicamente, o Parts Tracker visita todas as lojas que segue, associa os anúncios às suas peças e regista preço e stock."
+      },
+      "step3": {
+        "title": "Compre no mínimo",
+        "body": "O painel mostra a oferta mais barata em stock de cada peça, o total da configuração, o histórico e todas as descidas desde a última visita."
+      }
+    },
+    "band": {
+      "title": "Comece a acompanhar a sua configuração.",
+      "body": "Traga a lista de peças. Nós trazemos as lojas."
     }
   }
 }
