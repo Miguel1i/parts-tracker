@@ -27,6 +27,13 @@ on:
         description: scrape_runs id created by the web app (empty = create one)
         required: false
         default: ""
+      scheduled:
+        # An outside hourly trigger (GitHub's own schedule is unreliable on small repos) sends
+        # scheduled=true so the run is treated exactly like the cron schedule.
+        description: Treat as a scheduled run (interval gate applies)
+        type: boolean
+        required: false
+        default: false
 
 concurrency:
   # One scrape at a time per scope; a queued cron run waits instead of overlapping.
@@ -52,12 +59,14 @@ jobs:
       # here just lets the run go ahead.
       - name: Gate
         id: gate
+        env:
+          SCHEDULED: ${{ inputs.scheduled }}
         run: |
           if [ -z "$TURSO_DATABASE_URL" ]; then
             echo "::warning::TURSO_DATABASE_URL is not set (gh secret set TURSO_DATABASE_URL); skipping"
             echo "run=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          if [ "$GITHUB_EVENT_NAME" != "schedule" ]; then
+          if [ "$GITHUB_EVENT_NAME" != "schedule" ] && [ "$SCHEDULED" != "true" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           url="https://${TURSO_DATABASE_URL#libsql://}/v2/pipeline"
@@ -116,7 +125,7 @@ jobs:
           MERCHANT_ID: ${{ inputs.merchantId }}
           BUILD_ID: ${{ inputs.buildId }}
           RUN_ID: ${{ inputs.runId }}
-          TRIGGER: ${{ github.event_name == 'schedule' && 'cron' || 'manual' }}
+          TRIGGER: ${{ (github.event_name == 'schedule' || inputs.scheduled) && 'cron' || 'manual' }}
           GH_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: >-
           pnpm --filter @parts/scraper scrape
