@@ -122,7 +122,7 @@ export function CompareGrid({
   });
 
   return (
-    <div className="max-h-[70vh] overflow-auto rounded-xl border">
+    <div className="max-h-[70vh] overflow-auto rounded-[6px] border">
       <table className="w-full min-w-max border-separate border-spacing-0 text-sm">
         <caption className="sr-only">{t("table.label", { build: buildName })}</caption>
         <thead>

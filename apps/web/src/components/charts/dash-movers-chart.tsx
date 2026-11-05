@@ -104,7 +104,7 @@ export function MoversChart({ data }: { data: Record<Days, Mover[]> }) {
       </div>
 
       {all.length === 0 ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed px-4 py-10 text-center text-sm">
+        <p className="text-muted-foreground rounded-[6px] border border-dashed px-4 py-10 text-center text-sm">
           {t("empty")}
         </p>
       ) : table ? (
@@ -112,7 +112,7 @@ export function MoversChart({ data }: { data: Record<Days, Mover[]> }) {
           tabIndex={0}
           role="region"
           aria-label={t("tableLabel")}
-          className="focus-visible:ring-ring/50 max-h-80 overflow-auto rounded-xl border outline-none focus-visible:ring-[3px]"
+          className="focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 max-h-80 overflow-auto rounded-[6px] border"
         >
           <table className="w-full text-sm">
             <caption className="sr-only">{summary}</caption>
@@ -185,7 +185,7 @@ export function MoversChart({ data }: { data: Record<Days, Mover[]> }) {
                 if (!m) return null;
                 const drop = m.pct < 0;
                 return (
-                  <div className="bg-popover text-popover-foreground grid max-w-64 gap-1 rounded-lg border px-3 py-2 text-xs shadow-md">
+                  <div className="bg-popover text-popover-foreground grid max-w-64 gap-1 rounded-[6px] border px-3 py-2 text-xs shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]">
                     <div className="break-words font-medium">{m.name}</div>
                     <div className="flex items-center gap-1.5 text-sm font-semibold tabular-nums">
                       {drop ? (
@@ -224,7 +224,7 @@ export function MoversChart({ data }: { data: Record<Days, Mover[]> }) {
                 aria-pressed={!off}
                 onClick={() => set(!off)}
                 className={cn(
-                  "focus-visible:ring-ring/50 flex items-center gap-1.5 rounded-sm text-xs outline-none focus-visible:ring-[3px]",
+                  "focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 flex items-center gap-1.5 rounded-sm text-xs",
                   off && "opacity-50",
                 )}
               >

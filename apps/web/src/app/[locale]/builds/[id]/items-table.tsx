@@ -503,7 +503,7 @@ export function ItemsTable({
       {/* Phones: one card per part. */}
       <ul className="grid gap-2 sm:hidden">
         {items.map((item, index) => (
-          <li key={item.productId} className="grid gap-3 rounded-lg border p-3">
+          <li key={item.productId} className="grid gap-3 rounded-[6px] border p-3">
             <div className="flex items-start gap-2">
               <div className="min-w-0 flex-1">
                 <ProductLink id={item.productId} name={item.name} />
@@ -523,14 +523,14 @@ export function ItemsTable({
             </div>
           </li>
         ))}
-        <li className="flex items-center justify-between rounded-lg border p-3 text-sm font-medium">
+        <li className="flex items-center justify-between rounded-[6px] border p-3 text-sm font-medium">
           <span>{t("total")}</span>
           <span className="tabular-nums">{format.number(total, "price")}</span>
         </li>
       </ul>
 
       {/* Larger screens: a table that scrolls inside its own container. */}
-      <div className="hidden rounded-lg border sm:block">
+      <div className="hidden rounded-[6px] border sm:block">
         <Table>
           <TableHeader>
             <TableRow>

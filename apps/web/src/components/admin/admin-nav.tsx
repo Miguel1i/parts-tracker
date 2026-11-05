@@ -53,7 +53,7 @@ export function AdminNav({ counts }: { counts: { pendingUsers: number; pendingRe
                 href={href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "hover:bg-muted focus-visible:ring-ring/50 flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm outline-none focus-visible:ring-[3px]",
+                  "hover:bg-muted focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 flex items-center gap-2 whitespace-nowrap rounded-[4px] px-3 py-2 text-sm focus-visible:ring-[3px]",
                   active ? "bg-muted text-foreground font-medium" : "text-muted-foreground",
                 )}
               >

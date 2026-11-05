@@ -81,7 +81,7 @@ export function CompareHeatmap({
         </Button>
       </div>
       <div
-        className="max-h-[70vh] overflow-auto rounded-xl border"
+        className="max-h-[70vh] overflow-auto rounded-[6px] border"
         role="group"
         aria-label={t("heatmap.summary", { products: rows.length, merchants: merchants.length })}
       >

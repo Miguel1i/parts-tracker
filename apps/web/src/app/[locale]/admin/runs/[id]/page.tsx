@@ -145,7 +145,7 @@ export default async function RunDetailPage({ params }: PageProps<"/[locale]/adm
         {logs.length === 0 ? (
           <p className="text-muted-foreground text-sm">{t("noLogs")}</p>
         ) : (
-          <ul className="divide-y rounded-lg border">
+          <ul className="divide-y rounded-[6px] border">
             {logs.map((l) => (
               <li key={l.id} className="px-3 py-2 text-sm">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -168,7 +168,7 @@ export default async function RunDetailPage({ params }: PageProps<"/[locale]/adm
                     </summary>
                     <pre
                       tabIndex={0}
-                      className="bg-muted focus-visible:ring-ring/50 mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-md p-2 text-xs outline-none focus-visible:ring-[3px]"
+                      className="bg-muted focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 mt-2 max-h-72 overflow-auto whitespace-pre-wrap break-all rounded-[4px] p-2 text-xs"
                     >
                       {l.log}
                     </pre>

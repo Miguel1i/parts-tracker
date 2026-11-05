@@ -86,7 +86,7 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
           />
         )}
         {build.items.length > 0 && (
-          <div className="rounded-xl border p-4">
+          <div className="rounded-[6px] border p-4">
             <BuildTotalChartLazy data={chart} />
           </div>
         )}

@@ -146,7 +146,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
               }}
               aria-current={f === filter ? "page" : undefined}
               className={cn(
-                "hover:bg-muted whitespace-nowrap rounded-md px-3 py-1.5 text-sm",
+                "hover:bg-muted whitespace-nowrap rounded-[4px] px-3 py-1.5 text-sm",
                 f === filter ? "bg-muted font-medium" : "text-muted-foreground",
               )}
             >
@@ -178,7 +178,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
           <div className="flex gap-2">
             {page > 1 && (
               <Link
-                className="hover:bg-muted rounded-md border px-3 py-1.5"
+                className="hover:bg-muted rounded-[4px] border px-3 py-1.5"
                 href={{ pathname: "/admin/users", query: { ...sp, page: String(page - 1) } }}
               >
                 {t("previous")}
@@ -186,7 +186,7 @@ export default async function UsersPage({ searchParams }: PageProps<"/[locale]/a
             )}
             {page < pages && (
               <Link
-                className="hover:bg-muted rounded-md border px-3 py-1.5"
+                className="hover:bg-muted rounded-[4px] border px-3 py-1.5"
                 href={{ pathname: "/admin/users", query: { ...sp, page: String(page + 1) } }}
               >
                 {t("next")}

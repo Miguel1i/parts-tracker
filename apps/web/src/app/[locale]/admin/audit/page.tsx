@@ -89,7 +89,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/[locale]/a
       {rows.length === 0 ? (
         <EmptyState icon={ScrollText} title={t("empty")} />
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
+        <div className="overflow-x-auto rounded-[6px] border">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground text-left">
               <tr>
@@ -139,7 +139,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/[locale]/a
                         <summary className="text-muted-foreground cursor-pointer select-none">
                           {t("show")}
                         </summary>
-                        <pre className="bg-muted mt-2 max-w-[28rem] whitespace-pre-wrap break-all rounded-md p-2 text-xs">
+                        <pre className="bg-muted mt-2 max-w-[28rem] whitespace-pre-wrap break-all rounded-[4px] p-2 text-xs">
                           {JSON.stringify(r.diff, null, 2)}
                         </pre>
                       </details>

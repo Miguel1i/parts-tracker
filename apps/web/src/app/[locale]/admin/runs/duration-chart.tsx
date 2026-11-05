@@ -53,7 +53,7 @@ export function DurationChart({ runs }: { runs: RunDuration[] }) {
       </div>
 
       {runs.length === 0 ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed px-4 py-10 text-center text-sm">
+        <p className="text-muted-foreground rounded-[6px] border border-dashed px-4 py-10 text-center text-sm">
           {t("empty")}
         </p>
       ) : table ? (
@@ -61,7 +61,7 @@ export function DurationChart({ runs }: { runs: RunDuration[] }) {
           tabIndex={0}
           role="region"
           aria-label={t("tableLabel")}
-          className="focus-visible:ring-ring/50 max-h-80 overflow-auto rounded-xl border outline-none focus-visible:ring-[3px]"
+          className="focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 max-h-80 overflow-auto rounded-[6px] border"
         >
           <table className="w-full text-sm">
             <caption className="sr-only">{summary}</caption>
@@ -121,7 +121,7 @@ export function DurationChart({ runs }: { runs: RunDuration[] }) {
                 const run = active ? (payload?.[0]?.payload as RunDuration | undefined) : undefined;
                 if (!run) return null;
                 return (
-                  <div className="bg-popover text-popover-foreground grid gap-1 rounded-lg border px-3 py-2 text-xs shadow-md">
+                  <div className="bg-popover text-popover-foreground grid gap-1 rounded-[6px] border px-3 py-2 text-xs shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]">
                     <div className="flex items-center gap-2">
                       <span
                         aria-hidden

@@ -94,7 +94,7 @@ export function UsersTable({ users }: { users: UserRow[] }) {
 
   return (
     <>
-      <div className="overflow-x-auto rounded-md border">
+      <div className="overflow-x-auto rounded-[4px] border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -542,7 +542,7 @@ function BuildsDialog({ state, onClose }: { state: DialogState; onClose: () => v
           <DialogTitle>{t("builds.title", { name: open ? state.user.name : "" })}</DialogTitle>
           <DialogDescription>{t("builds.description")}</DialogDescription>
         </DialogHeader>
-        <ul className="divide-y rounded-md border">
+        <ul className="divide-y rounded-[4px] border">
           {open &&
             state.user.builds.map((b) => (
               <li key={b.id} className="flex items-center gap-2 px-3 py-2 text-sm">

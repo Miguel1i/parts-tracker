@@ -92,7 +92,7 @@ export default async function RunsPage({ searchParams }: PageProps<"/[locale]/ad
         {rows.length === 0 ? (
           <EmptyState icon={Activity} title={t("empty")} />
         ) : (
-          <div className="overflow-x-auto rounded-lg border">
+          <div className="overflow-x-auto rounded-[6px] border">
             <table className="w-full text-sm">
               <thead className="bg-muted text-muted-foreground text-left">
                 <tr>

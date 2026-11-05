@@ -140,7 +140,7 @@ export default async function ProductPage({
             <p className="text-muted-foreground text-sm">{t("diagnostics.description")}</p>
           </div>
           {diagnostics.length === 0 ? (
-            <p className="text-muted-foreground rounded-xl border border-dashed px-4 py-8 text-center text-sm">
+            <p className="text-muted-foreground rounded-[6px] border border-dashed px-4 py-8 text-center text-sm">
               {t("diagnostics.empty")}
             </p>
           ) : (
@@ -149,7 +149,7 @@ export default async function ProductPage({
                 <li
                   key={d.merchantId}
                   id={`diag-${d.merchantId}`}
-                  className="min-w-0 scroll-mt-20 rounded-lg border p-3"
+                  className="min-w-0 scroll-mt-20 rounded-[6px] border p-3"
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium">{d.merchantName}</span>
@@ -166,7 +166,7 @@ export default async function ProductPage({
                       </summary>
                       <pre
                         tabIndex={0}
-                        className="bg-muted mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-md p-3 text-xs"
+                        className="bg-muted mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-[4px] p-3 text-xs"
                       >
                         {d.log}
                       </pre>

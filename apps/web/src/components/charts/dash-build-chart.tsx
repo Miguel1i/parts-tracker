@@ -148,7 +148,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
       </div>
 
       {priced.length === 0 ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed px-4 py-10 text-center text-sm">
+        <p className="text-muted-foreground rounded-[6px] border border-dashed px-4 py-10 text-center text-sm">
           {mode === "single" && data.single.length > 0 ? t("emptySingle") : t("empty")}
         </p>
       ) : table ? (
@@ -156,7 +156,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
           tabIndex={0}
           role="region"
           aria-label={t("tableLabel")}
-          className="focus-visible:ring-ring/50 max-h-80 overflow-auto rounded-xl border outline-none focus-visible:ring-[3px]"
+          className="focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 max-h-80 overflow-auto rounded-[6px] border"
         >
           <table className="w-full text-sm">
             <caption className="sr-only">{summary}</caption>
@@ -231,7 +231,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
                   .filter((c) => c.v != null)
                   .sort((a, b) => b.v! - a.v!);
                 return (
-                  <div className="bg-popover text-popover-foreground grid min-w-48 gap-1.5 rounded-lg border px-3 py-2 text-xs shadow-md">
+                  <div className="bg-popover text-popover-foreground grid min-w-48 gap-1.5 rounded-[6px] border px-3 py-2 text-xs shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]">
                     <div className="text-muted-foreground">{dateLabel(row.ts, true)}</div>
                     {total == null ? (
                       <div className="text-muted-foreground">{t("noPrice")}</div>
@@ -356,7 +356,7 @@ function LegendItem({
         onClick={onToggle}
         onDoubleClick={onIsolate}
         className={cn(
-          "focus-visible:ring-ring/50 flex items-center gap-1.5 rounded-sm text-xs outline-none focus-visible:ring-[3px]",
+          "focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 flex items-center gap-1.5 rounded-sm text-xs",
           off && "opacity-50",
         )}
       >

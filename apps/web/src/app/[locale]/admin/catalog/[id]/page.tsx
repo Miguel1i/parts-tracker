@@ -66,7 +66,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/admin
             src={product.imageUrl}
             alt=""
             referrerPolicy="no-referrer"
-            className="bg-muted size-24 shrink-0 rounded-lg object-contain"
+            className="bg-muted size-24 shrink-0 rounded-[4px] object-contain"
           />
         )}
         <div className="min-w-0 flex-1">
@@ -104,7 +104,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/admin
       {identifiers.length === 0 ? (
         <p className="text-muted-foreground text-sm">{t("noIdentifiers")}</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
+        <div className="overflow-x-auto rounded-[6px] border">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground text-left">
               <tr>

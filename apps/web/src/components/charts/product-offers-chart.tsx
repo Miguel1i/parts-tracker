@@ -85,7 +85,7 @@ export function ProductOffersChart({
       </div>
 
       {offers.length === 0 ? (
-        <p className="text-muted-foreground rounded-xl border border-dashed px-4 py-10 text-center text-sm">
+        <p className="text-muted-foreground rounded-[6px] border border-dashed px-4 py-10 text-center text-sm">
           {t("empty")}
         </p>
       ) : (
@@ -137,7 +137,7 @@ export function ProductOffersChart({
                       : undefined;
                     if (!o) return null;
                     return (
-                      <div className="bg-popover text-popover-foreground grid min-w-44 gap-1 rounded-lg border px-3 py-2 text-xs shadow-md">
+                      <div className="bg-popover text-popover-foreground grid min-w-44 gap-1 rounded-[6px] border px-3 py-2 text-xs shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)]">
                         <div className="font-semibold tabular-nums">
                           {priceFmt(o.price + o.shipping)}{" "}
                           <span className="text-muted-foreground font-normal">
@@ -216,7 +216,7 @@ export function ProductOffersChart({
             role="region"
             aria-label={t("tableLabel")}
             className={cn(
-              "focus-visible:ring-ring/50 overflow-x-auto rounded-xl border outline-none focus-visible:ring-[3px]",
+              "focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2 overflow-x-auto rounded-[6px] border",
               !table && "mt-1",
             )}
           >

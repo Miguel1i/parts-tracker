@@ -89,7 +89,7 @@ export default async function SharedBuildPage({ params }: PageProps<"/[locale]/s
       {lines.length === 0 ? (
         <p className="text-muted-foreground">{t("empty")}</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border">
+        <div className="overflow-x-auto rounded-[6px] border">
           <table className="w-full text-sm">
             <thead className="bg-muted text-muted-foreground text-left">
               <tr>

@@ -163,9 +163,9 @@ export default async function ReviewPage({ searchParams }: PageProps<"/[locale]/
                     {heading}
                   </li>
                 )}
-                <li className="bg-card rounded-xl border p-4">
+                <li className="bg-card rounded-[6px] border p-4">
                   {report && (
-                    <div className="bg-muted mb-4 flex flex-wrap items-center gap-2 rounded-md px-3 py-2 text-sm">
+                    <div className="bg-muted mb-4 flex flex-wrap items-center gap-2 rounded-[4px] px-3 py-2 text-sm">
                       <Badge variant="destructive">
                         {t("reports.by", {
                           name:
@@ -197,7 +197,7 @@ export default async function ReviewPage({ searchParams }: PageProps<"/[locale]/
                             src={product.imageUrl}
                             alt=""
                             referrerPolicy="no-referrer"
-                            className="bg-muted size-16 shrink-0 rounded-md object-contain"
+                            className="bg-muted size-16 shrink-0 rounded-[4px] object-contain"
                           />
                         )}
                         <div className="min-w-0">
@@ -294,7 +294,7 @@ export default async function ReviewPage({ searchParams }: PageProps<"/[locale]/
                           </summary>
                           <ul className="mt-2 flex flex-col gap-1">
                             {s.results.map((r, i) => (
-                              <li key={`${r.rule}-${i}`} className="bg-muted rounded-md px-2 py-1">
+                              <li key={`${r.rule}-${i}`} className="bg-muted rounded-[4px] px-2 py-1">
                                 <span className="font-medium">{r.rule}</span>{" "}
                                 <span className={cn("text-xs uppercase", verdictClass[r.verdict])}>
                                   {r.verdict}

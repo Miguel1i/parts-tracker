@@ -24,7 +24,7 @@ export function PendingPanel({ users }: { users: PendingUser[] }) {
   const { pending, run } = useAdminAction();
 
   return (
-    <section aria-labelledby="pending-title" className="bg-card mb-8 rounded-md border">
+    <section aria-labelledby="pending-title" className="bg-card mb-8 rounded-[4px] border">
       <header className="flex items-baseline justify-between gap-3 border-b px-5 py-3">
         <h2 id="pending-title" className="font-semibold">
           {t("title")}

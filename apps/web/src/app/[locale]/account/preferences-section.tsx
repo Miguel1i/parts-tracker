@@ -145,7 +145,7 @@ export function PreferencesSection({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-center justify-between gap-4 rounded-md border p-3">
+          <div className="flex items-center justify-between gap-4 rounded-[4px] border p-3">
             <div className="min-w-0">
               <Label htmlFor="pref-shipping">{t("withShipping")}</Label>
               <p className="text-muted-foreground mt-1 text-xs">{t("withShippingHint")}</p>

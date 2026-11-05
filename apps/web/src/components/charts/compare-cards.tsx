@@ -40,7 +40,7 @@ export function CompareCards({
                     <li
                       key={id}
                       className={
-                        "flex items-center justify-between gap-2 rounded-md px-2 py-1.5 " +
+                        "flex items-center justify-between gap-2 rounded-[4px] px-2 py-1.5 " +
                         (cell?.isBest ? "bg-primary/5 ring-primary/30 ring-1" : "")
                       }
                     >
