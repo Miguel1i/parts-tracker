@@ -35,8 +35,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Typecheck
-        run: pnpm typecheck
+      # The web app is type-checked by `next build` below; check the packages here.
+      - name: Typecheck packages
+        run: pnpm -r --filter "!web" --if-present typecheck
 
       - name: Test
         run: pnpm test
@@ -45,19 +46,26 @@ jobs:
         run: pnpm build
 
       # UI smoke tests (Playwright + axe) against the production build and a throwaway SQLite DB.
+      # Pull requests only: main only receives squash-merges of PRs that already passed them.
       - name: Playwright version
         id: pw
+        if: github.event_name == 'pull_request'
         run: echo "version=$(pnpm --filter web exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
 
       - uses: actions/cache@v4
+        if: github.event_name == 'pull_request'
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
 
+      # The runner image already has Chrome's system libraries, so only the browser is fetched
+      # (and only on a cache miss).
       - name: Install Chromium
-        run: pnpm --filter web exec playwright install --with-deps chromium
+        if: github.event_name == 'pull_request'
+        run: pnpm --filter web exec playwright install chromium
 
       - name: E2E smoke tests
+        if: github.event_name == 'pull_request'
         run: pnpm --filter web e2e
 
       - uses: actions/upload-artifact@v4

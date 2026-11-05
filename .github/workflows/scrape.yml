@@ -45,57 +45,72 @@ jobs:
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
     steps:
-      # Until the Turso secrets exist the job is a no-op (a warning, not a failure every hour).
-      - name: Check secrets
-        id: secrets
+      # Gate before checkout/install, so a skipped hour costs seconds. Without the Turso secrets
+      # the job is a no-op (a warning, not a failure). Scheduled runs (hourly) only scrape once
+      # app_settings.cron_interval_hours (minus 10 min) has passed since the last cron run; the
+      # check reads Turso over its HTTP API. scripts/scrape.ts re-checks, so a failed query
+      # here just lets the run go ahead.
+      - name: Gate
+        id: gate
         run: |
           if [ -z "$TURSO_DATABASE_URL" ]; then
             echo "::warning::TURSO_DATABASE_URL is not set (gh secret set TURSO_DATABASE_URL); skipping"
-            echo "ok=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "run=false" >> "$GITHUB_OUTPUT"; exit 0
           fi
+          if [ "$GITHUB_EVENT_NAME" != "schedule" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          url="https://${TURSO_DATABASE_URL#libsql://}/v2/pipeline"
+          sql="select (select cron_interval_hours from app_settings where id = 1), (select max(started_at) from scrape_runs where \"trigger\" = 'cron')"
+          body=$(jq -n --arg sql "$sql" '{requests: [{type: "execute", stmt: {sql: $sql}}, {type: "close"}]}')
+          if res=$(curl -fsS -X POST "$url" -H "Authorization: Bearer $TURSO_AUTH_TOKEN" -H "content-type: application/json" -d "$body"); then
+            hours=$(jq -r '.results[0].response.result.rows[0][0].value // "6"' <<<"$res")
+            last=$(jq -r '.results[0].response.result.rows[0][1].value // "0"' <<<"$res")
+            now=$(($(date +%s) * 1000))
+            need=$(( (hours < 1 ? 1 : hours) * 60 - 10 ))
+            mins=$(( (now - last) / 60000 ))
+            if [ "$last" != "0" ] && [ "$mins" -lt "$need" ]; then
+              echo "cron run skipped: last cron run ${mins} min ago, interval ${hours} h"
+              echo "run=false" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+          else
+            echo "::warning::cron gate query failed; running anyway"
+          fi
+          echo "run=true" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v5
-        if: steps.secrets.outputs.ok == 'true'
+        if: steps.gate.outputs.run == 'true'
 
       - uses: pnpm/action-setup@v4
-        if: steps.secrets.outputs.ok == 'true'
+        if: steps.gate.outputs.run == 'true'
 
       - uses: actions/setup-node@v5
-        if: steps.secrets.outputs.ok == 'true'
+        if: steps.gate.outputs.run == 'true'
         with:
           node-version: 24
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-        if: steps.secrets.outputs.ok == 'true'
-
-      # Hourly schedule; app_settings.cronIntervalHours decides which scheduled runs scrape.
-      # Checked before the Chromium install so skipped hours cost only a checkout + install.
-      - name: Cron gate
-        id: gate
-        if: steps.secrets.outputs.ok == 'true' && github.event_name == 'schedule'
-        run: pnpm --filter @parts/scraper cron-gate
+        if: steps.gate.outputs.run == 'true'
 
       - name: Playwright version
         id: pw
-        if: steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
+        if: steps.gate.outputs.run == 'true'
         run: echo "version=$(pnpm --filter @parts/scraper exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
 
       - uses: actions/cache@v4
-        if: steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
+        if: steps.gate.outputs.run == 'true'
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
 
       # Downloads Chromium only on a cache miss; the system packages are installed every run.
       - name: Install Chromium
-        if: steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
+        if: steps.gate.outputs.run == 'true'
         run: pnpm --filter @parts/scraper exec playwright install --with-deps chromium
 
       - name: Scrape
-        if: steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
+        if: steps.gate.outputs.run == 'true'
         env:
           PRODUCT_ID: ${{ inputs.productId }}
           MERCHANT_ID: ${{ inputs.merchantId }}
@@ -115,7 +130,7 @@ jobs:
 
       # Raw HTML of failed fetches, for diagnosing blocks and broken extractors. Never in the DB.
       - uses: actions/upload-artifact@v4
-        if: always() && steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
+        if: always() && steps.gate.outputs.run == 'true'
         with:
           name: scrape-debug-${{ github.run_id }}
           path: debug/
