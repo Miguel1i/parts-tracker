@@ -463,21 +463,6 @@
         "label": "New password",
         "help": "At least 8 characters. Tell them over a safe channel."
       }
-    },
-    "errors": {
-      "generic": "Something went wrong. Try again.",
-      "invalid": "Some values aren't valid.",
-      "notFound": "It no longer exists. Reload the page.",
-      "self": "You can't do that to your own account.",
-      "emailMismatch": "The email doesn't match.",
-      "userExists": "A user with that email already exists.",
-      "slugTaken": "That slug is already used.",
-      "nameTaken": "That name is already used.",
-      "duplicate": "A merchant with that name or slug already exists.",
-      "invalidAdapter": "The adapter settings aren't valid.",
-      "hasHistory": "This merchant has price history, which is kept for good. Disable it instead.",
-      "alreadyDecided": "Someone already decided on this candidate.",
-      "dispatchFailed": "GitHub didn't accept the run. Check GH_DISPATCH_TOKEN and GH_REPO."
     }
   },
   "NotFound": {
@@ -527,5 +512,30 @@
       "cta": "Create your account",
       "footer": "If you weren't expecting this, you can ignore this email."
     }
+  },
+  "Errors": {
+    "generic": "Something went wrong. Try again.",
+    "invalid": "Some values aren't valid.",
+    "notFound": "It no longer exists. Reload the page.",
+    "self": "You can't do that to your own account.",
+    "emailMismatch": "The email doesn't match.",
+    "userExists": "A user with that email already exists.",
+    "slugTaken": "That slug is already used.",
+    "nameTaken": "That name is already used.",
+    "duplicate": "A merchant with that name or slug already exists.",
+    "invalidAdapter": "The adapter settings aren't valid.",
+    "hasHistory": "This merchant has price history, which is kept for good. Disable it instead.",
+    "alreadyDecided": "Someone already decided on this candidate.",
+    "dispatchFailed": "GitHub didn't accept the run. Check GH_DISPATCH_TOKEN and GH_REPO.",
+    "rateLimited": "You checked recently. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+    "unknownMerchant": "That shop isn't one of the tracked merchants.",
+    "badUrl": "That isn't a valid shop link (http or https).",
+    "wrongPassword": "Wrong password.",
+    "emailTaken": "Another account already uses that email.",
+    "usernameTaken": "That username is taken.",
+    "lastAdmin": "You're the only admin; make someone else an admin first.",
+    "alreadyReported": "This offer was already reported and is waiting for review.",
+    "nothingToCheck": "Prices were checked moments ago, so there's nothing to refresh yet.",
+    "importEmpty": "No parts found in the pasted list."
   }
 }

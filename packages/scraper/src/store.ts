@@ -10,6 +10,7 @@ import {
 import {
   appSettings,
   blocklist,
+  buildItems,
   matchCandidates,
   merchants,
   pricePoints,
@@ -26,7 +27,7 @@ import { and, eq, gte, inArray, or } from "drizzle-orm";
 import type { PairInput, PairMerchant, PairOutcome, PairState } from "./pair";
 import { productAsin } from "./queries";
 
-export type RunScope = { productId?: string; merchantId?: string };
+export type RunScope = { productId?: string; merchantId?: string; buildId?: string };
 
 /** A DB handle or an open transaction. */
 export type Writer = Pick<Db, "select" | "insert" | "update" | "delete">;
@@ -79,10 +80,28 @@ export function toTarget(
 
 /** Products × enabled merchants in scope, minus pairs switched off in `product_merchant`. */
 export async function loadRunData(db: Db, scope: RunScope, now: Date): Promise<RunData> {
+  // A build narrows to its items' (non-archived) products; with a productId too, the intersection.
+  const buildProductIds = scope.buildId
+    ? (
+        await db
+          .select({ id: products.id })
+          .from(buildItems)
+          .innerJoin(products, eq(products.id, buildItems.productId))
+          .where(and(eq(buildItems.buildId, scope.buildId), eq(products.archived, false)))
+      ).map((r) => r.id)
+    : null;
+  if (buildProductIds && !buildProductIds.length) {
+    return { pairs: [], targets: new Map(), blocks: new Map(), asins: new Map() };
+  }
+  const productFilter = scope.productId
+    ? eq(products.id, scope.productId)
+    : eq(products.archived, false);
   const productRows = await db
     .select()
     .from(products)
-    .where(scope.productId ? eq(products.id, scope.productId) : eq(products.archived, false));
+    .where(
+      buildProductIds ? and(productFilter, inArray(products.id, buildProductIds)) : productFilter,
+    );
   const merchantRows = await db
     .select()
     .from(merchants)

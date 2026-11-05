@@ -463,21 +463,6 @@
         "label": "Nova palavra-passe",
         "help": "Pelo menos 8 caracteres. Comunique-a por um canal seguro."
       }
-    },
-    "errors": {
-      "generic": "Ocorreu um erro. Tente novamente.",
-      "invalid": "Alguns valores não são válidos.",
-      "notFound": "Já não existe. Recarregue a página.",
-      "self": "Não pode fazer isso à sua própria conta.",
-      "emailMismatch": "O email não corresponde.",
-      "userExists": "Já existe um utilizador com esse email.",
-      "slugTaken": "Esse slug já está a ser usado.",
-      "nameTaken": "Esse nome já está a ser usado.",
-      "duplicate": "Já existe uma loja com esse nome ou slug.",
-      "invalidAdapter": "As definições do adaptador não são válidas.",
-      "hasHistory": "Esta loja tem histórico de preços, que é guardado para sempre. Desative-a em vez disso.",
-      "alreadyDecided": "Alguém já decidiu sobre este candidato.",
-      "dispatchFailed": "O GitHub não aceitou a execução. Verifique GH_DISPATCH_TOKEN e GH_REPO."
     }
   },
   "NotFound": {
@@ -527,5 +512,30 @@
       "cta": "Criar a sua conta",
       "footer": "Se não esperava este email, pode ignorá-lo."
     }
+  },
+  "Errors": {
+    "generic": "Ocorreu um erro. Tente novamente.",
+    "invalid": "Alguns valores não são válidos.",
+    "notFound": "Já não existe. Recarregue a página.",
+    "self": "Não pode fazer isso à sua própria conta.",
+    "emailMismatch": "O email não corresponde.",
+    "userExists": "Já existe um utilizador com esse email.",
+    "slugTaken": "Esse slug já está a ser usado.",
+    "nameTaken": "Esse nome já está a ser usado.",
+    "duplicate": "Já existe uma loja com esse nome ou slug.",
+    "invalidAdapter": "As definições do adaptador não são válidas.",
+    "hasHistory": "Esta loja tem histórico de preços, que é guardado para sempre. Desative-a em vez disso.",
+    "alreadyDecided": "Alguém já decidiu sobre este candidato.",
+    "dispatchFailed": "O GitHub não aceitou a execução. Verifique GH_DISPATCH_TOKEN e GH_REPO.",
+    "rateLimited": "Verificou há pouco. Tente novamente dentro de {minutes, plural, one {# minuto} other {# minutos}}.",
+    "unknownMerchant": "Essa loja não é uma das lojas acompanhadas.",
+    "badUrl": "Esse não é um link de loja válido (http ou https).",
+    "wrongPassword": "Palavra-passe errada.",
+    "emailTaken": "Outra conta já usa esse email.",
+    "usernameTaken": "Esse nome de utilizador já está a ser usado.",
+    "lastAdmin": "É o único administrador; torne outra pessoa administrador primeiro.",
+    "alreadyReported": "Esta oferta já foi reportada e aguarda revisão.",
+    "nothingToCheck": "Os preços foram verificados há instantes; ainda não há nada para atualizar.",
+    "importEmpty": "Não foram encontradas peças na lista colada."
   }
 }

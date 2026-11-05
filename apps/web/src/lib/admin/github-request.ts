@@ -1,4 +1,9 @@
-export type DispatchInputs = { productId: string; merchantId: string; runId: string };
+export type DispatchInputs = {
+  runId: string;
+  productId?: string;
+  merchantId?: string;
+  buildId?: string;
+};
 
 type Env = Record<string, string | undefined>;
 
@@ -7,8 +12,17 @@ export type DispatchRequest = {
   init: { method: "POST"; headers: Record<string, string>; body: string };
 };
 
-export function localScrapeCommand({ productId, merchantId, runId }: DispatchInputs) {
-  return `pnpm scrape --product ${productId} --merchant ${merchantId} --run-id ${runId} --trigger manual`;
+export function localScrapeCommand({ productId, merchantId, buildId, runId }: DispatchInputs) {
+  return [
+    "pnpm scrape",
+    productId && `--product ${productId}`,
+    merchantId && `--merchant ${merchantId}`,
+    buildId && `--build ${buildId}`,
+    `--run-id ${runId}`,
+    "--trigger manual",
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 /** Null when dispatching isn't configured (token or repo missing). Throws on a malformed repo. */
@@ -34,7 +48,12 @@ export function buildDispatchRequest(env: Env, inputs: DispatchInputs): Dispatch
       },
       body: JSON.stringify({
         ref: env.GH_DISPATCH_REF?.trim() || "main",
-        inputs: { productId: inputs.productId, merchantId: inputs.merchantId, runId: inputs.runId },
+        inputs: {
+          productId: inputs.productId ?? "",
+          merchantId: inputs.merchantId ?? "",
+          buildId: inputs.buildId ?? "",
+          runId: inputs.runId,
+        },
       }),
     },
   };

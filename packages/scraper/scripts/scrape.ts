@@ -3,7 +3,8 @@
  *
  *   pnpm scrape                                  # every enabled pair (cron)
  *   pnpm scrape --product <id|name> --merchant <id|slug|name>
- *   pnpm scrape --run-id <id> --trigger manual   # a run queued by the web app
+ *   pnpm scrape --build <id>                     # every product in one build
+ *   pnpm scrape --run-id <id> --trigger manual   # a run queued by the web app (its stored scope)
  *   pnpm scrape --no-browser                     # plain fetch only
  *
  * Writes to TURSO_DATABASE_URL (default: local.db at the repo root). Raw HTML of failed fetches
@@ -12,18 +13,20 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { createDb, resolveDatabaseUrl } from "@parts/db";
+import { createDb, resolveDatabaseUrl, scrapeRuns } from "@parts/db";
+import { eq } from "@parts/db/orm";
 import { createBrowserSession } from "../src/browser";
 import { loadRates } from "../src/fx";
 import { plainTransport, SmartFetcher } from "../src/http";
 import { runScrape } from "../src/run";
-import { findMerchant, findProduct } from "../src/store";
+import { findMerchant, findProduct, type RunScope } from "../src/store";
 import { loadEnv } from "./env";
 
 const { values: args } = parseArgs({
   options: {
     product: { type: "string" },
     merchant: { type: "string" },
+    build: { type: "string" },
     "run-id": { type: "string" },
     trigger: { type: "string", default: "manual" },
     "gh-run-url": { type: "string" },
@@ -39,12 +42,32 @@ loadEnv();
 const db = createDb();
 console.log(`db: ${resolveDatabaseUrl().replace(/\?.*$/, "")}`);
 
+const runId = opt(args["run-id"]);
 const productKey = opt(args.product);
+const buildKey = opt(args.build);
 const merchantKey = opt(args.merchant);
 const product = productKey ? await findProduct(db, productKey) : null;
 const merchant = merchantKey ? await findMerchant(db, merchantKey) : null;
 if (productKey && !product) throw new Error(`no product ${productKey}`);
 if (merchantKey && !merchant) throw new Error(`no merchant ${merchantKey}`);
+
+// A run queued by the web app carries its scope in the row; explicit flags override it.
+let scope: RunScope = {
+  ...(product ? { productId: product.id } : {}),
+  ...(merchant ? { merchantId: merchant.id } : {}),
+  ...(buildKey ? { buildId: buildKey } : {}),
+};
+if (runId && !Object.keys(scope).length) {
+  const [row] = await db.select().from(scrapeRuns).where(eq(scrapeRuns.id, runId));
+  if (row) {
+    const { productId, merchantId, buildId } = row.scope;
+    scope = {
+      ...(productId ? { productId } : {}),
+      ...(merchantId ? { merchantId } : {}),
+      ...(buildId ? { buildId } : {}),
+    };
+  }
+}
 
 const trigger = args.trigger === "cron" ? "cron" : "manual";
 const browser = args["no-browser"] ? null : createBrowserSession({ headless: !args.headed });
@@ -59,12 +82,9 @@ try {
     fetcher,
     rates,
     trigger,
-    runId: opt(args["run-id"]),
+    runId,
     ghRunUrl: opt(args["gh-run-url"]),
-    scope: {
-      ...(product ? { productId: product.id } : {}),
-      ...(merchant ? { merchantId: merchant.id } : {}),
-    },
+    scope,
     merchantConcurrency: Number(args.concurrency) || 4,
     log: console.log,
     onFailurePage: (pair, page) => {
