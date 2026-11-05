@@ -24,6 +24,7 @@ import {
   type MatchTarget,
   type Offer,
   type SaleorConfig,
+  type FeedIndex,
 } from "@parts/core";
 import type { AdapterConfig, LastMatch, ScrapeStatus } from "@parts/db";
 import type { FetchResult, PageFetcher } from "./http";
@@ -65,6 +66,8 @@ export interface PairInput {
   /** ASIN to try at amazon.* shops before searching. */
   asin?: string | null;
   rates: FxRates;
+  /** The merchant's affiliate feed, loaded once per run: matched instead of fetching pages. */
+  feed?: FeedIndex | null;
 }
 
 export interface Scored {
@@ -264,6 +267,8 @@ export async function scrapePair(
       ? finish({ status: "blocked", message: `blocked (${lastBlock})` })
       : finish({ status: "error", message: lastError || "fetch failed" });
 
+  if (input.feed) return feedPair(input, input.feed, finish, lastMatchOf, acceptedOutcome, log, mm);
+
   // 1. Pinned URL: always used, never searched past (A16).
   if (state?.manualUrl) {
     log(`pinned ${state.manualUrl}`);
@@ -432,5 +437,62 @@ export async function scrapePair(
     review,
     lastMatch: review ? lastMatchOf(review) : undefined,
     autoUrl,
+  });
+}
+
+/**
+ * A pair matched against the merchant's affiliate feed (no page fetches): a pinned URL is
+ * looked up in the feed; otherwise the feed's GTIN/MPN/name candidates are scored like pages.
+ */
+function feedPair(
+  input: PairInput,
+  feed: FeedIndex,
+  finish: (o: Omit<PairOutcome, "trace" | "failurePages" | "requests" | "ms">) => PairOutcome,
+  lastMatchOf: (s: Scored) => LastMatch,
+  acceptedOutcome: (s: Scored, extra?: Partial<PairOutcome>) => PairOutcome,
+  log: (line: string) => void,
+  mm: MatchMerchant,
+): PairOutcome {
+  const { target, state } = input;
+  const describe = (d: MatchDecision) =>
+    `${d.decision} ${d.score}${d.vetoes.length ? ` veto ${d.vetoes.join(",")}` : ""}`;
+
+  if (state?.manualUrl) {
+    log(`pinned ${state.manualUrl} (feed of ${feed.size})`);
+    const offer = feed.byCanonicalUrl(state.manualUrl);
+    if (!offer)
+      return finish({ status: "not_found", message: "pinned product is not in the feed" });
+    const decision = matchOffer(target, offer, mm, { pinned: true });
+    log(`  → ${describe(decision)} | ${offer.title}`);
+    const s: Scored = { offer, decision, via: "manual" };
+    if (decision.decision === "accept") return acceptedOutcome(s);
+    return finish({
+      status: "not_found",
+      message: "pinned product has no price",
+      lastMatch: lastMatchOf(s),
+    });
+  }
+
+  log(`feed: ${feed.size} products`);
+  const accepts: Scored[] = [];
+  const reviews: Scored[] = [];
+  for (const offer of feed.candidates(target)) {
+    const decision = matchOffer(target, offer, mm);
+    log(`  candidate → ${describe(decision)} | ${offer.title}`);
+    const s: Scored = { offer, decision, via: "search" };
+    if (decision.decision === "accept") accepts.push(s);
+    else if (decision.decision === "review") reviews.push(s);
+  }
+  const best = selectBestOffer(accepts);
+  if (best)
+    return acceptedOutcome(best, { autoUrl: { url: best.offer.canonicalUrl, failures: 0 } });
+  const review = reviews.sort((a, b) => b.decision.score - a.decision.score)[0];
+  return finish({
+    status: "not_found",
+    message: review
+      ? `review candidate ${review.decision.score}: ${review.offer.title}`
+      : "not in the feed",
+    review,
+    lastMatch: review ? lastMatchOf(review) : undefined,
   });
 }

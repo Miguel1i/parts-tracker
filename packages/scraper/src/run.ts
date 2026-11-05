@@ -1,5 +1,6 @@
 /** A whole scrape run: plan the pairs, scrape them politely, write the results. */
-import type { FxRates } from "@parts/core";
+import type { FeedIndex, FxRates } from "@parts/core";
+import { feedUrlFor, loadFeed, redactFeedUrl } from "./feed";
 import type { Db, ScrapeStatus } from "@parts/db";
 import type { PageFetcher } from "./http";
 import { scrapePair, type FailurePage, type PairOutcome, type RunMemo } from "./pair";
@@ -16,6 +17,10 @@ import {
 } from "./store";
 
 export interface RunOptions {
+  /** Env for AWIN_FEEDS (default process.env). */
+  env?: Record<string, string | undefined>;
+  /** Feed loader (tests). */
+  loadFeed?: (url: string, rates: FxRates) => Promise<FeedIndex>;
   db: Db;
   fetcher: PageFetcher;
   rates: FxRates;
@@ -147,10 +152,27 @@ export async function runScrape(options: RunOptions): Promise<RunResult> {
 
     await mapLimit([...byMerchant.values()], options.merchantConcurrency ?? 4, async (list) => {
       const statuses: ScrapeStatus[] = [];
+      // A merchant with an affiliate feed is matched against it (one download), not its pages.
+      let feed: FeedIndex | null = null;
+      let feedError: string | null = null;
+      const feedUrl = feedUrlFor(list[0]!.merchant.slug, options.env);
+      if (feedUrl) {
+        try {
+          feed = await (options.loadFeed ?? loadFeed)(feedUrl, rates);
+          log(`feed ${list[0]!.merchant.name}: ${feed.size} products (${redactFeedUrl(feedUrl)})`);
+        } catch (err) {
+          feedError = `feed download failed: ${errorText(err)}`.slice(0, 300);
+          log(`feed ${list[0]!.merchant.name}: ${feedError}`);
+        }
+      }
       await mapLimit(list, options.pairConcurrency ?? 2, async (pair) => {
         let outcome: PairOutcome;
         try {
-          outcome = await scrapePair(pairInput(pair, data, rates), fetcher, { now, memo });
+          if (feedError) throw new Error(feedError);
+          outcome = await scrapePair({ ...pairInput(pair, data, rates), feed }, fetcher, {
+            now,
+            memo,
+          });
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
           outcome = {

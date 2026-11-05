@@ -29,3 +29,4 @@ export {
   saleorSlugFromUrl,
 } from "./extract/saleor";
 export type { SaleorConfig, SaleorNode } from "./extract/saleor";
+export { FeedIndex, feedDelimiter, feedOffers, parseCsv } from "./extract/feed";

@@ -25,10 +25,11 @@ describe("translations", () => {
   });
 
   it.each(["en.json", ...others])("%s has no empty strings", (file) => {
-    const empty = keys(load(file)).filter((k) => {
+    const tree = load(file);
+    const empty = keys(tree).filter((k) => {
       const value = k
         .split(".")
-        .reduce<Tree | string>((node, part) => (node as Tree)[part]!, load(file));
+        .reduce<Tree | string>((node, part) => (node as Tree)[part]!, tree);
       return typeof value === "string" && value.trim() === "";
     });
     expect(empty).toEqual([]);

@@ -44,6 +44,8 @@ jobs:
     env:
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      # Optional: affiliate feed links by merchant slug (JSON), see packages/scraper/src/feed.ts.
+      AWIN_FEEDS: ${{ secrets.AWIN_FEEDS }}
     steps:
       # Gate before checkout/install, so a skipped hour costs seconds. Without the Turso secrets
       # the job is a no-op (a warning, not a failure). Scheduled runs (hourly) only scrape once

@@ -1,0 +1,5 @@
+aw_deep_link,product_name,aw_product_id,merchant_product_id,merchant_image_url,merchant_category,search_price,currency,merchant_deep_link,brand_name,ean,mpn,in_stock,stock_quantity
+https://www.awin1.com/pclick.php?p=1&a=2&m=20983,"Processador AMD Ryzen 7 9800X3D 4.7GHz Box",111,P-9800,https://img.example.pt/9800.jpg,Processadores,456.90,EUR,https://www.pccomponentes.pt/amd-ryzen-7-9800x3d-47-52ghz-box,AMD,0730143315289,100-100001084WOF,1,12
+https://www.awin1.com/pclick.php?p=3&a=2&m=20983,"Processador AMD Ryzen 7 9800X3D Tray, ""sem cooler""",112,P-9800T,https://img.example.pt/9800t.jpg,Processadores,429.00,EUR,https://www.pccomponentes.pt/amd-ryzen-7-9800x3d-tray,AMD,,100-000001084,0,0
+https://www.awin1.com/pclick.php?p=4&a=2&m=20983,Noctua NH-D15S chromax.black,113,P-NH,,Refrigeração,115.99,EUR,https://www.pccomponentes.pt/noctua-nh-d15s-chromax-black,Noctua,9010018000238,NH-D15S chromax.black,1,3
+,Sem link,114,P-X,,X,10.00,EUR,,X,,,1,1
