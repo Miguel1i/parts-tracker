@@ -121,7 +121,7 @@ export function CompareView({
               aria-pressed={view === v}
               onClick={() => changeView(v)}
               className={cn(
-                "focus-visible:outline-ring border-border px-3 text-[13px] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 [&+&]:border-l",
+                "focus-visible:outline-ring border-border px-3 text-[0.8125rem] font-medium focus-visible:outline-2 focus-visible:-outline-offset-2 [&+&]:border-l",
                 view === v
                   ? "bg-foreground text-background"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground",

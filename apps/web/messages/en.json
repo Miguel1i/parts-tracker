@@ -505,7 +505,7 @@
           "searchTemplate": "Search URL template",
           "searchTemplateHint": "Must contain '{q}', which is replaced by the search terms.",
           "currency": "Currency",
-          "currencyHint": "3 uppercase letters, e.g. EUR.",
+          "currencyHint": "Prices are converted to EUR with ECB rates.",
           "shipping": "Shipping (in the shop's currency)",
           "freeShippingOver": "Free shipping over",
           "freeShippingOverHint": "Leave empty if there is no threshold.",
@@ -540,7 +540,8 @@
           "maxConcurrency": "Max concurrent requests",
           "maxConcurrencyHint": "1 or 2.",
           "overrides": "Other overrides (JSON)",
-          "overridesHint": "A JSON object with any other adapter keys."
+          "overridesHint": "A JSON object with any other adapter keys.",
+          "visibleNeedsEnabled": "Turn on “Enabled” first: a disabled shop is never shown to users."
         },
         "errors": {
           "name": "Enter a name.",
@@ -620,7 +621,8 @@
           "blocked": "Blocked",
           "error": "Error"
         }
-      }
+      },
+      "back": "Back to merchants"
     },
     "catalog": {
       "title": "Catalog",
@@ -1024,7 +1026,7 @@
     "invalidAdapter": "The adapter settings aren't valid.",
     "hasHistory": "This merchant has price history, which is kept for good. Disable it instead.",
     "alreadyDecided": "Someone already decided on this candidate.",
-    "dispatchFailed": "GitHub didn't accept the run. Check GH_DISPATCH_TOKEN and GH_REPO.",
+    "dispatchFailed": "Checks can't start: the server has no GitHub token (GH_DISPATCH_TOKEN), or GitHub refused it. An admin needs to set it.",
     "rateLimited": "You checked recently. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
     "unknownMerchant": "That shop isn't one of the tracked merchants.",
     "badUrl": "That isn't a valid shop link (http or https).",

@@ -505,7 +505,7 @@
           "searchTemplate": "Modelo de URL de pesquisa",
           "searchTemplateHint": "Tem de conter '{q}', que é substituído pelos termos de pesquisa.",
           "currency": "Moeda",
-          "currencyHint": "3 letras maiúsculas, por exemplo EUR.",
+          "currencyHint": "Os preços são convertidos para EUR com as taxas do BCE.",
           "shipping": "Envio (na moeda da loja)",
           "freeShippingOver": "Envio grátis acima de",
           "freeShippingOverHint": "Deixe vazio se não houver limite.",
@@ -540,7 +540,8 @@
           "maxConcurrency": "Máximo de pedidos em simultâneo",
           "maxConcurrencyHint": "1 ou 2.",
           "overrides": "Outras definições (JSON)",
-          "overridesHint": "Um objeto JSON com quaisquer outras chaves do adaptador."
+          "overridesHint": "Um objeto JSON com quaisquer outras chaves do adaptador.",
+          "visibleNeedsEnabled": "Ative primeiro “Ativo”: uma loja desativada nunca é mostrada aos utilizadores."
         },
         "errors": {
           "name": "Introduza um nome.",
@@ -620,7 +621,8 @@
           "blocked": "Bloqueado",
           "error": "Erro"
         }
-      }
+      },
+      "back": "Voltar às lojas"
     },
     "catalog": {
       "title": "Catálogo",
@@ -1024,7 +1026,7 @@
     "invalidAdapter": "As definições do adaptador não são válidas.",
     "hasHistory": "Esta loja tem histórico de preços, que é guardado para sempre. Desative-a em vez disso.",
     "alreadyDecided": "Alguém já decidiu sobre este candidato.",
-    "dispatchFailed": "O GitHub não aceitou a execução. Verifique GH_DISPATCH_TOKEN e GH_REPO.",
+    "dispatchFailed": "As verificações não podem começar: o servidor não tem token do GitHub (GH_DISPATCH_TOKEN) ou o GitHub recusou-o. Um administrador tem de o configurar.",
     "rateLimited": "Verificou há pouco. Tente novamente dentro de {minutes, plural, one {# minuto} other {# minutos}}.",
     "unknownMerchant": "Essa loja não é uma das lojas acompanhadas.",
     "badUrl": "Esse não é um link de loja válido (http ou https).",

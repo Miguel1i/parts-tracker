@@ -50,7 +50,7 @@ function AvatarFallback({
       className={cn(
         "border-border bg-secondary flex size-full items-center justify-center rounded-[inherit] border",
         "text-secondary-foreground font-mono text-xs font-semibold uppercase tracking-[0.04em]",
-        "group-data-[size=lg]/avatar:text-sm group-data-[size=sm]/avatar:text-[10px]",
+        "group-data-[size=lg]/avatar:text-sm group-data-[size=sm]/avatar:text-[0.625rem]",
         className,
       )}
       {...props}

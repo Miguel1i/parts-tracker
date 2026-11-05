@@ -70,7 +70,7 @@ async function SignedIn({ userId }: { userId: string }) {
         {/* One ruled strip of figures (hairlines between cells), not four floating cards. */}
         <div className="bg-border grid grid-cols-2 gap-px overflow-hidden rounded-[6px] border lg:grid-cols-4">
           <Tile title={t("kpi.buildTotal")}>
-            <p className="font-mono text-[26px] font-semibold tabular-nums leading-none">
+            <p className="font-mono text-[1.625rem] font-semibold tabular-nums leading-none">
               {format.number(d.total, "price")}
             </p>
             <p className="text-muted-foreground text-xs">
@@ -85,7 +85,7 @@ async function SignedIn({ userId }: { userId: string }) {
             )}
           </Tile>
           <Tile title={t("kpi.savings")}>
-            <p className="font-mono text-[26px] font-semibold tabular-nums leading-none">
+            <p className="font-mono text-[1.625rem] font-semibold tabular-nums leading-none">
               {d.savings == null ? "–" : format.number(d.savings, "price")}
             </p>
             <p className="text-muted-foreground text-xs">
@@ -93,13 +93,13 @@ async function SignedIn({ userId }: { userId: string }) {
             </p>
           </Tile>
           <Tile title={t("kpi.merchants")}>
-            <p className="font-mono text-[26px] font-semibold tabular-nums leading-none">
+            <p className="font-mono text-[1.625rem] font-semibold tabular-nums leading-none">
               {d.merchantCount}
             </p>
             <p className="text-muted-foreground text-xs">{t("merchantsHint")}</p>
           </Tile>
           <Tile title={t("kpi.lastRun")}>
-            <p className="text-[22px] font-bold leading-none">{runStatus ?? "–"}</p>
+            <p className="text-[1.375rem] font-bold leading-none">{runStatus ?? "–"}</p>
             <p className="text-muted-foreground text-xs">
               {d.lastRun?.at ? format.relativeTime(d.lastRun.at) : t("noRuns")}
             </p>
@@ -155,7 +155,7 @@ async function SignedIn({ userId }: { userId: string }) {
 function Tile({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="bg-card flex min-w-0 flex-col gap-2 p-4 sm:p-5">
-      <p className="text-muted-foreground font-mono text-[11px] uppercase tracking-[0.08em]">
+      <p className="text-muted-foreground font-mono text-[0.6875rem] uppercase tracking-[0.08em]">
         {title}
       </p>
       {children}

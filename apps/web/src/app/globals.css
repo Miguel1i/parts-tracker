@@ -208,8 +208,15 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+  /* Everything is sized in rem, so the root size scales the whole UI: 17px, 18px on big screens. */
   html {
     @apply font-sans;
+    font-size: 106.25%;
+  }
+  @media (min-width: 1536px) {
+    html {
+      font-size: 112.5%;
+    }
   }
 }
 

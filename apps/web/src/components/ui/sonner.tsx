@@ -10,7 +10,7 @@ import { Toaster as Sonner, type ToasterProps } from "sonner";
  * label where sonner would put an icon. Sonner keeps stacking/swipe; we own the look.
  */
 
-const label = "font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.08em]";
+const label = "font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.08em]";
 
 const Toaster = ({ toastOptions, ...props }: ToasterProps) => {
   const { resolvedTheme } = useTheme();
@@ -41,7 +41,7 @@ const Toaster = ({ toastOptions, ...props }: ToasterProps) => {
           icon: "mt-0.5 flex shrink-0 items-center group-data-[type=success]/toast:text-success group-data-[type=error]/toast:text-destructive",
           content: "flex min-w-0 flex-1 flex-col gap-0.5",
           title: "font-semibold leading-snug",
-          description: "text-muted-foreground text-[13px] leading-snug",
+          description: "text-muted-foreground text-[0.8125rem] leading-snug",
           actionButton:
             "bg-foreground text-background focus-visible:outline-ring ml-auto h-7 shrink-0 self-center rounded-[4px] px-2.5 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2",
           cancelButton:

@@ -24,7 +24,7 @@ export const menuItem =
 
 /** Mono uppercase micro label (11px, tracked) used for menu group labels. */
 export const microLabel =
-  "font-mono text-[11px] font-medium uppercase leading-none tracking-[0.08em] text-muted-foreground";
+  "font-mono text-[0.6875rem] font-medium uppercase leading-none tracking-[0.08em] text-muted-foreground";
 
 /**
  * Modal panel. Centred on desktop; on phones it docks to the bottom edge as a sheet

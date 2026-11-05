@@ -19,6 +19,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "@/i18n/navigation";
@@ -71,25 +78,84 @@ function TextField({
   );
 }
 
+/** Currencies the scraper can convert (ECB reference rates), EUR first. */
+const CURRENCIES = ["EUR", "GBP", "USD", "CHF", "PLN", "CZK", "DKK", "SEK", "NOK", "HUF", "RON"];
+
 function SwitchField({
   label,
   hint,
   checked,
   onChange,
+  disabled,
 }: {
   label: string;
   hint: string;
   checked: boolean;
   onChange: (value: boolean) => void;
+  disabled?: boolean;
 }) {
   const id = useId();
   return (
-    <div className="flex items-start gap-3">
-      <Switch id={id} checked={checked} onCheckedChange={onChange} className="mt-0.5" />
+    <div className={"flex items-start gap-3" + (disabled ? " opacity-60" : "")}>
+      <Switch
+        id={id}
+        checked={checked}
+        onCheckedChange={onChange}
+        disabled={disabled}
+        className="mt-0.5"
+      />
       <div className="grid gap-0.5">
         <Label htmlFor={id}>{label}</Label>
         <p className="text-muted-foreground text-xs">{hint}</p>
       </div>
+    </div>
+  );
+}
+
+function CurrencyField({
+  label,
+  hint,
+  value,
+  onChange,
+  error,
+}: {
+  label: string;
+  hint: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}) {
+  const id = useId();
+  const options = CURRENCIES.includes(value) || !value ? CURRENCIES : [value, ...CURRENCIES];
+  return (
+    <div className="grid gap-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger
+          id={id}
+          className="w-full"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={`${id}-${error ? "error" : "hint"}`}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((c) => (
+            <SelectItem key={c} value={c}>
+              {c}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {error ? (
+        <p id={`${id}-error`} className="text-destructive text-sm">
+          {error}
+        </p>
+      ) : (
+        <p id={`${id}-hint`} className="text-muted-foreground text-xs">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
@@ -203,14 +269,12 @@ export function MerchantForm({
             error={e("country")}
             maxLength={2}
           />
-          <TextField
+          <CurrencyField
             label={f("currency")}
             hint={f("currencyHint")}
             value={v.currency}
-            onChange={(x) => set("currency", x.toUpperCase())}
+            onChange={(x) => set("currency", x)}
             error={e("currency")}
-            maxLength={3}
-            required
           />
           <div className="grid gap-1.5">
             <ColorField
@@ -271,11 +335,13 @@ export function MerchantForm({
           checked={v.enabled}
           onChange={(x) => set("enabled", x)}
         />
+        {/* A disabled shop is hidden from users regardless, so the switch is locked off. */}
         <SwitchField
           label={f("visibleToUsers")}
-          hint={f("visibleToUsersHint")}
-          checked={v.visibleToUsers}
+          hint={v.enabled ? f("visibleToUsersHint") : f("visibleNeedsEnabled")}
+          checked={v.enabled && v.visibleToUsers}
           onChange={(x) => set("visibleToUsers", x)}
+          disabled={!v.enabled}
         />
         <SwitchField
           label={f("ownOnly")}

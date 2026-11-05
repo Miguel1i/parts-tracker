@@ -9,8 +9,9 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useRail } from "@/hooks/use-rail";
 import { Link, usePathname } from "@/i18n/navigation";
-import { useAdminCounts } from "@/lib/admin-counts";
-import { adminNav, inAdmin, isActive, mainNav } from "@/lib/nav";
+import { useAdminCounts, useLoadAdminCounts } from "@/lib/admin-counts";
+import { useSession } from "@/lib/auth/client";
+import { adminNav, isActive, mainNav } from "@/lib/nav";
 import { cn } from "@/lib/utils";
 
 /*
@@ -22,7 +23,7 @@ type Item = { href: string; label: string; icon: LucideIcon; count?: number; cou
 
 function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-muted-foreground collapsed:sr-only mb-2 px-3 font-mono text-[11px] uppercase tracking-[0.08em]">
+    <p className="text-muted-foreground collapsed:sr-only mb-2 px-3 font-mono text-[0.6875rem] uppercase tracking-[0.08em]">
       {children}
     </p>
   );
@@ -49,7 +50,7 @@ function NavItems({
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "group/nav relative flex h-10 items-center gap-3 rounded-[4px] px-3 text-[15px]",
+              "group/nav relative flex h-10 items-center gap-3 rounded-[4px] px-3 text-[0.9375rem]",
               "transition-[background-color,color] duration-150 motion-reduce:transition-none",
               "focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2",
               "collapsed:justify-center collapsed:px-0",
@@ -79,8 +80,8 @@ function NavItems({
               <span
                 aria-label={countLabel}
                 className={cn(
-                  "bg-primary text-primary-foreground ml-auto grid h-5 min-w-5 place-items-center rounded-full px-1.5 font-mono text-[11px] font-semibold tabular-nums",
-                  "collapsed:absolute collapsed:right-1 collapsed:top-1 collapsed:ml-0 collapsed:h-4 collapsed:min-w-4 collapsed:px-1 collapsed:text-[10px]",
+                  "bg-primary text-primary-foreground ml-auto grid h-5 min-w-5 place-items-center rounded-full px-1.5 font-mono text-[0.6875rem] font-semibold tabular-nums",
+                  "collapsed:absolute collapsed:right-1 collapsed:top-1 collapsed:ml-0 collapsed:h-4 collapsed:min-w-4 collapsed:px-1 collapsed:text-[0.625rem]",
                 )}
               >
                 {count}
@@ -105,7 +106,7 @@ function NavItems({
   );
 }
 
-/** Main sections, plus an Admin group while inside /admin (the area itself is gated). */
+/** Main sections, plus an Admin group for admins. */
 export function NavList({
   onNavigate,
   tooltips = false,
@@ -116,9 +117,13 @@ export function NavList({
 }) {
   const t = useTranslations("Nav");
   const ta = useTranslations("Admin.nav");
-  const pathname = usePathname();
   const counts = useAdminCounts();
-  const admin = inAdmin(pathname);
+  // Role-based: an admin sees the Admin group on every page (the area itself is still guarded
+  // server-side; this only decides which links to draw).
+  const { data: session } = useSession();
+  const user = session?.user as { role?: string; status?: string } | undefined;
+  const admin = user?.role === "admin" && user.status === "active";
+  useLoadAdminCounts(admin);
   const badge = { users: counts?.pendingUsers, review: counts?.pendingReview } as Record<
     string,
     number | undefined
@@ -135,7 +140,7 @@ export function NavList({
         />
       </div>
       {admin && (
-        <div className="animate-page-in motion-reduce:animate-none">
+        <div>
           <GroupLabel>{t("admin")}</GroupLabel>
           <NavItems
             tooltips={tooltips}
@@ -212,7 +217,7 @@ export function AppRail() {
           aria-expanded={!collapsed}
           aria-label={collapsed ? t("expand") : t("collapse")}
           className={cn(
-            "text-muted-foreground hover:bg-accent hover:text-foreground flex h-8 w-full items-center gap-2 rounded-[4px] px-2 font-mono text-[11px] uppercase tracking-[0.08em]",
+            "text-muted-foreground hover:bg-accent hover:text-foreground flex h-8 w-full items-center gap-2 rounded-[4px] px-2 font-mono text-[0.6875rem] uppercase tracking-[0.08em]",
             "focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2",
             "collapsed:justify-center",
           )}

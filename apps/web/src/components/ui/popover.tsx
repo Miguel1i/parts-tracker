@@ -61,7 +61,7 @@ function PopoverTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="popover-title"
-      className={cn("text-[15px] font-semibold leading-tight tracking-[-0.01em]", className)}
+      className={cn("text-[0.9375rem] font-semibold leading-tight tracking-[-0.01em]", className)}
       {...props}
     />
   );
@@ -71,7 +71,7 @@ function PopoverDescription({ className, ...props }: React.ComponentProps<"p">) 
   return (
     <p
       data-slot="popover-description"
-      className={cn("text-muted-foreground text-[13px] leading-snug", className)}
+      className={cn("text-muted-foreground text-[0.8125rem] leading-snug", className)}
       {...props}
     />
   );
