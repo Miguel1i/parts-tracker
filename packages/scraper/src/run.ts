@@ -4,7 +4,9 @@ import type { Db, ScrapeStatus } from "@parts/db";
 import type { PageFetcher } from "./http";
 import { scrapePair, type FailurePage, type PairOutcome, type RunMemo } from "./pair";
 import {
+  expireStaleRuns,
   finishRun,
+  setRunPlanned,
   loadRunData,
   pairInput,
   recentSkipMinutes,
@@ -98,6 +100,7 @@ export async function runScrape(options: RunOptions): Promise<RunResult> {
   const scope = options.scope ?? {};
   const started = now();
   const retry = <T>(fn: () => Promise<T>) => withRetry(fn, { sleep: options.sleep });
+  await retry(() => expireStaleRuns(db, new Date(started))).catch(() => {});
   const runId = await retry(() =>
     startRun(
       db,
@@ -135,6 +138,8 @@ export async function runScrape(options: RunOptions): Promise<RunResult> {
       return !recent;
     });
     log(`run ${runId}: ${pairs.length} pairs (${stats.skipped} checked recently, skipped)`);
+    stats.planned = pairs.length;
+    await retry(() => setRunPlanned(db, runId, pairs.length)).catch(() => {});
 
     const byMerchant = new Map<string, PlannedPair[]>();
     for (const p of pairs) {

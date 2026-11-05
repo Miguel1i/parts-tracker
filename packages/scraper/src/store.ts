@@ -23,7 +23,7 @@ import {
   type CandidateSignals,
   type ScrapeStatus,
 } from "@parts/db";
-import { and, eq, gte, inArray, isNull, or } from "drizzle-orm";
+import { and, eq, gte, inArray, isNull, lt, or } from "drizzle-orm";
 import type { PairInput, PairMerchant, PairOutcome, PairState } from "./pair";
 import { productAsin } from "./queries";
 
@@ -235,6 +235,28 @@ export async function startRun(
     })
     .returning({ id: scrapeRuns.id });
   return row!.id;
+}
+
+/** Records how many pairs a run will check, so the web app can show progress (done / planned). */
+export async function setRunPlanned(db: Db, runId: string, planned: number) {
+  await db.update(scrapeRuns).set({ stats: { planned } }).where(eq(scrapeRuns.id, runId));
+}
+
+/** Runs still queued or running after this long never finished (dispatch lost, job killed). */
+export const STALE_RUN_MS = 3 * 60 * 60_000;
+
+/** Marks stale queued/running runs as failed, so they don't show as pending forever. */
+export async function expireStaleRuns(db: Db, now: Date) {
+  await db
+    .update(scrapeRuns)
+    .set({ status: "failed", finishedAt: now })
+    .where(
+      and(
+        inArray(scrapeRuns.status, ["queued", "running"]),
+        isNull(scrapeRuns.finishedAt),
+        lt(scrapeRuns.createdAt, new Date(now.getTime() - STALE_RUN_MS)),
+      ),
+    );
 }
 
 export async function finishRun(

@@ -358,7 +358,8 @@
         "not_found": "not found",
         "blocked": "blocked by the shop",
         "error": "error"
-      }
+      },
+      "progressOf": "Checked {count} of {total}…"
     },
     "add": {
       "title": "Add parts",

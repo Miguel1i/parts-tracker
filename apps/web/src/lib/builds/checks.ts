@@ -14,6 +14,7 @@ import {
 import { and, asc, desc, eq, gt, inArray, not, isNull, or } from "@parts/db/orm";
 import { dispatchScrape } from "@/lib/admin/github";
 import { ActionError } from "@/lib/auth/guard";
+import { STALE_RUN_MS } from "@/lib/runs";
 import { ownedBuild } from "./access";
 import { userMerchantIds } from "./queries";
 
@@ -245,4 +246,26 @@ export async function reportMatch(db: Db, userId: string, input: ReportInput) {
       },
     });
   });
+}
+
+/**
+ * The user's latest still-active run for a build (queued/running, not stale), so "Check now"
+ * picks up its progress after a reload. Null when there is none.
+ */
+export async function activeBuildRun(db: Db, userId: string, buildId: string) {
+  const now = Date.now();
+  const rows = await db
+    .select({ id: scrapeRuns.id, status: scrapeRuns.status, scope: scrapeRuns.scope })
+    .from(scrapeRuns)
+    .where(
+      and(
+        eq(scrapeRuns.requestedBy, userId),
+        inArray(scrapeRuns.status, ["queued", "running"]),
+        gt(scrapeRuns.createdAt, new Date(now - STALE_RUN_MS)),
+      ),
+    )
+    .orderBy(desc(scrapeRuns.createdAt))
+    .limit(10);
+  const run = rows.find((r) => r.scope?.buildId === buildId);
+  return run ? { id: run.id, status: run.status } : null;
 }
