@@ -771,7 +771,10 @@
     "lastAdmin": "É o único administrador; torne outra pessoa administrador primeiro.",
     "alreadyReported": "Esta oferta já foi reportada e aguarda revisão.",
     "nothingToCheck": "Os preços foram verificados há instantes; ainda não há nada para atualizar.",
-    "importEmpty": "Não foram encontradas peças na lista colada."
+    "importEmpty": "Não foram encontradas peças na lista colada.",
+    "importTooLarge": "Essa lista é demasiado longa: importe no máximo {max} peças de cada vez.",
+    "emptyBuild": "Esta configuração ainda não tem peças para verificar.",
+    "noMerchants": "Não escolheu nenhuma loja para comparar. Escolha-as em Perfil e definições."
   },
   "Share": {
     "sharedBy": "Partilhado por {name}",

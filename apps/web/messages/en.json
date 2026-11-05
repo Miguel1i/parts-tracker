@@ -771,7 +771,10 @@
     "lastAdmin": "You're the only admin; make someone else an admin first.",
     "alreadyReported": "This offer was already reported and is waiting for review.",
     "nothingToCheck": "Prices were checked moments ago, so there's nothing to refresh yet.",
-    "importEmpty": "No parts found in the pasted list."
+    "importEmpty": "No parts found in the pasted list.",
+    "importTooLarge": "That list is too long: import at most {max} parts at a time.",
+    "emptyBuild": "This build has no parts to check yet.",
+    "noMerchants": "You haven't selected any shops to compare. Choose some in Profile & settings."
   },
   "Share": {
     "sharedBy": "Shared by {name}",

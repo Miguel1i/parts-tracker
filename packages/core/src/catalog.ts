@@ -84,17 +84,25 @@ export function parsePcpp(text: string): PcppItem[] {
 const CUT =
   /\s+(?:\d+(?:\.\d+)?\s?(?:GHz|CFM)|\d+-Core|M\.2|ATX|PCIe|80\+|Processor|Memory|Video Card|CPU Cooler|Motherboard|Solid State Drive|Power Supply|Case)(?![A-Za-z]).*$/i;
 
-/** Search query for a PCPartPicker part name: no parentheses, spec tail cut, at most 9 words. */
-export function pcppQuery(name: string): string {
-  const q = name
+/** A PCPartPicker part name without parentheses and without its spec tail. */
+function coreName(name: string): string {
+  return name
     .replace(/\(.*?\)/g, "")
     .replace(/(\d)\s+(GB|TB|W)\b/gi, "$1$2")
     .replace(CUT, "")
     .trim();
-  return q.split(/\s+/).slice(0, 9).join(" ") || name;
 }
 
-/** Dedupe key: two names that reduce to the same query denote the same catalog product. */
+/** Search query for a PCPartPicker part name: the core name, at most 9 words. */
+export function pcppQuery(name: string): string {
+  return coreName(name).split(/\s+/).slice(0, 9).join(" ") || name;
+}
+
+/**
+ * Dedupe key: two names with the same core name denote the same catalog product. Unlike the
+ * search query it isn't truncated, so variant words late in a long name (Ti, 16GB, OC…) still
+ * tell products apart.
+ */
 export function catalogKey(name: string): string {
-  return compact(normalizeTitle(pcppQuery(name)));
+  return compact(normalizeTitle(coreName(name) || name));
 }

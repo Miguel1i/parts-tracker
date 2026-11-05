@@ -14,6 +14,7 @@ export function useActionErrorText() {
       const minutes = Math.max(1, Math.ceil(Number(meta?.retryAfterSec ?? 60) / 60));
       return t("rateLimited", { minutes });
     }
+    if (code === "importTooLarge") return t("importTooLarge", { max: Number(meta?.max ?? 40) });
     return t.has(code) ? t(code as "generic") : t("generic");
   };
 }

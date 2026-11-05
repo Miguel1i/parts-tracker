@@ -144,12 +144,12 @@ describe("startCheck", () => {
     await expect(check()).resolves.toMatchObject({ dispatched: true });
   });
 
-  it("only counts merchants the user compares, and an empty build has nothing to check", async () => {
+  it("says why when the user compares no merchants or the build is empty", async () => {
     await db.insert(userMerchants).values({ userId: "u1", merchantId: "m1", enabled: false });
-    await expect(check()).rejects.toMatchObject({ code: "nothingToCheck" });
+    await expect(check()).rejects.toMatchObject({ code: "noMerchants" });
     await db.delete(userMerchants);
     await db.delete(buildItems);
-    await expect(check()).rejects.toMatchObject({ code: "nothingToCheck" });
+    await expect(check()).rejects.toMatchObject({ code: "emptyBuild" });
   });
 
   it("marks the run failed and throws dispatchFailed when GitHub refuses", async () => {

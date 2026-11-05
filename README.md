@@ -2,7 +2,7 @@
 
 Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portuguese, Spanish, French and UK merchants). Prices are scraped on a schedule or on demand, every observation is kept, and history is shown in interactive charts.
 
-> Status: **milestone 5 — auth & admin**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
+> Status: **milestone 6 — user features**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
 
 ## Stack
 
@@ -134,6 +134,14 @@ bash scripts/setup-vercel-env.sh
 ```
 
 From PowerShell: `& "C:\Program Files\Git\bin\bash.exe" -lc "bash scripts/setup-vercel-env.sh"`.
+
+## Builds & account
+
+- **My builds** (`/builds`): each user's part lists with the current best price per part (cheapest in-stock offer among the shops they compare, optionally with shipping) and the total. Add parts by searching the catalog, pasting a shop link (only for known merchants; the link is never fetched by the server), or pasting a PCPartPicker list (Markdown or plain text, up to 40 parts). New parts join the shared catalog after deduplication by link, ASIN/GTIN and name.
+- **Check now** queues a scrape of the build (scope `{buildId}`) on GitHub Actions. Users get one manual run per `userRunCooldownMinutes` (admins are exempt), and runs whose pairs were all checked within `recentCheckSkipMinutes` are refused because prices are shared.
+- **Report wrong match** sends the pair's current offer to the admin review queue; only an admin's "Confirm wrong" blocklists it (and unpins the URL).
+- **Share**: a public read-only page at `/share/<token>` (random token, can be reset), showing only the owner's display name.
+- **Profile & settings** (`/account`): display name and username, email change (current password required), password change, active sessions, preferences (language, theme, default build, shipping in prices, which shops to compare), data export (JSON) and account deletion (password required; the last admin can't delete themselves).
 
 ## Translations
 

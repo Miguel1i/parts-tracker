@@ -88,6 +88,8 @@ export async function startCheck(
     }
 
     const merchantIds = await userMerchantIds(tx, actor.id);
+    if (productIds.length === 0) throw new ActionError("emptyBuild");
+    if (merchantIds.length === 0) throw new ActionError("noMerchants");
     let needsCheck = false;
     if (productIds.length > 0 && merchantIds.length > 0) {
       const pairs = await tx

@@ -93,7 +93,10 @@ export type ActionErrorCode =
   | "lastAdmin"
   | "alreadyReported"
   | "nothingToCheck"
-  | "importEmpty";
+  | "importEmpty"
+  | "importTooLarge"
+  | "emptyBuild"
+  | "noMerchants";
 
 export type ActionResult<T> =
   | { ok: true; data: T }

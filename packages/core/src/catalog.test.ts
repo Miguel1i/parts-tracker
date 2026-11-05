@@ -90,6 +90,14 @@ describe("catalogKey", () => {
       catalogKey("AMD Ryzen 7 9800X3D"),
     );
   });
+  it("keeps variants that differ late in a long name apart", () => {
+    expect(catalogKey("MSI GAMING TRIO OC PLUS GeForce RTX 5070 Ti 16 GB Video Card")).not.toBe(
+      catalogKey("MSI GAMING TRIO OC PLUS GeForce RTX 5070 Ti 12 GB Video Card"),
+    );
+    expect(catalogKey("MSI GAMING TRIO OC PLUS GeForce RTX 5070 Ti 16 GB")).not.toBe(
+      catalogKey("MSI GAMING TRIO OC PLUS GeForce RTX 5070 16 GB"),
+    );
+  });
   it("keeps different products apart", () => {
     expect(catalogKey("AMD Ryzen 7 9800X3D")).not.toBe(catalogKey("AMD Ryzen 7 7800X3D"));
   });

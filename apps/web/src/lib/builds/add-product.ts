@@ -49,6 +49,23 @@ export async function addToBuild(tx: Conn, buildId: string, productId: string, q
   await tx.update(builds).set({ updatedAt: new Date() }).where(eq(builds.id, buildId));
 }
 
+/** Most lines one PCPartPicker import may add (a full build is ~10-15 parts). */
+export const MAX_IMPORT_ITEMS = 40;
+
+/** catalogKey → product id for every non-archived catalog product (first one wins). */
+async function catalogKeys(tx: Conn) {
+  const rows = await tx
+    .select({ id: products.id, name: products.name })
+    .from(products)
+    .where(eq(products.archived, false));
+  const keys = new Map<string, string>();
+  for (const p of rows) {
+    const key = catalogKey(p.name);
+    if (key && !keys.has(key)) keys.set(key, p.id);
+  }
+  return keys;
+}
+
 /** Only an http(s) URL; anything else (javascript:, file:, garbage) is `badUrl`. */
 function parseHttpUrl(raw: string): string {
   const trimmed = raw.trim();
@@ -146,13 +163,9 @@ export async function addProductByUrl(
     // 3. The same name, ignoring noise (case, spacing, packaging words).
     if (!productId) {
       const key = catalogKey(name);
-      const existing = await tx
-        .select({ id: products.id, name: products.name })
-        .from(products)
-        .where(eq(products.archived, false));
-      const byName = key ? existing.find((p) => catalogKey(p.name) === key) : undefined;
+      const byName = key ? (await catalogKeys(tx)).get(key) : undefined;
       if (byName) {
-        productId = byName.id;
+        productId = byName;
         matchedBy = "name";
       }
     }
@@ -213,6 +226,10 @@ export type ImportInput = { buildId: string; text: string; replace: boolean };
 export async function importPcppList(db: Db, actorId: string, input: ImportInput) {
   const items = parsePcpp(input.text);
   if (items.length === 0) throw new ActionError("importEmpty");
+  // Unmatched lines become shared catalog products that every scheduled run scrapes.
+  if (items.length > MAX_IMPORT_ITEMS) {
+    throw new ActionError("importTooLarge", { max: MAX_IMPORT_ITEMS });
+  }
 
   return db.transaction(async (tx) => {
     if (input.replace) {
@@ -220,15 +237,7 @@ export async function importPcppList(db: Db, actorId: string, input: ImportInput
         .delete(buildItems)
         .where(and(eq(buildItems.buildId, input.buildId), isNull(buildItems.boughtAt)));
     }
-    const known = new Map<string, string>();
-    const existing = await tx
-      .select({ id: products.id, name: products.name })
-      .from(products)
-      .where(eq(products.archived, false));
-    for (const p of existing) {
-      const key = catalogKey(p.name);
-      if (key && !known.has(key)) known.set(key, p.id);
-    }
+    const known = await catalogKeys(tx);
 
     let added = 0;
     let matched = 0;

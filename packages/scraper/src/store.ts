@@ -342,9 +342,15 @@ async function writePair(
       } satisfies CandidateSignals,
       runId,
     };
-    // One pending row per pair + canonical URL; a rejected one stays rejected.
-    const [existing] = await db
-      .select({ id: matchCandidates.id, status: matchCandidates.status })
+    // One scored row per pair + canonical URL; a rejected one stays rejected. Users' wrong-match
+    // reports (stage "report") are separate rows: never overwritten here, and a dismissed report
+    // doesn't stop a scored candidate for the same URL from reaching the queue.
+    const rows = await db
+      .select({
+        id: matchCandidates.id,
+        status: matchCandidates.status,
+        signals: matchCandidates.signals,
+      })
       .from(matchCandidates)
       .where(
         and(
@@ -353,6 +359,7 @@ async function writePair(
           eq(matchCandidates.url, url),
         ),
       );
+    const existing = rows.find((r) => r.signals?.stage !== "report");
     if (!existing) {
       await db
         .insert(matchCandidates)
