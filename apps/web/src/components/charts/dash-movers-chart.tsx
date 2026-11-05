@@ -149,7 +149,7 @@ export function MoversChart({ data }: { data: Record<Days, Mover[]> }) {
       ) : (
         <ChartContainer
           config={config}
-          role="img"
+          role="figure"
           aria-label={summary}
           className="aspect-auto w-full justify-start"
           style={{ height: Math.max(120, rows.length * 32 + 40) }}

@@ -383,19 +383,19 @@ export function ProductHistoryChart(props: ProductHistoryChartProps) {
             {table ? <LineChartIcon aria-hidden /> : <Table2 aria-hidden />}
             {table ? t("viewChart") : t("viewTable")}
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={exportPng}
-            disabled={!data || table || !!empty}
-          >
-            <ImageDown aria-hidden />
-            {t("exportPng")}
-          </Button>
-          <Button size="sm" variant="outline" onClick={exportCsv} disabled={!data || !!empty}>
-            <Download aria-hidden />
-            {t("exportCsv")}
-          </Button>
+          {/* Shown only when there's something to export (no faded, unusable controls). */}
+          {data && !empty && !table && (
+            <Button size="sm" variant="outline" onClick={exportPng}>
+              <ImageDown aria-hidden />
+              {t("exportPng")}
+            </Button>
+          )}
+          {data && !empty && (
+            <Button size="sm" variant="outline" onClick={exportCsv}>
+              <Download aria-hidden />
+              {t("exportCsv")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -464,7 +464,7 @@ export function ProductHistoryChart(props: ProductHistoryChartProps) {
             <div ref={wrapRef} className="relative min-w-0">
               <ChartContainer
                 config={{}}
-                role="img"
+                role="figure"
                 aria-label={summary}
                 className="aspect-auto h-80 w-full min-w-0 justify-start"
               >
