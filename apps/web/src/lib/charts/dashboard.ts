@@ -1,4 +1,5 @@
 import "server-only";
+import { shownRunStatus } from "@/lib/runs";
 import { toCategory } from "@parts/core";
 import {
   buildItems,
@@ -304,7 +305,10 @@ export async function loadDashboard(db: Conn, userId: string): Promise<Dashboard
     .orderBy(desc(scrapeRuns.createdAt))
     .limit(1);
   const lastRun = run
-    ? { status: run.status, at: (run.at ?? run.created)?.getTime() ?? null }
+    ? {
+        status: shownRunStatus(run.status, run.created, Date.now()),
+        at: (run.at ?? run.created)?.getTime() ?? null,
+      }
     : null;
   const empty: DashboardData = {
     build,

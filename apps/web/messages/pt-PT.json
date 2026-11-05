@@ -358,7 +358,8 @@
         "not_found": "não encontrado",
         "blocked": "bloqueado pela loja",
         "error": "erro"
-      }
+      },
+      "progressOf": "Verificados {count} de {total}…"
     },
     "add": {
       "title": "Adicionar peças",

@@ -28,6 +28,7 @@ vi.mock("@/lib/auth/server", () => ({ auth: { api: {} } }));
 const github = vi.hoisted(() => ({ dispatchScrape: vi.fn() }));
 vi.mock("@/lib/admin/github", () => github);
 
+import { shownRunStatus } from "@/lib/runs";
 import { reportMatch, runStatus, startCheck } from "./checks";
 
 const dir = mkdtempSync(join(tmpdir(), "parts-checks-"));
@@ -255,5 +256,17 @@ describe("reportMatch", () => {
     await reportMatch(db, "u1", { buildId: "b1", productId: "p1", merchantId: "m1" });
     const [c] = await db.select().from(matchCandidates);
     expect(c).toMatchObject({ url: "https://shop.example/seen", score: 0 });
+  });
+});
+
+describe("shownRunStatus", () => {
+  const now = Date.UTC(2026, 10, 5, 12);
+  it("shows queued/running runs older than 3 h as failed", () => {
+    expect(shownRunStatus("queued", new Date(now - 4 * 3600_000), now)).toBe("failed");
+    expect(shownRunStatus("running", new Date(now - 4 * 3600_000), now)).toBe("failed");
+  });
+  it("leaves recent and finished runs alone", () => {
+    expect(shownRunStatus("queued", new Date(now - 60_000), now)).toBe("queued");
+    expect(shownRunStatus("succeeded", new Date(now - 9 * 3600_000), now)).toBe("succeeded");
   });
 });

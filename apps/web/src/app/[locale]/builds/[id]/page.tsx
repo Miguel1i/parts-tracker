@@ -13,6 +13,7 @@ import { BuildTotalChartLazy } from "@/components/charts/dash-build-chart-lazy";
 import { BuildMenu } from "../build-menu";
 import { AddPanel } from "./add-panel";
 import { CheckButton } from "./check-button";
+import { activeBuildRun } from "@/lib/builds/checks";
 import { ItemsTable } from "./items-table";
 import { SharePanel } from "./share-panel";
 import { kicker } from "@/lib/kicker";
@@ -29,6 +30,7 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
   if (!build) notFound();
   const merchants = await merchantOptions(db);
   const { chart, sparks } = await loadBuildCharts(db, user.id, id, build.withShipping);
+  const activeRun = await activeBuildRun(db, user.id, id);
   const t = await getTranslations("Builds");
   const format = await getFormatter();
 
@@ -74,7 +76,7 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
       </div>
 
       <div className="grid gap-6">
-        <CheckButton buildId={build.id} />
+        <CheckButton buildId={build.id} initialRun={activeRun} />
         {build.items.length === 0 ? (
           <EmptyState icon={PackageOpen} title={t("detail.empty.title")}>
             {t("detail.empty.body")}

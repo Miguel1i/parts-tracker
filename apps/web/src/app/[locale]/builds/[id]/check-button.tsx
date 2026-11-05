@@ -23,18 +23,36 @@ type RunState = {
   id: string;
   status: string;
   logs: Log[];
+  /** Pairs the run will check (set by the scraper once it starts). */
+  planned?: number;
   command?: string;
   gaveUp?: boolean;
 };
 
-/** "Check now": queues a run, then polls its status every 4 s until it ends. */
-export function CheckButton({ buildId, label }: { buildId: string; label?: string }) {
+/**
+ * "Check now": queues a run, then polls its status every 4 s until it ends, with a progress bar
+ * (checked / planned). `initialRun` is a run already in progress (after a reload), picked up.
+ */
+export function CheckButton({
+  buildId,
+  label,
+  initialRun,
+}: {
+  buildId: string;
+  label?: string;
+  initialRun?: { id: string; status: string } | null;
+}) {
   const t = useTranslations("Builds.check");
   const router = useRouter();
   const errorText = useActionErrorText();
   const [starting, startTransition] = useTransition();
-  const [run, setRun] = useState<RunState | null>(null);
+  const [run, setRun] = useState<RunState | null>(() =>
+    initialRun ? { id: initialRun.id, status: initialRun.status, logs: [] } : null,
+  );
   const startedAt = useRef(0);
+  useEffect(() => {
+    if (initialRun && !startedAt.current) startedAt.current = Date.now();
+  }, [initialRun]);
   const inFlight = useRef(false);
 
   const active = !!run && !run.gaveUp && !TERMINAL.includes(run.status);
@@ -55,8 +73,9 @@ export function CheckButton({ buildId, label }: { buildId: string; label?: strin
           setRun((r) => (r ? { ...r, gaveUp: true } : r));
           return;
         }
-        const { status, logs } = res.data;
-        setRun((r) => (r && r.id === runId ? { ...r, status, logs } : r));
+        const { status, logs, stats } = res.data;
+        const planned = stats?.planned;
+        setRun((r) => (r && r.id === runId ? { ...r, status, logs, planned } : r));
         if (TERMINAL.includes(status)) {
           router.refresh();
           if (status === "succeeded") toast.success(t("done"));
@@ -108,9 +127,30 @@ export function CheckButton({ buildId, label }: { buildId: string; label?: strin
               : run.status === "queued"
                 ? t("queued")
                 : run.status === "running"
-                  ? t("progress", { count: finished })
+                  ? run.planned
+                    ? t("progressOf", { count: finished, total: run.planned })
+                    : t("progress", { count: finished })
                   : t(run.status === "succeeded" ? "summary" : "failed", { count: finished })}
           </p>
+          {active && run.status === "running" && (
+            <div
+              role="progressbar"
+              aria-label={t("running")}
+              aria-valuemin={0}
+              aria-valuemax={run.planned ?? undefined}
+              aria-valuenow={run.planned ? finished : undefined}
+              className="bg-muted relative h-1.5 w-full max-w-sm overflow-hidden rounded-full"
+            >
+              {run.planned ? (
+                <span
+                  className="bg-primary absolute inset-y-0 left-0 rounded-full transition-[width] duration-500 motion-reduce:transition-none"
+                  style={{ width: `${Math.min(100, (finished / run.planned) * 100)}%` }}
+                />
+              ) : (
+                <span className="bg-primary/60 absolute inset-y-0 left-0 w-1/3 animate-pulse rounded-full" />
+              )}
+            </div>
+          )}
           {run.command && !TERMINAL.includes(run.status) && (
             <p>
               {t("localCommand")}{" "}

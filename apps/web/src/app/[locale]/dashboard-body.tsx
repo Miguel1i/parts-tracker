@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link } from "@/i18n/navigation";
 import { getSession, requireUser } from "@/lib/auth/guard";
 import { loadDashboard } from "@/lib/charts/dashboard";
+import { activeBuildRun } from "@/lib/builds/checks";
+import { RefreshWhile } from "@/components/refresh-while";
 import { CheckButton } from "./builds/[id]/check-button";
 import { Landing } from "./landing";
 import { kicker } from "@/lib/kicker";
@@ -26,6 +28,8 @@ async function SignedIn({ userId }: { userId: string }) {
   const ts = await getTranslations("Charts.spark");
   const format = await getFormatter();
   const d = await loadDashboard(getDb(), userId);
+  const activeRun = d.build ? await activeBuildRun(getDb(), userId, d.build.id) : null;
+  const runActive = d.lastRun?.status === "queued" || d.lastRun?.status === "running";
   const header = (
     <PageHeader
       kicker={await kicker("dashboard")}
@@ -64,7 +68,9 @@ async function SignedIn({ userId }: { userId: string }) {
               {d.build.name}
             </Link>
           </p>
-          <CheckButton buildId={d.build.id} label={t("checkAll")} />
+          <CheckButton buildId={d.build.id} label={t("checkAll")} initialRun={activeRun} />
+          {/* Keep the "Last run" tile current while any run is pending. */}
+          <RefreshWhile active={runActive} />
         </div>
 
         {/* One ruled strip of figures (hairlines between cells), not four floating cards. */}
