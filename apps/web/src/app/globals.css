@@ -161,6 +161,13 @@
 }
 
 @layer base {
+  /* Horizontal scrollers contain their absolutely positioned children (e.g. sr-only labels in
+     table headers); otherwise those escape the scroller and widen the page on phones. */
+  .overflow-x-auto,
+  .overflow-auto {
+    position: relative;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

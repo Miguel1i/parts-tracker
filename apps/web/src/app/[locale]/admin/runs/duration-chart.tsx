@@ -107,12 +107,13 @@ export function DurationChart({ runs }: { runs: RunDuration[] }) {
               tickFormatter={(v: number) => when(v, "short")}
             />
             <YAxis
-              width={36}
+              // Wide enough for the largest label (an unusually long run must not clip).
+              width={Math.max(32, format.number(Math.ceil(slowest)).length * 8 + 12)}
               tickLine={false}
               axisLine={false}
               domain={[0, "auto"]}
               allowDecimals={false}
-              tickFormatter={(v: number) => String(v)}
+              tickFormatter={(v: number) => format.number(v)}
             />
             <Tooltip
               cursor={{ stroke: "var(--border)", strokeWidth: 1 }}

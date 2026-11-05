@@ -140,7 +140,7 @@ export function CompareGrid({
                     }
                     className={
                       "bg-muted text-foreground sticky top-0 border-b px-3 py-2 text-left align-middle font-medium " +
-                      (i === 0 ? "left-0 z-30 min-w-48 border-r" : "z-20 min-w-36")
+                      (i === 0 ? "left-0 z-30 border-r" : "z-20 min-w-32")
                     }
                   >
                     {h.column.getCanSort() ? (
@@ -188,7 +188,15 @@ export function CompareGrid({
                       (isBestCell ? "bg-primary/5" : "")
                     }
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    {i === 0 ? (
+                      // The table is min-w-max, so give names a fixed width to wrap in;
+                      // otherwise the sticky column pushes every shop off-screen.
+                      <div className="w-36 whitespace-normal break-words sm:w-56">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </div>
+                    ) : (
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
                   </td>
                 );
               })}

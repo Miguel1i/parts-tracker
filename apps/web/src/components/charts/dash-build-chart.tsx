@@ -1,5 +1,7 @@
 "use client";
 
+import { categoryColor } from "@/lib/charts/category-color";
+
 import { useFormatter, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { Area, CartesianGrid, ComposedChart, Line, Tooltip, XAxis, YAxis } from "recharts";
@@ -75,10 +77,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
         }) + (data.refTotal != null ? ` ${t("summaryRef", { ref: price(data.refTotal) })}` : "");
 
   const config: ChartConfig = Object.fromEntries(
-    data.categories.map((c) => [
-      c.key,
-      { label: catLabel(c.key), color: `var(--chart-merchant-${c.slot})` },
-    ]),
+    data.categories.map((c) => [c.key, { label: catLabel(c.key), color: categoryColor(c.slot) }]),
   );
   const maxY = Math.max(0, ...rows.map((r) => Math.max(r.total ?? 0, data.refTotal ?? 0)));
 
@@ -244,7 +243,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
                         <span
                           aria-hidden
                           className="h-0.5 w-3 shrink-0 rounded"
-                          style={{ background: `var(--chart-merchant-${c.slot})` }}
+                          style={{ background: categoryColor(c.slot) }}
                         />
                         <span className="font-medium tabular-nums">{price(c.v!)}</span>
                         <span className="text-muted-foreground">{catLabel(c.key)}</span>
@@ -277,7 +276,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
                 stackId="total"
                 stroke="var(--card)"
                 strokeWidth={2}
-                fill={`var(--chart-merchant-${c.slot})`}
+                fill={categoryColor(c.slot)}
                 fillOpacity={0.85}
                 connectNulls={false}
                 isAnimationActive={false}
@@ -314,7 +313,7 @@ export function BuildTotalChart({ data }: { data: BuildChartData }) {
                 <span
                   aria-hidden
                   className="size-2.5 rounded-[2px]"
-                  style={{ background: `var(--chart-merchant-${c.slot})` }}
+                  style={{ background: categoryColor(c.slot) }}
                 />
               }
             />

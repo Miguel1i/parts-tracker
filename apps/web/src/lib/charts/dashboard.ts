@@ -94,13 +94,29 @@ export async function loadObsByProduct(
   return out;
 }
 
-/** Category order is fixed so a category keeps its colour slot on every chart. */
+/**
+ * Chart categories, in fixed order so each keeps its colour slot on every chart: eight named
+ * categories take the eight categorical slots; everything else (fans, monitors, HDDs,
+ * uncategorized) folds into "other", drawn in neutral grey (slot 0) rather than a ninth hue.
+ */
+export const CHART_CATEGORIES = [
+  "cpu",
+  "gpu",
+  "motherboard",
+  "ram",
+  "ssd",
+  "psu",
+  "case",
+  "cooler",
+] as const;
+
 export function categoryKey(raw: string | null): string {
-  return toCategory(raw);
+  const c = toCategory(raw);
+  return (CHART_CATEGORIES as readonly string[]).includes(c) ? c : "other";
 }
+/** 1-8 for the named categories, 0 (neutral) for "other". */
 export function categorySlot(key: string): number {
-  const i = (categories as readonly string[]).indexOf(key);
-  return ((i < 0 ? categories.length - 1 : i) % 8) + 1;
+  return (CHART_CATEGORIES as readonly string[]).indexOf(key) + 1;
 }
 
 export type ChartRow = {
@@ -122,6 +138,10 @@ export type BuildChartData = {
 
 const MAX_POINTS = 500;
 
+/**
+ * Totals over the parts priced at each moment; the stack shows which category is missing when a
+ * part has no in-stock offer, and the tooltip says how many parts lack a price.
+ */
 function toRows(totals: BuildTotal[]): ChartRow[] {
   const mapped = totals.map((t) => ({ ...t, value: t.total }));
   return downsample(mapped, MAX_POINTS).map((t) => ({
@@ -160,7 +180,7 @@ export function buildChartData(
   return {
     anywhere: toRows(buildTotals(bi, obsByProduct, { ...base, mode: "anywhere" })),
     single: toRows(buildTotals(bi, obsByProduct, { ...base, mode: "singleMerchant" })),
-    categories: (categories as readonly string[])
+    categories: [...CHART_CATEGORIES, "other"]
       .filter((c) => present.has(c))
       .map((key) => ({ key, slot: categorySlot(key) })),
     refTotal: refs.length ? refs.reduce((n, i) => n + i.refPrice! * i.quantity, 0) : null,
