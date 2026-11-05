@@ -7,7 +7,7 @@ import { EmptyState, PageHeader } from "@/components/empty-state";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
-import { loadRunDurations } from "@/lib/admin/health";
+import { loadRunDurations } from "@/lib/admin/health-data";
 import { getSettings } from "@/lib/admin/queries";
 import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { DurationChart } from "./duration-chart";

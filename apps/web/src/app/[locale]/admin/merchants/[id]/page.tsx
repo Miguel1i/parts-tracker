@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/empty-state";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
 import { splitAdapterConfig } from "@/lib/admin/adapter-schema";
-import { loadMerchantHealth } from "@/lib/admin/health";
+import { loadMerchantHealth } from "@/lib/admin/health-data";
 import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
 import { HealthChart } from "./health-chart";
 import { MerchantForm } from "../merchant-form";

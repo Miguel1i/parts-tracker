@@ -1,5 +1,4 @@
-import { getDb, scrapeLogs, scrapeRuns, type ScrapeStatus } from "@parts/db";
-import { and, desc, eq, gte, isNotNull } from "@parts/db/orm";
+import type { ScrapeStatus } from "@parts/db/schema";
 
 export const HEALTH_STATUSES = ["ok", "out_of_stock", "not_found", "blocked", "error"] as const;
 
@@ -17,7 +16,7 @@ export type DayHealth = {
 
 export type RunDuration = { id: string; startedAt: number; minutes: number };
 
-const DAY_MS = 86_400_000;
+export const DAY_MS = 86_400_000;
 
 export const emptyCounts = (): StatusCounts => ({
   ok: 0,
@@ -27,7 +26,7 @@ export const emptyCounts = (): StatusCounts => ({
   error: 0,
 });
 
-const dayKey = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+export const dayKey = (ms: number) => new Date(ms).toISOString().slice(0, 10);
 
 /** One entry per UTC day for the last `days` days ending on `now`'s day (oldest first). */
 export function dailyHealth(
@@ -63,27 +62,4 @@ export function runDurations(
         : [];
     })
     .sort((a, b) => a.startedAt - b.startedAt);
-}
-
-export async function loadMerchantHealth(merchantId: string, now = Date.now(), days = 30) {
-  const since = new Date(Date.parse(dayKey(now)) - (days - 1) * DAY_MS);
-  const rows = await getDb()
-    .select({ createdAt: scrapeLogs.createdAt, status: scrapeLogs.status })
-    .from(scrapeLogs)
-    .where(and(eq(scrapeLogs.merchantId, merchantId), gte(scrapeLogs.createdAt, since)));
-  return dailyHealth(rows, now, days);
-}
-
-export async function loadRunDurations(limit = 60) {
-  const rows = await getDb()
-    .select({
-      id: scrapeRuns.id,
-      startedAt: scrapeRuns.startedAt,
-      finishedAt: scrapeRuns.finishedAt,
-    })
-    .from(scrapeRuns)
-    .where(and(isNotNull(scrapeRuns.startedAt), isNotNull(scrapeRuns.finishedAt)))
-    .orderBy(desc(scrapeRuns.startedAt))
-    .limit(limit);
-  return runDurations(rows);
 }
