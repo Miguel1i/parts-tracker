@@ -1,0 +1,236 @@
+{
+ "data": {
+  "products": {
+   "edges": [
+    {
+     "node": {
+      "name": "Processador AMD Ryzen 7 9800X3D \"Zen 5\" 8-Core 4.7GHz c/ Turbo 5.2GHz 104MB Cache SktAM5",
+      "slug": "processador-amd-ryzen-7-9800x3d-zen-5-8-core-4-7ghz-c-turbo-5-2ghz-104mb-cache-sktam5-100-100001084wof-730143315289",
+      "isAvailableForPurchase": true,
+      "thumbnail": {
+       "url": "https://pcdiga-prod.eu.saleor.cloud/thumbnail/UHJvZHVjdE1lZGlhOjE1NDc4Mjg5/512/"
+      },
+      "category": {
+       "slug": "processadores-amd",
+       "parent": {
+        "slug": "processadores",
+        "parent": {
+         "slug": "componentes",
+         "parent": null
+        }
+       }
+      },
+      "attributes": [
+       {
+        "attribute": {
+         "slug": "manufacturer"
+        },
+        "values": [
+         {
+          "name": "AMD"
+         }
+        ]
+       },
+       {
+        "attribute": {
+         "slug": "partnumber"
+        },
+        "values": [
+         {
+          "name": "100-100001084WOF"
+         }
+        ]
+       },
+       {
+        "attribute": {
+         "slug": "ean"
+        },
+        "values": [
+         {
+          "name": "730143315289"
+         }
+        ]
+       }
+      ],
+      "variants": [
+       {
+        "sku": "P074076",
+        "quantityAvailable": 10,
+        "pricing": {
+         "price": {
+          "gross": {
+           "amount": 457.0,
+           "currency": "EUR"
+          }
+         }
+        }
+       }
+      ],
+      "pricing": {
+       "priceRange": {
+        "start": {
+         "gross": {
+          "amount": 457.0,
+          "currency": "EUR"
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "node": {
+      "name": "Computador Desktop PCDIGA Gaming GML-AR79UG6W11P POWERED BY ASUS",
+      "slug": "computador-desktop-pcdiga-gaming-gml-ar79ug6w11p-powered-by-asus-powered-by-asus-gml-ar79ug6w11p",
+      "isAvailableForPurchase": true,
+      "thumbnail": {
+       "url": "https://pcdiga-prod.eu.saleor.cloud/thumbnail/UHJvZHVjdE1lZGlhOjE1NjExNDk5/512/"
+      },
+      "category": {
+       "slug": "computadores-pcdiga-gaming",
+       "parent": {
+        "slug": "computadores-desktop",
+        "parent": {
+         "slug": "computadores-e-software",
+         "parent": null
+        }
+       }
+      },
+      "attributes": [
+       {
+        "attribute": {
+         "slug": "manufacturer"
+        },
+        "values": [
+         {
+          "name": "PCDIGA"
+         }
+        ]
+       },
+       {
+        "attribute": {
+         "slug": "partnumber"
+        },
+        "values": [
+         {
+          "name": "POWERED BY ASUS"
+         }
+        ]
+       },
+       {
+        "attribute": {
+         "slug": "ean"
+        },
+        "values": [
+         {
+          "name": "GML-AR79UG6W11P"
+         }
+        ]
+       }
+      ],
+      "variants": [
+       {
+        "sku": "P087159",
+        "quantityAvailable": 0,
+        "pricing": {
+         "price": {
+          "gross": {
+           "amount": 2799.0,
+           "currency": "EUR"
+          }
+         }
+        }
+       }
+      ],
+      "pricing": {
+       "priceRange": {
+        "start": {
+         "gross": {
+          "amount": 2799.0,
+          "currency": "EUR"
+         }
+        }
+       }
+      }
+     }
+    },
+    {
+     "node": {
+      "name": "Computador Desktop PCDIGA Gaming GML-PR79UD6W11P",
+      "slug": "computador-desktop-pcdiga-gaming-gml-pr79ud6w11p-powered-by-pcdiga-gml-pr79ud6w11p",
+      "isAvailableForPurchase": true,
+      "thumbnail": {
+       "url": "https://pcdiga-prod.eu.saleor.cloud/thumbnail/UHJvZHVjdE1lZGlhOjE1NTg0MTM3/512/"
+      },
+      "category": {
+       "slug": "computadores-pcdiga-gaming",
+       "parent": {
+        "slug": "computadores-desktop",
+        "parent": {
+         "slug": "computadores-e-software",
+         "parent": null
+        }
+       }
+      },
+      "attributes": [
+       {
+        "attribute": {
+         "slug": "manufacturer"
+        },
+        "values": [
+         {
+          "name": "PCDIGA"
+         }
+        ]
+       },
+       {
+        "attribute": {
+         "slug": "partnumber"
+        },
+        "values": [
+         {
+          "name": "POWERED BY PCDIGA"
+         }
+        ]
+       },
+       {
+        "attribute": {
+         "slug": "ean"
+        },
+        "values": [
+         {
+          "name": "GML-PR79UD6W11P"
+         }
+        ]
+       }
+      ],
+      "variants": [
+       {
+        "sku": "P085685",
+        "quantityAvailable": 0,
+        "pricing": {
+         "price": {
+          "gross": {
+           "amount": 3099.0,
+           "currency": "EUR"
+          }
+         }
+        }
+       }
+      ],
+      "pricing": {
+       "priceRange": {
+        "start": {
+         "gross": {
+          "amount": 3099.0,
+          "currency": "EUR"
+         }
+        }
+       }
+      }
+     }
+    }
+   ]
+  }
+ }
+}

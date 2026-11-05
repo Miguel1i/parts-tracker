@@ -56,7 +56,47 @@ export interface FetchOptions {
 
 export interface PageFetcher {
   get(url: string, options?: FetchOptions): Promise<FetchResult>;
+  /** POST a JSON body to a shop's public API (same per-host throttle). Optional for fakes. */
+  postJson?(url: string, body: unknown, options?: { limits?: HostLimits }): Promise<JsonResult>;
   readonly hasBrowser: boolean;
+}
+
+export interface JsonResult {
+  /** HTTP status, or 0 when the request failed. */
+  status: number;
+  json?: unknown;
+  error?: string;
+  attempts: number;
+  ms: number;
+}
+
+export type JsonTransport = (
+  url: string,
+  body: unknown,
+) => Promise<{ status: number; json?: unknown }>;
+
+/** Native fetch POSTing JSON, with a timeout. */
+export function jsonTransport(timeoutMs = 25_000): JsonTransport {
+  return async (url, body) => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "User-Agent": USER_AGENT,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    const text = await res.text();
+    let json: unknown;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      json = undefined;
+    }
+    return { status: res.status, json };
+  };
 }
 
 const CHALLENGE_MARKERS: [RegExp, string][] = [
@@ -115,6 +155,8 @@ export interface SmartFetcherOptions {
   retries?: number;
   /** First backoff in ms, doubled each retry (default 3000). Retry-After wins when longer. */
   backoffMs?: number;
+  /** JSON API transport (default: native fetch). */
+  json?: JsonTransport;
 }
 
 const MAX_BACKOFF_MS = 30_000;
@@ -187,5 +229,23 @@ export class SmartFetcher implements PageFetcher {
     attempts++;
     const r = await this.attempt("browser", browser!, url, limits);
     return done(r, "browser");
+  }
+
+  async postJson(
+    url: string,
+    body: unknown,
+    options: { limits?: HostLimits } = {},
+  ): Promise<JsonResult> {
+    const started = this.clock.now();
+    const transport = this.options.json ?? jsonTransport();
+    try {
+      const r = await this.limiter.run(hostOf(url), options.limits ?? clampLimits(), () =>
+        transport(url, body),
+      );
+      return { ...r, attempts: 1, ms: this.clock.now() - started };
+    } catch (err) {
+      const error = err instanceof Error ? err.message : String(err);
+      return { status: 0, error: `api: ${error}`, attempts: 1, ms: this.clock.now() - started };
+    }
   }
 }
