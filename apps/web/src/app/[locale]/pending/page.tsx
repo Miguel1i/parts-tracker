@@ -29,10 +29,10 @@ export default async function PendingPage() {
     <div className="mx-auto w-full max-w-[28rem] py-4 sm:py-10">
       <Logo className="mb-8" />
       <div className="bg-card text-card-foreground rounded-[6px] border border-dashed p-6 sm:p-8">
-        <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em]">
+        <h1 className="text-[1.875rem] font-extrabold leading-[1.08] tracking-[-0.02em]">
           {t("title")}
         </h1>
-        <p className="text-muted-foreground mt-3 text-[15px] leading-6">
+        <p className="text-muted-foreground mt-3 text-[0.9375rem] leading-6">
           {t("body", { email: session!.user.email })}
         </p>
         <PendingActions />

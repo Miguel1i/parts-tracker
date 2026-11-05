@@ -13,6 +13,7 @@ import { HealthChart } from "./health-chart";
 import { MerchantForm } from "../merchant-form";
 import { TestPanel } from "../test-panel";
 import { kicker } from "@/lib/kicker";
+import { BackLink } from "@/components/back-link";
 
 // Session-dependent and admin-only: render on request (see ../layout.tsx).
 export const instant = false;
@@ -31,6 +32,7 @@ export default async function EditMerchantPage({
 }: PageProps<"/[locale]/admin/merchants/[id]">) {
   await initLocale();
   await requireAdmin();
+  const t = await getTranslations("Admin.merchants");
   const { id } = await params;
   const db = getDb();
   const [m] = await db.select().from(merchants).where(eq(merchants.id, id));
@@ -46,6 +48,7 @@ export default async function EditMerchantPage({
   return (
     <div className="grid gap-8">
       <div>
+        <BackLink href="/admin/merchants">{t("back")}</BackLink>
         <PageHeader kicker={await kicker("admin")} title={m.name} />
         <MerchantForm
           merchantId={m.id}

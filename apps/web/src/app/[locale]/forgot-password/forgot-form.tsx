@@ -41,7 +41,7 @@ export function ForgotForm() {
     return (
       <div className="grid gap-4" role="status">
         <MailCheck className="text-primary size-6" aria-hidden />
-        <p className="text-[15px] leading-6">{t("sent")}</p>
+        <p className="text-[0.9375rem] leading-6">{t("sent")}</p>
         <Link href="/sign-in" className="text-sm font-medium underline underline-offset-2">
           {t("back")}
         </Link>

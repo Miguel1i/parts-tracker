@@ -38,7 +38,7 @@ export function Logo({ compact = false, className }: { compact?: boolean; classN
     <span className={cn("text-foreground inline-flex items-center gap-2.5", className)}>
       <LogoMark className="size-7" />
       {!compact && (
-        <span className="text-[17px] leading-none tracking-[-0.03em]">
+        <span className="text-[1.0625rem] leading-none tracking-[-0.03em]">
           <span className="sr-only">Parts Tracker</span>
           <span aria-hidden className="font-extrabold">
             parts

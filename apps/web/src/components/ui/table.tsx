@@ -80,7 +80,7 @@ function TableHead({
       data-slot="table-head"
       className={cn(
         "h-9 whitespace-nowrap px-3 text-left align-middle",
-        "text-muted-foreground font-mono text-[11px] font-medium uppercase tracking-[0.08em]",
+        "text-muted-foreground font-mono text-[0.6875rem] font-medium uppercase tracking-[0.08em]",
         "[&:has([role=checkbox])]:pr-0",
         numeric && "text-right",
         className,
@@ -114,7 +114,7 @@ function TableCaption({ className, ...props }: React.ComponentProps<"caption">) 
     <caption
       data-slot="table-caption"
       className={cn(
-        "text-muted-foreground mt-3 text-left font-mono text-[11px] uppercase tracking-[0.08em]",
+        "text-muted-foreground mt-3 text-left font-mono text-[0.6875rem] uppercase tracking-[0.08em]",
         className,
       )}
       {...props}

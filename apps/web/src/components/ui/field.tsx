@@ -33,7 +33,7 @@ function FieldLegend({
       className={cn(
         "text-foreground mb-2",
         "data-[variant=legend]:text-base data-[variant=legend]:font-bold data-[variant=legend]:tracking-[-0.01em]",
-        "data-[variant=label]:text-[13px] data-[variant=label]:font-semibold",
+        "data-[variant=label]:text-[0.8125rem] data-[variant=label]:font-semibold",
         className,
       )}
       {...props}
@@ -123,7 +123,7 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="field-label"
       className={cn(
-        "flex w-fit items-center gap-2 text-[13px] font-semibold group-data-[disabled=true]/field:opacity-50",
+        "flex w-fit items-center gap-2 text-[0.8125rem] font-semibold group-data-[disabled=true]/field:opacity-50",
         className,
       )}
       {...props}
@@ -136,7 +136,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="field-description"
       className={cn(
-        "text-muted-foreground text-left text-[13px] font-normal leading-normal",
+        "text-muted-foreground text-left text-[0.8125rem] font-normal leading-normal",
         "group-data-[orientation=horizontal]/field:text-balance [[data-variant=legend]+&]:-mt-1",
         "[&>a]:decoration-primary/60 [&>a:hover]:text-foreground [&>a]:underline [&>a]:underline-offset-4",
         className,
@@ -166,7 +166,7 @@ function FieldSeparator({
         <>
           <span
             data-slot="field-separator-content"
-            className="text-muted-foreground font-mono text-[11px] uppercase tracking-[0.08em]"
+            className="text-muted-foreground font-mono text-[0.6875rem] uppercase tracking-[0.08em]"
           >
             {children}
           </span>
@@ -205,7 +205,7 @@ function FieldError({
     <div
       role="alert"
       data-slot="field-error"
-      className={cn("text-destructive text-[13px] font-medium", className)}
+      className={cn("text-destructive text-[0.8125rem] font-medium", className)}
       {...props}
     >
       {content}

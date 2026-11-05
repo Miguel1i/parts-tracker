@@ -116,7 +116,7 @@ const ChartTooltip = RechartsPrimitive.Tooltip;
 
 /* The tooltip heading reads like a receipt line: mono micro-caps over a dashed rule. */
 const tooltipLabelClass =
-  "border-b border-dashed border-border pb-1.5 font-mono text-[11px] uppercase tracking-[0.06em] text-muted-foreground";
+  "border-b border-dashed border-border pb-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-muted-foreground";
 
 function ChartTooltipContent({
   active,
@@ -295,7 +295,7 @@ function ChartLegendContent({
             <div
               key={index}
               className={cn(
-                "text-muted-foreground flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.06em] [&>svg]:h-3 [&>svg]:w-3",
+                "text-muted-foreground flex items-center gap-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.06em] [&>svg]:h-3 [&>svg]:w-3",
               )}
             >
               {itemConfig?.icon && !hideIcon ? (

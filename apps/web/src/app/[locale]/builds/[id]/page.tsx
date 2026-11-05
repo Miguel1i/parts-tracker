@@ -43,11 +43,11 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
       </Link>
       <div className="border-border mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-6">
         <div className="min-w-0">
-          <p className="text-primary mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em]">
+          <p className="text-primary mb-3 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.08em]">
             {await kicker("builds")}
           </p>
           <div className="flex items-center gap-2">
-            <h1 className="break-words text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[40px]">
+            <h1 className="break-words text-[1.875rem] font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[2.5rem]">
               {build.name}
             </h1>
             <BuildMenu buildId={build.id} name={build.name} redirectOnDelete />
@@ -63,7 +63,7 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
         <div className="text-right">
-          <p className="font-mono text-[28px] font-semibold tabular-nums">
+          <p className="font-mono text-[1.75rem] font-semibold tabular-nums">
             {format.number(build.total, "price")}
           </p>
           <p className="text-muted-foreground text-xs">

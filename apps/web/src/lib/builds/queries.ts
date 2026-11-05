@@ -281,11 +281,14 @@ export async function getBuildView(
 
 /** Shops the user can name as where a part was bought. */
 export async function merchantOptions(db: Conn) {
-  return db
-    .select({ id: merchants.id, name: merchants.name })
-    .from(merchants)
-    .where(eq(merchants.visibleToUsers, true))
-    .orderBy(asc(merchants.sortOrder), asc(merchants.name));
+  return (
+    db
+      .select({ id: merchants.id, name: merchants.name })
+      .from(merchants)
+      // A disabled shop is never shown, whatever its visibility flag says.
+      .where(and(eq(merchants.enabled, true), eq(merchants.visibleToUsers, true)))
+      .orderBy(asc(merchants.sortOrder), asc(merchants.name))
+  );
 }
 
 export type CatalogHit = { id: string; name: string; category: string | null };

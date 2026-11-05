@@ -64,7 +64,7 @@ export function AccountMenu({ side = "bottom" }: { side?: "top" | "bottom" | "ri
         <Button variant="ghost" size="icon" aria-label={t("menu")} className="relative">
           <Avatar className="size-7 rounded-[4px] after:rounded-[4px]">
             {user.image && <AvatarImage src={user.image} alt="" className="rounded-[4px]" />}
-            <AvatarFallback className="bg-foreground text-background rounded-[4px] font-mono text-[11px] font-semibold">
+            <AvatarFallback className="bg-foreground text-background rounded-[4px] font-mono text-[0.6875rem] font-semibold">
               {initials(user.name || user.email)}
             </AvatarFallback>
           </Avatar>

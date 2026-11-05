@@ -77,10 +77,10 @@ export default async function ProductPage({
         <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-end">
           <ProductThumb src={head.image} size="lg" />
           <div className="min-w-0">
-            <p className="text-primary mb-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em]">
+            <p className="text-primary mb-3 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.08em]">
               {await kicker("part")}
             </p>
-            <h1 className="break-words text-[30px] font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[40px]">
+            <h1 className="break-words text-[1.875rem] font-extrabold leading-[1.08] tracking-[-0.02em] md:text-[2.5rem]">
               {head.name}
             </h1>
             <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-2 text-sm">
@@ -102,10 +102,10 @@ export default async function ProductPage({
         </div>
         <dl className="flex gap-6 text-right">
           <div>
-            <dt className="text-muted-foreground font-mono text-[11px] uppercase tracking-[0.08em]">
+            <dt className="text-muted-foreground font-mono text-[0.6875rem] uppercase tracking-[0.08em]">
               {t("bestPrice")}
             </dt>
-            <dd className="font-mono text-[28px] font-semibold tabular-nums">
+            <dd className="font-mono text-[1.75rem] font-semibold tabular-nums">
               {offer ? format.number(offer.unitTotal, "price") : "–"}
             </dd>
             <dd className="text-muted-foreground text-xs">
@@ -115,10 +115,10 @@ export default async function ProductPage({
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground font-mono text-[11px] uppercase tracking-[0.08em]">
+            <dt className="text-muted-foreground font-mono text-[0.6875rem] uppercase tracking-[0.08em]">
               {t("refPrice")}
             </dt>
-            <dd className="font-mono text-[28px] font-semibold tabular-nums">
+            <dd className="font-mono text-[1.75rem] font-semibold tabular-nums">
               {head.refPrice != null ? format.number(head.refPrice, "price") : "–"}
             </dd>
             {vsRef != null && (

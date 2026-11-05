@@ -26,7 +26,7 @@ function RuleLabel({ num, children, id }: { num: string; children: string; id?: 
       <span aria-hidden className="bg-foreground absolute inset-x-0 top-1/2 h-px" />
       <h2
         id={id}
-        className="bg-background text-foreground relative pr-3 font-mono text-[11px] font-medium uppercase tracking-[0.08em]"
+        className="bg-background text-foreground relative pr-3 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.08em]"
       >
         <span className="text-primary">— {num}</span> {children}
       </h2>
@@ -48,7 +48,7 @@ async function Receipt() {
         aria-label={t("label")}
         className="bg-card text-card-foreground relative rounded-[6px] border px-5 pb-5 pt-4 shadow-[0_8px_24px_-12px_rgb(0_0_0/0.25)] motion-reduce:rotate-0 sm:px-6 lg:rotate-[0.6deg]"
       >
-        <div className="flex items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.08em]">
+        <div className="flex items-center justify-between gap-3 font-mono text-[0.6875rem] uppercase tracking-[0.08em]">
           <span className="text-muted-foreground">{t("title")}</span>
           <span className="border-border text-muted-foreground rounded-[2px] border px-1.5 py-0.5">
             {t("sample")}
@@ -60,7 +60,7 @@ async function Receipt() {
 
         <div aria-hidden className="border-foreground/40 my-4 border-t border-dashed" />
 
-        <table className="w-full font-mono text-[13px] tabular-nums">
+        <table className="w-full font-mono text-[0.8125rem] tabular-nums">
           <thead className="sr-only">
             <tr>
               <th scope="col">{t("shop")}</th>
@@ -86,7 +86,7 @@ async function Receipt() {
                     )}
                   >
                     <span className="block">{row.shop}</span>
-                    <span className="text-[11px] uppercase tracking-[0.06em]">
+                    <span className="text-[0.6875rem] uppercase tracking-[0.06em]">
                       {cheapest ? (
                         <span className="bg-primary text-primary-foreground mt-0.5 inline-block rounded-[2px] px-1 font-semibold">
                           {t("cheapest")}
@@ -115,7 +115,7 @@ async function Receipt() {
 
         <div aria-hidden className="border-foreground/40 my-4 border-t border-dashed" />
 
-        <dl className="grid gap-1.5 font-mono text-[13px] tabular-nums">
+        <dl className="grid gap-1.5 font-mono text-[0.8125rem] tabular-nums">
           <div className="flex justify-between gap-4">
             <dt className="text-muted-foreground">{t("low30")}</dt>
             <dd>{format.number(LOW_30, "price")}</dd>
@@ -128,7 +128,7 @@ async function Receipt() {
 
         <div aria-hidden className="border-foreground/40 my-4 border-t border-dashed" />
 
-        <p className="text-muted-foreground text-center font-mono text-[11px] uppercase tracking-[0.08em]">
+        <p className="text-muted-foreground text-center font-mono text-[0.6875rem] uppercase tracking-[0.08em]">
           {t("checked")}
         </p>
       </div>
@@ -151,10 +151,10 @@ export async function Landing() {
       {/* Hero: asymmetric, left-aligned statement + the receipt on the right. */}
       <section className="grid items-center gap-12 pt-2 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16 lg:pt-8">
         <div className="min-w-0">
-          <p className="text-primary mb-5 font-mono text-[11px] font-medium uppercase tracking-[0.08em]">
+          <p className="text-primary mb-5 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.08em]">
             {t("kicker")}
           </p>
-          <h1 className="text-[42px] font-extrabold leading-[0.98] tracking-[-0.035em] sm:text-6xl lg:text-[56px] xl:text-7xl 2xl:text-[84px]">
+          <h1 className="text-[2.625rem] font-extrabold leading-[0.98] tracking-[-0.035em] sm:text-6xl lg:text-[3.5rem] xl:text-7xl 2xl:text-[5.25rem]">
             <span className="block">{t("headline1")}</span>
             <span className="block">
               {t("headline2")}
@@ -202,7 +202,7 @@ export async function Landing() {
                 {num}
               </span>
               <h3 className="mt-3 text-xl font-bold tracking-[-0.01em]">{t(`how.${key}.title`)}</h3>
-              <p className="text-muted-foreground mt-2 text-[15px] leading-6">
+              <p className="text-muted-foreground mt-2 text-[0.9375rem] leading-6">
                 {t(`how.${key}.body`)}
               </p>
             </li>

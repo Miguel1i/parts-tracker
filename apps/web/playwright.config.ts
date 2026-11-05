@@ -22,6 +22,9 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "retain-on-failure",
+    // No page fade-in (template.tsx honours reduced motion): axe would otherwise measure text
+    // contrast mid-fade, at partial opacity, and fail at random.
+    contextOptions: { reducedMotion: "reduce" },
   },
   projects: [
     { name: "setup", testMatch: /auth\.setup\.ts/ },

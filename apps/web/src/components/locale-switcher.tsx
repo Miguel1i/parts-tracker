@@ -32,7 +32,7 @@ export function LocaleSwitcher({ side = "bottom" }: { side?: "top" | "bottom" | 
           size="icon"
           aria-label={t("change")}
           disabled={pending}
-          className="font-mono text-[11px] font-semibold tracking-[0.06em]"
+          className="font-mono text-[0.6875rem] font-semibold tracking-[0.06em]"
         >
           <span aria-hidden>{codes[locale] ?? locale}</span>
         </Button>

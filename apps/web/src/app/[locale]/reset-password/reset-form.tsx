@@ -26,7 +26,7 @@ export function ResetForm() {
   if (invalid) {
     return (
       <div className="grid gap-4">
-        <p role="alert" className="text-[15px] leading-6">
+        <p role="alert" className="text-[0.9375rem] leading-6">
           {t("invalid")}
         </p>
         <Link href="/forgot-password" className="text-sm font-medium underline underline-offset-2">
@@ -40,7 +40,7 @@ export function ResetForm() {
     return (
       <div className="grid gap-4" role="status">
         <CircleCheck className="text-success size-6" aria-hidden />
-        <p className="text-[15px] leading-6">{t("done")}</p>
+        <p className="text-[0.9375rem] leading-6">{t("done")}</p>
         <Button asChild size="lg" className="w-full">
           <Link href="/sign-in">{t("signIn")}</Link>
         </Button>

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const badgeVariants = cva(
   [
     "inline-flex h-5 w-fit shrink-0 items-center gap-1 overflow-hidden whitespace-nowrap",
-    "rounded-[2px] border px-1.5 font-mono text-[11px] font-medium uppercase leading-none tracking-[0.08em]",
+    "rounded-[2px] border px-1.5 font-mono text-[0.6875rem] font-medium uppercase leading-none tracking-[0.08em]",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
     "[&>svg]:pointer-events-none [&>svg]:size-3",
   ],
