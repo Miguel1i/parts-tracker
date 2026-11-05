@@ -123,14 +123,129 @@
     "empty": {
       "title": "Ainda sem preços",
       "body": "Os preços aparecem aqui depois da primeira verificação. As lojas e os produtos chegam com a etapa da base de dados."
+    },
+    "signedOut": {
+      "title": "Acompanhe os preços de componentes",
+      "body": "Inicie sessão para ver o total da sua configuração, as alterações de preço e as maiores variações.",
+      "signIn": "Iniciar sessão"
+    },
+    "noBuild": {
+      "title": "Ainda sem configuração",
+      "body": "Crie uma configuração e adicione componentes para ver aqui o total, as poupanças e o histórico de preços.",
+      "cta": "Ir para as minhas configurações"
+    },
+    "buildLabel": "Configuração:",
+    "checkAll": "Verificar tudo",
+    "withShipping": "com portes",
+    "withoutShipping": "sem portes",
+    "missing": "{count, plural, one {# componente ainda sem preço} other {# componentes ainda sem preço}}",
+    "savingsNone": "Requer preços de referência",
+    "savingsHint": "Abaixo dos preços de referência",
+    "merchantsHint": "Lojas que compara",
+    "noRuns": "Ainda sem execuções",
+    "runStatus": {
+      "queued": "Em fila",
+      "running": "A decorrer",
+      "succeeded": "Concluída",
+      "failed": "Falhou",
+      "cancelled": "Cancelada"
+    },
+    "feed": {
+      "title": "Melhor preço alterado",
+      "description": "Preço mais baixo em stock, últimos 14 dias.",
+      "empty": "Sem alterações do melhor preço nos últimos 14 dias."
     }
   },
   "Compare": {
     "title": "Comparar",
-    "description": "Cada produto em cada loja.",
+    "description": "Cada peça de uma configuração em cada loja.",
     "empty": {
       "title": "Ainda nada para comparar",
       "body": "A grelha de comparação e o mapa de diferenças de preço chegam com a etapa das vistas."
+    },
+    "build": "Configuração",
+    "noShops": "Não tem lojas ativas. Ative algumas nas definições.",
+    "view": {
+      "label": "Vista",
+      "grid": "Grelha",
+      "heatmap": "Mapa de calor"
+    },
+    "shipping": {
+      "with": "Preços com portes",
+      "without": "Preços sem portes"
+    },
+    "columns": {
+      "button": "Lojas",
+      "label": "Mostrar lojas",
+      "show": "Mostrar todas"
+    },
+    "table": {
+      "product": "Produto",
+      "best": "Melhor preço",
+      "sortBy": "Ordenar por {column}",
+      "label": "Preços de {build} por loja"
+    },
+    "badge": {
+      "best": "Melhor"
+    },
+    "stock": {
+      "inStock": "Em stock",
+      "outOfStock": "Esgotado",
+      "notFound": "Não encontrado",
+      "blocked": "A loja bloqueou a última verificação",
+      "error": "A última verificação falhou",
+      "unchecked": "Ainda não verificado",
+      "notTracked": "Sem oferta desta loja"
+    },
+    "menu": {
+      "actions": "Ações para {product} em {merchant}",
+      "open": "Abrir página da loja",
+      "noUrl": "Ainda sem página da loja",
+      "report": "Reportar correspondência errada",
+      "reported": "Reportado. Obrigado, não voltará a ser associado.",
+      "check": "Verificar agora",
+      "checkQueued": "Verificação em fila. Recarregue dentro de um minuto para ver os novos preços.",
+      "log": "Ver registo"
+    },
+    "log": {
+      "title": "Última verificação: {merchant}",
+      "status": "Estado",
+      "message": "Mensagem",
+      "when": "Verificado",
+      "empty": "Este par ainda não foi verificado.",
+      "noLog": "Sem texto de registo."
+    },
+    "heatmap": {
+      "summary": "Mapa de calor das diferenças de preço: {products} produtos por {merchants} lojas. Mais claro significa mais perto do melhor preço.",
+      "viewTable": "Ver como tabela",
+      "legend": "% acima do preço mais baixo em stock",
+      "best": "Melhor",
+      "bins": {
+        "1": "Melhor",
+        "2": "menos de 5%",
+        "3": "5 a 10%",
+        "4": "10 a 20%",
+        "5": "20 a 35%",
+        "6": "35 a 60%",
+        "7": "60% ou mais"
+      },
+      "above": "{pct}% acima do melhor",
+      "isBest": "Melhor preço",
+      "noData": "Sem preço",
+      "cell": "{product} em {merchant}: {detail}"
+    },
+    "cards": {
+      "label": "Preços por loja para {product}"
+    },
+    "noBuilds": {
+      "title": "Ainda sem configurações",
+      "body": "Crie uma configuração para comparar as suas peças entre lojas.",
+      "cta": "Ir para as minhas configurações"
+    },
+    "noItems": {
+      "title": "Esta configuração não tem peças",
+      "body": "Adicione peças à configuração para as comparar.",
+      "cta": "Abrir a configuração"
     }
   },
   "Builds": {
@@ -294,7 +409,8 @@
       "catalog": "Catálogo",
       "review": "Fila de revisão",
       "audit": "Registo de auditoria",
-      "pendingCount": "{count, plural, one {# pendente} other {# pendentes}}"
+      "pendingCount": "{count, plural, one {# pendente} other {# pendentes}}",
+      "runs": "Execuções"
     },
     "common": {
       "save": "Guardar",
@@ -479,6 +595,25 @@
         "outOfStock": "Sem stock",
         "vetoes": "Vetos: {vetoes}",
         "stats": "Estatísticas"
+      },
+      "healthChart": {
+        "title": "Resultados das verificações, últimos 30 dias",
+        "description": "Proporção das verificações de cada dia por resultado. Os dias sem verificações ficam vazios.",
+        "viewTable": "Ver como tabela",
+        "viewChart": "Ver como gráfico",
+        "tableLabel": "Tabela dos resultados diários",
+        "day": "Dia",
+        "legend": "Resultados (selecione para mostrar ou ocultar)",
+        "summary": "Gráfico de barras empilhadas de {total} verificações nos últimos {days} dias; {ok} com sucesso.",
+        "empty": "Sem verificações registadas para este comerciante nos últimos 30 dias.",
+        "noChecks": "Sem verificações",
+        "status": {
+          "ok": "OK",
+          "out_of_stock": "Sem stock",
+          "not_found": "Não encontrado",
+          "blocked": "Bloqueado",
+          "error": "Erro"
+        }
       }
     },
     "catalog": {
@@ -567,7 +702,8 @@
         "identifier": "Identificadores",
         "candidate": "Candidatos",
         "invite": "Convites",
-        "settings": "Definições"
+        "settings": "Definições",
+        "run": "Execuções"
       },
       "time": "Hora",
       "actor": "Autor",
@@ -698,6 +834,80 @@
         "label": "Nova palavra-passe",
         "help": "Pelo menos 8 caracteres. Comunique-a por um canal seguro."
       }
+    },
+    "runs": {
+      "title": "Execuções",
+      "description": "Todas as execuções de recolha, agendadas ou iniciadas manualmente.",
+      "detailTitle": "Detalhes da execução",
+      "back": "Voltar às execuções",
+      "list": "Todas as execuções",
+      "empty": "Ainda não há execuções",
+      "system": "Sistema",
+      "checkAll": "Verificar tudo",
+      "starting": "A iniciar…",
+      "rerun": "Executar de novo",
+      "dispatched": "Execução iniciada.",
+      "notDispatched": "O envio para o GitHub não está configurado aqui. Execute isto no repositório para iniciar a execução:",
+      "github": "GitHub",
+      "openGithub": "Abrir no GitHub",
+      "logs": "Registos por par",
+      "noLogs": "Sem registos por par nesta execução.",
+      "showLog": "Mostrar registo",
+      "logsTruncated": "A mostrar os primeiros {shown} de {total} registos.",
+      "columns": {
+        "started": "Início",
+        "finished": "Fim",
+        "scope": "Âmbito",
+        "status": "Estado",
+        "trigger": "Origem",
+        "requestedBy": "Pedida por",
+        "duration": "Duração",
+        "stats": "Resultados",
+        "links": "Ligações"
+      },
+      "triggers": {
+        "cron": "Agendada",
+        "manual": "Manual"
+      },
+      "scope": {
+        "all": "Tudo",
+        "product": "Produto",
+        "merchant": "Comerciante",
+        "build": "Montagem",
+        "legacy": "Importação antiga"
+      },
+      "statuses": {
+        "queued": "Em fila",
+        "running": "A decorrer",
+        "succeeded": "Concluída",
+        "failed": "Falhou",
+        "cancelled": "Cancelada"
+      },
+      "stats": {
+        "ok": "OK",
+        "blocked": "Bloqueado",
+        "not_found": "Não encontrado",
+        "review": "Revisão",
+        "error": "Erro"
+      },
+      "cron": {
+        "label": "Intervalo das verificações agendadas",
+        "option": "{hours, plural, one {Todas as horas} other {A cada # horas}}",
+        "saved": "Intervalo guardado",
+        "hint": "O fluxo de trabalho acorda de hora a hora e ignora a execução até ter passado este tempo desde a última agendada."
+      },
+      "chart": {
+        "title": "Duração das execuções",
+        "description": "Quanto tempo demorou cada execução concluída, do início ao fim.",
+        "minutes": "{value} min",
+        "started": "Início",
+        "duration": "Duração",
+        "viewTable": "Ver como tabela",
+        "viewChart": "Ver como gráfico",
+        "tableLabel": "Tabela da duração das execuções",
+        "summary": "Gráfico de linhas da duração das últimas {count} execuções; a mais recente demorou {last} e a mais longa {max}.",
+        "empty": "Ainda não há execuções concluídas."
+      }
     }
   },
   "NotFound": {
@@ -787,5 +997,179 @@
     "partial": "(alguns componentes não têm preço)",
     "noPrice": "Sem preço",
     "bought": "Comprado"
+  },
+  "Charts": {
+    "spark": {
+      "down": "Últimos 30 dias: desceu {pct}%",
+      "up": "Últimos 30 dias: subiu {pct}%",
+      "flat": "Últimos 30 dias: sem alteração"
+    },
+    "category": {
+      "cpu": "CPU",
+      "gpu": "GPU",
+      "motherboard": "Placa-mãe",
+      "ram": "Memória",
+      "ssd": "SSD",
+      "hdd": "Disco rígido",
+      "psu": "Fonte de alimentação",
+      "case": "Caixa",
+      "cooler": "Cooler",
+      "fan": "Ventoinhas",
+      "monitor": "Monitor",
+      "other": "Outros"
+    },
+    "buildTotal": {
+      "title": "Total da configuração ao longo do tempo",
+      "withShipping": "Preços mais baixos em stock, com portes",
+      "withoutShipping": "Preços mais baixos em stock, sem portes",
+      "range": "Intervalo de tempo",
+      "range_7d": "7d",
+      "range_30d": "30d",
+      "range_90d": "90d",
+      "range_1y": "1a",
+      "range_all": "Tudo",
+      "mode": "Onde comprar",
+      "modeAnywhere": "Mais barato em qualquer loja",
+      "modeSingle": "Mais barato numa só loja",
+      "viewTable": "Ver como tabela",
+      "viewChart": "Ver como gráfico",
+      "tableLabel": "Total da configuração ao longo do tempo, em tabela",
+      "date": "Data",
+      "total": "Total",
+      "legend": "Legenda do gráfico",
+      "reference": "Preços de referência",
+      "noPrice": "Sem preço nesta altura",
+      "missing": "{count, plural, one {# componente sem preço} other {# componentes sem preço}}",
+      "empty": "Ainda sem dados. Execute uma verificação para iniciar o histórico.",
+      "emptySingle": "Nenhuma loja tem todos os componentes em stock neste intervalo.",
+      "summary": "Total da configuração, {mode}: {price} agora, {dir, select, down {desceu {pct}%} up {subiu {pct}%} other {sem alteração}} no intervalo apresentado.",
+      "summaryNone": "Total da configuração, {mode}: ainda sem dados de preço.",
+      "summaryRef": "Os preços de referência somam {ref}."
+    },
+    "movers": {
+      "title": "Maiores variações",
+      "description": "Alteração do preço mais baixo em stock.",
+      "range": "Período",
+      "range_7": "7 dias",
+      "range_30": "30 dias",
+      "viewTable": "Ver como tabela",
+      "viewChart": "Ver como gráfico",
+      "tableLabel": "Maiores variações, em tabela",
+      "product": "Produto",
+      "before": "Antes",
+      "now": "Agora",
+      "change": "Variação",
+      "legend": "Legenda do gráfico",
+      "dropLabel": "Preço desceu",
+      "riseLabel": "Preço subiu",
+      "drop": "mais barato",
+      "rise": "mais caro",
+      "empty": "Ainda sem alterações de preço para mostrar.",
+      "summary": "Maiores variações em {days} dias: {name} {pct}, entre {count} alterações.",
+      "summaryNone": "Sem alterações de preço em {days} dias."
+    }
+  },
+  "Product": {
+    "title": "Produto",
+    "back": "Voltar às montagens",
+    "referencePage": "Página de referência",
+    "bestPrice": "Melhor preço agora",
+    "refPrice": "Preço de referência",
+    "withShipping": "com portes",
+    "withoutShipping": "sem portes",
+    "noOffer": "Ainda sem oferta",
+    "belowRef": "{pct} abaixo da referência",
+    "aboveRef": "{pct} acima da referência",
+    "history": {
+      "title": "Histórico de preços",
+      "withShipping": "Incluir portes",
+      "range": "Intervalo de tempo",
+      "ranges": {
+        "7d": "7d",
+        "30d": "30d",
+        "90d": "90d",
+        "1y": "1a",
+        "all": "Tudo"
+      },
+      "viewTable": "Ver como tabela",
+      "viewChart": "Ver como gráfico",
+      "exportPng": "PNG",
+      "exportCsv": "CSV",
+      "error": "Não foi possível carregar o histórico de preços.",
+      "empty": "Ainda sem dados. Execute uma verificação para iniciar o histórico.",
+      "tableLabel": "Observações de preços",
+      "legend": "Lojas",
+      "legendHint": "Clique para ocultar, duplo clique para isolar",
+      "marks": "Marcas do gráfico",
+      "columns": {
+        "time": "Hora",
+        "merchant": "Loja",
+        "price": "Preço",
+        "shipping": "Portes",
+        "stock": "Stock"
+      },
+      "inStock": "Em stock",
+      "outOfStock": "Sem stock",
+      "noOffers": "Sem ofertas neste momento.",
+      "refLine": "Referência {price}",
+      "boughtLabel": "Comprado",
+      "keyOutOfStock": "Sem stock",
+      "keyBand": "Preço mais baixo",
+      "keyLow": "Mínimo no intervalo",
+      "keyNow": "Preço atual",
+      "tooltip": {
+        "detail": "{price} + {shipping} de portes · {stock} · {time}"
+      },
+      "openShop": "Abrir página da loja",
+      "viewLog": "Ver registo",
+      "viewRun": "Execução {id}",
+      "summary": {
+        "lowest": "Mais baixo {price} em {merchant}",
+        "down": "menos {pct}% em {days} dias",
+        "up": "mais {pct}% em {days} dias",
+        "flat": "sem alteração em {days} dias",
+        "none": "Ainda sem dados de preços"
+      }
+    },
+    "offers": {
+      "title": "Ofertas atuais",
+      "description": "Último preço por loja, com os portes empilhados.",
+      "shipping": "Mostrar portes",
+      "viewTable": "Ver como tabela",
+      "viewChart": "Ver como gráfico",
+      "empty": "Ainda sem ofertas. Execute uma verificação para encontrar algumas.",
+      "summary": "Mais barato {price} em {merchant}",
+      "summaryNone": "Nenhuma oferta em stock",
+      "legend": "Segmentos das barras",
+      "keyPrice": "Preço",
+      "keyShipping": "Portes",
+      "tableLabel": "Últimas ofertas",
+      "columns": {
+        "merchant": "Loja",
+        "price": "Preço",
+        "shipping": "Portes",
+        "stock": "Stock",
+        "checked": "Última verificação",
+        "link": "Página da loja"
+      },
+      "inStock": "Em stock",
+      "outOfStock": "Sem stock",
+      "cheapest": "Mais barato",
+      "openShop": "Abrir",
+      "tooltip": "{price} + {shipping} de portes"
+    },
+    "diagnostics": {
+      "title": "Diagnóstico",
+      "description": "A última verificação deste produto em cada loja.",
+      "empty": "Ainda não há verificações registadas para este produto.",
+      "showLog": "Mostrar registo",
+      "status": {
+        "ok": "OK",
+        "out_of_stock": "Sem stock",
+        "not_found": "Não encontrado",
+        "blocked": "Bloqueado",
+        "error": "Erro"
+      }
+    }
   }
 }

@@ -7,7 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { initLocale } from "@/i18n/server";
 import { requireUser } from "@/lib/auth/guard";
-import { listBuilds } from "@/lib/builds/queries";
+import { listBuilds, priceWithShipping } from "@/lib/builds/queries";
+import { loadBuildSparks } from "@/lib/charts/dashboard";
+import { Sparkline, sparkLabel } from "@/components/charts/dash-sparkline";
 import { BuildMenu, CreateBuildButton } from "./build-menu";
 
 // Reads the session at the top level: render on request.
@@ -24,7 +26,15 @@ export default async function BuildsPage() {
   const user = await requireUser();
   const t = await getTranslations("Builds");
   const format = await getFormatter();
-  const list = await listBuilds(getDb(), user.id);
+  const db = getDb();
+  const list = await listBuilds(db, user.id);
+  const ts = await getTranslations("Charts.spark");
+  const sparks = await loadBuildSparks(
+    db,
+    user.id,
+    list.map((b) => b.id),
+    await priceWithShipping(db, user.id),
+  );
 
   return (
     <>
@@ -64,15 +74,21 @@ export default async function BuildsPage() {
                       </Badge>
                     )}
                   </div>
-                  <div className="mt-auto">
-                    <p className="text-2xl font-semibold tabular-nums">
-                      {format.number(b.total, "price")}
-                    </p>
-                    {b.missingPrice > 0 && (
-                      <p className="text-muted-foreground text-xs">
-                        {t("missing", { count: b.missingPrice })}
+                  <div className="mt-auto flex items-end justify-between gap-3">
+                    <div>
+                      <p className="text-2xl font-semibold tabular-nums">
+                        {format.number(b.total, "price")}
                       </p>
-                    )}
+                      {b.missingPrice > 0 && (
+                        <p className="text-muted-foreground text-xs">
+                          {t("missing", { count: b.missingPrice })}
+                        </p>
+                      )}
+                    </div>
+                    <Sparkline
+                      values={sparks[b.id] ?? []}
+                      label={`${b.name}. ${sparkLabel(ts, sparks[b.id] ?? [])}`}
+                    />
                   </div>
                 </CardContent>
               </Card>

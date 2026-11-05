@@ -28,7 +28,7 @@ type RunState = {
 };
 
 /** "Check now": queues a run, then polls its status every 4 s until it ends. */
-export function CheckButton({ buildId }: { buildId: string }) {
+export function CheckButton({ buildId, label }: { buildId: string; label?: string }) {
   const t = useTranslations("Builds.check");
   const router = useRouter();
   const errorText = useActionErrorText();
@@ -98,7 +98,7 @@ export function CheckButton({ buildId }: { buildId: string }) {
         ) : (
           <RefreshCw className="size-4" />
         )}
-        {active ? t("running") : t("button")}
+        {active ? t("running") : (label ?? t("button"))}
       </Button>
       {run && (
         <div className="text-muted-foreground grid gap-1 text-sm" aria-live="polite">

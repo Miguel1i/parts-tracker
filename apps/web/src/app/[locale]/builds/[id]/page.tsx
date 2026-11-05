@@ -8,6 +8,8 @@ import { Link } from "@/i18n/navigation";
 import { initLocale } from "@/i18n/server";
 import { requireUser } from "@/lib/auth/guard";
 import { getBuildView, merchantOptions } from "@/lib/builds/queries";
+import { loadBuildCharts } from "@/lib/charts/dashboard";
+import { BuildTotalChartLazy } from "@/components/charts/dash-build-chart-lazy";
 import { BuildMenu } from "../build-menu";
 import { AddPanel } from "./add-panel";
 import { CheckButton } from "./check-button";
@@ -25,6 +27,7 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
   const build = await getBuildView(db, id, user.id);
   if (!build) notFound();
   const merchants = await merchantOptions(db);
+  const { chart, sparks } = await loadBuildCharts(db, user.id, id, build.withShipping);
   const t = await getTranslations("Builds");
   const format = await getFormatter();
 
@@ -79,7 +82,13 @@ export default async function BuildPage({ params }: { params: Promise<{ id: stri
             merchants={merchants}
             total={build.total}
             missingPrice={build.missingPrice}
+            sparks={sparks}
           />
+        )}
+        {build.items.length > 0 && (
+          <div className="rounded-xl border p-4">
+            <BuildTotalChartLazy data={chart} />
+          </div>
         )}
         <div className="grid items-start gap-6 lg:grid-cols-2">
           <AddPanel buildId={build.id} />

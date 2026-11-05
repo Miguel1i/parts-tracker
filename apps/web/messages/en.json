@@ -123,14 +123,129 @@
     "empty": {
       "title": "No prices yet",
       "body": "Prices appear here after the first scrape run. Merchants and products arrive with the database milestone."
+    },
+    "signedOut": {
+      "title": "Track PC part prices",
+      "body": "Sign in to see your build total, price changes and the biggest movers.",
+      "signIn": "Sign in"
+    },
+    "noBuild": {
+      "title": "No build yet",
+      "body": "Create a build and add parts to see its total, savings and price history here.",
+      "cta": "Go to my builds"
+    },
+    "buildLabel": "Build:",
+    "checkAll": "Check all",
+    "withShipping": "incl. shipping",
+    "withoutShipping": "excl. shipping",
+    "missing": "{count, plural, one {# part has no price yet} other {# parts have no price yet}}",
+    "savingsNone": "Needs reference prices",
+    "savingsHint": "Below reference prices",
+    "merchantsHint": "Shops you compare",
+    "noRuns": "No runs yet",
+    "runStatus": {
+      "queued": "Queued",
+      "running": "Running",
+      "succeeded": "Succeeded",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "feed": {
+      "title": "Best price changed",
+      "description": "Cheapest in-stock price, last 14 days.",
+      "empty": "No best-price changes in the last 14 days."
     }
   },
   "Compare": {
     "title": "Compare",
-    "description": "Every product against every merchant.",
+    "description": "Every part of a build against every shop.",
     "empty": {
       "title": "Nothing to compare yet",
       "body": "The comparison grid and price-gap heatmap arrive with the views milestone."
+    },
+    "build": "Build",
+    "noShops": "You have no shops switched on. Enable some in your settings.",
+    "view": {
+      "label": "View",
+      "grid": "Grid",
+      "heatmap": "Heatmap"
+    },
+    "shipping": {
+      "with": "Prices include shipping",
+      "without": "Prices exclude shipping"
+    },
+    "columns": {
+      "button": "Shops",
+      "label": "Show shops",
+      "show": "Show all"
+    },
+    "table": {
+      "product": "Product",
+      "best": "Best price",
+      "sortBy": "Sort by {column}",
+      "label": "Prices of {build} by shop"
+    },
+    "badge": {
+      "best": "Best"
+    },
+    "stock": {
+      "inStock": "In stock",
+      "outOfStock": "Out of stock",
+      "notFound": "Not found",
+      "blocked": "The shop blocked the last check",
+      "error": "The last check failed",
+      "unchecked": "Not checked yet",
+      "notTracked": "No offer from this shop"
+    },
+    "menu": {
+      "actions": "Actions for {product} at {merchant}",
+      "open": "Open shop page",
+      "noUrl": "No shop page yet",
+      "report": "Report wrong match",
+      "reported": "Reported. Thanks, it won't be matched again.",
+      "check": "Check now",
+      "checkQueued": "Check queued. Reload in a minute to see new prices.",
+      "log": "View log"
+    },
+    "log": {
+      "title": "Latest check: {merchant}",
+      "status": "Status",
+      "message": "Message",
+      "when": "Checked",
+      "empty": "This pair hasn't been checked yet.",
+      "noLog": "No log text."
+    },
+    "heatmap": {
+      "summary": "Price-gap heatmap: {products} products by {merchants} shops. Lighter means closer to the best price.",
+      "viewTable": "View as table",
+      "legend": "% above the cheapest in-stock price",
+      "best": "Best",
+      "bins": {
+        "1": "Best",
+        "2": "under 5%",
+        "3": "5 to 10%",
+        "4": "10 to 20%",
+        "5": "20 to 35%",
+        "6": "35 to 60%",
+        "7": "60% or more"
+      },
+      "above": "{pct}% above best",
+      "isBest": "Best price",
+      "noData": "No price",
+      "cell": "{product} at {merchant}: {detail}"
+    },
+    "cards": {
+      "label": "Prices by shop for {product}"
+    },
+    "noBuilds": {
+      "title": "No builds yet",
+      "body": "Create a build to compare its parts across shops.",
+      "cta": "Go to my builds"
+    },
+    "noItems": {
+      "title": "This build has no parts",
+      "body": "Add parts to the build to compare them.",
+      "cta": "Open the build"
     }
   },
   "Builds": {
@@ -294,7 +409,8 @@
       "catalog": "Catalog",
       "review": "Review queue",
       "audit": "Audit log",
-      "pendingCount": "{count, plural, one {# pending} other {# pending}}"
+      "pendingCount": "{count, plural, one {# pending} other {# pending}}",
+      "runs": "Runs"
     },
     "common": {
       "save": "Save",
@@ -479,6 +595,25 @@
         "outOfStock": "Out of stock",
         "vetoes": "Vetoes: {vetoes}",
         "stats": "Stats"
+      },
+      "healthChart": {
+        "title": "Check results, last 30 days",
+        "description": "Share of each day's checks by outcome. Days without checks are empty.",
+        "viewTable": "View as table",
+        "viewChart": "View as chart",
+        "tableLabel": "Daily check results table",
+        "day": "Day",
+        "legend": "Outcomes (select to show or hide)",
+        "summary": "Stacked bar chart of {total} checks over the last {days} days; {ok} succeeded.",
+        "empty": "No checks recorded for this merchant in the last 30 days.",
+        "noChecks": "No checks",
+        "status": {
+          "ok": "OK",
+          "out_of_stock": "Out of stock",
+          "not_found": "Not found",
+          "blocked": "Blocked",
+          "error": "Error"
+        }
       }
     },
     "catalog": {
@@ -567,7 +702,8 @@
         "identifier": "Identifiers",
         "candidate": "Candidates",
         "invite": "Invites",
-        "settings": "Settings"
+        "settings": "Settings",
+        "run": "Runs"
       },
       "time": "Time",
       "actor": "Actor",
@@ -698,6 +834,80 @@
         "label": "New password",
         "help": "At least 8 characters. Tell them over a safe channel."
       }
+    },
+    "runs": {
+      "title": "Runs",
+      "description": "Every scrape run, scheduled or started by hand.",
+      "detailTitle": "Run details",
+      "back": "Back to runs",
+      "list": "All runs",
+      "empty": "No runs yet",
+      "system": "System",
+      "checkAll": "Check all",
+      "starting": "Starting…",
+      "rerun": "Re-run",
+      "dispatched": "Run started.",
+      "notDispatched": "GitHub dispatch isn't configured here. Run this in the repo to start the run:",
+      "github": "GitHub",
+      "openGithub": "Open on GitHub",
+      "logs": "Pair logs",
+      "noLogs": "No pair logs for this run.",
+      "showLog": "Show log",
+      "logsTruncated": "Showing the first {shown} of {total} logs.",
+      "columns": {
+        "started": "Started",
+        "finished": "Finished",
+        "scope": "Scope",
+        "status": "Status",
+        "trigger": "Trigger",
+        "requestedBy": "Requested by",
+        "duration": "Duration",
+        "stats": "Results",
+        "links": "Links"
+      },
+      "triggers": {
+        "cron": "Scheduled",
+        "manual": "Manual"
+      },
+      "scope": {
+        "all": "Everything",
+        "product": "Product",
+        "merchant": "Merchant",
+        "build": "Build",
+        "legacy": "Legacy import"
+      },
+      "statuses": {
+        "queued": "Queued",
+        "running": "Running",
+        "succeeded": "Succeeded",
+        "failed": "Failed",
+        "cancelled": "Cancelled"
+      },
+      "stats": {
+        "ok": "OK",
+        "blocked": "Blocked",
+        "not_found": "Not found",
+        "review": "Review",
+        "error": "Error"
+      },
+      "cron": {
+        "label": "Scheduled check interval",
+        "option": "{hours, plural, one {Every hour} other {Every # hours}}",
+        "saved": "Interval saved",
+        "hint": "The workflow wakes up hourly and skips the run until this much time has passed since the last scheduled one."
+      },
+      "chart": {
+        "title": "Run duration",
+        "description": "How long each finished run took, from start to finish.",
+        "minutes": "{value} min",
+        "started": "Started",
+        "duration": "Duration",
+        "viewTable": "View as table",
+        "viewChart": "View as chart",
+        "tableLabel": "Run duration table",
+        "summary": "Line chart of the duration of the last {count} runs; the latest took {last} and the longest {max}.",
+        "empty": "No finished runs yet."
+      }
     }
   },
   "NotFound": {
@@ -787,5 +997,179 @@
     "partial": "(some parts have no price)",
     "noPrice": "No price",
     "bought": "Bought"
+  },
+  "Charts": {
+    "spark": {
+      "down": "Last 30 days: down {pct}%",
+      "up": "Last 30 days: up {pct}%",
+      "flat": "Last 30 days: unchanged"
+    },
+    "category": {
+      "cpu": "CPU",
+      "gpu": "GPU",
+      "motherboard": "Motherboard",
+      "ram": "Memory",
+      "ssd": "SSD",
+      "hdd": "Hard drive",
+      "psu": "Power supply",
+      "case": "Case",
+      "cooler": "Cooler",
+      "fan": "Fans",
+      "monitor": "Monitor",
+      "other": "Other"
+    },
+    "buildTotal": {
+      "title": "Build total over time",
+      "withShipping": "Cheapest in-stock prices, shipping included",
+      "withoutShipping": "Cheapest in-stock prices, shipping not included",
+      "range": "Time range",
+      "range_7d": "7d",
+      "range_30d": "30d",
+      "range_90d": "90d",
+      "range_1y": "1y",
+      "range_all": "All",
+      "mode": "Where to buy",
+      "modeAnywhere": "Cheapest anywhere",
+      "modeSingle": "Cheapest at one shop",
+      "viewTable": "View as table",
+      "viewChart": "View as chart",
+      "tableLabel": "Build total over time, as a table",
+      "date": "Date",
+      "total": "Total",
+      "legend": "Chart legend",
+      "reference": "Reference prices",
+      "noPrice": "No price at this time",
+      "missing": "{count, plural, one {# part has no price} other {# parts have no price}}",
+      "empty": "No data yet. Run a check to start the history.",
+      "emptySingle": "No single shop has every part in stock in this range.",
+      "summary": "Build total, {mode}: {price} now, {dir, select, down {down {pct}%} up {up {pct}%} other {unchanged}} over the range shown.",
+      "summaryNone": "Build total, {mode}: no price data yet.",
+      "summaryRef": "Reference prices total {ref}."
+    },
+    "movers": {
+      "title": "Biggest movers",
+      "description": "Change of the cheapest in-stock price.",
+      "range": "Period",
+      "range_7": "7 days",
+      "range_30": "30 days",
+      "viewTable": "View as table",
+      "viewChart": "View as chart",
+      "tableLabel": "Biggest movers, as a table",
+      "product": "Product",
+      "before": "Before",
+      "now": "Now",
+      "change": "Change",
+      "legend": "Chart legend",
+      "dropLabel": "Price dropped",
+      "riseLabel": "Price rose",
+      "drop": "cheaper",
+      "rise": "dearer",
+      "empty": "No price changes to show yet.",
+      "summary": "Biggest movers over {days} days: {name} {pct}, among {count} changes.",
+      "summaryNone": "No price changes over {days} days."
+    }
+  },
+  "Product": {
+    "title": "Product",
+    "back": "Back to builds",
+    "referencePage": "Reference page",
+    "bestPrice": "Best price now",
+    "refPrice": "Reference price",
+    "withShipping": "with shipping",
+    "withoutShipping": "without shipping",
+    "noOffer": "No offer yet",
+    "belowRef": "{pct} below reference",
+    "aboveRef": "{pct} above reference",
+    "history": {
+      "title": "Price history",
+      "withShipping": "Include shipping",
+      "range": "Time range",
+      "ranges": {
+        "7d": "7d",
+        "30d": "30d",
+        "90d": "90d",
+        "1y": "1y",
+        "all": "All"
+      },
+      "viewTable": "View as table",
+      "viewChart": "View as chart",
+      "exportPng": "PNG",
+      "exportCsv": "CSV",
+      "error": "Couldn't load the price history.",
+      "empty": "No data yet. Run a check to start the history.",
+      "tableLabel": "Price observations",
+      "legend": "Merchants",
+      "legendHint": "Click to hide, double-click to isolate",
+      "marks": "Chart marks",
+      "columns": {
+        "time": "Time",
+        "merchant": "Merchant",
+        "price": "Price",
+        "shipping": "Shipping",
+        "stock": "Stock"
+      },
+      "inStock": "In stock",
+      "outOfStock": "Out of stock",
+      "noOffers": "No offers at this time.",
+      "refLine": "Reference {price}",
+      "boughtLabel": "Bought",
+      "keyOutOfStock": "Out of stock",
+      "keyBand": "Lowest price",
+      "keyLow": "Lowest in range",
+      "keyNow": "Current price",
+      "tooltip": {
+        "detail": "{price} + {shipping} shipping · {stock} · {time}"
+      },
+      "openShop": "Open shop page",
+      "viewLog": "View log",
+      "viewRun": "Run {id}",
+      "summary": {
+        "lowest": "Lowest {price} at {merchant}",
+        "down": "down {pct}% in {days} days",
+        "up": "up {pct}% in {days} days",
+        "flat": "unchanged in {days} days",
+        "none": "No price data yet"
+      }
+    },
+    "offers": {
+      "title": "Current offers",
+      "description": "Latest price per merchant, shipping stacked on top.",
+      "shipping": "Show shipping",
+      "viewTable": "View as table",
+      "viewChart": "View as chart",
+      "empty": "No offers yet. Run a check to find some.",
+      "summary": "Cheapest {price} at {merchant}",
+      "summaryNone": "No offer in stock",
+      "legend": "Bar segments",
+      "keyPrice": "Price",
+      "keyShipping": "Shipping",
+      "tableLabel": "Latest offers",
+      "columns": {
+        "merchant": "Merchant",
+        "price": "Price",
+        "shipping": "Shipping",
+        "stock": "Stock",
+        "checked": "Last checked",
+        "link": "Shop page"
+      },
+      "inStock": "In stock",
+      "outOfStock": "Out of stock",
+      "cheapest": "Cheapest",
+      "openShop": "Open",
+      "tooltip": "{price} + {shipping} shipping"
+    },
+    "diagnostics": {
+      "title": "Diagnostics",
+      "description": "The latest check of this product at each merchant.",
+      "empty": "No checks logged for this product yet.",
+      "showLog": "Show log",
+      "status": {
+        "ok": "OK",
+        "out_of_stock": "Out of stock",
+        "not_found": "Not found",
+        "blocked": "Blocked",
+        "error": "Error"
+      }
+    }
   }
 }

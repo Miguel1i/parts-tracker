@@ -7,7 +7,8 @@ export type AuditEntry = {
   actorUserId: string;
   /** Dotted verb, e.g. `user.ban`, `merchant.update`, `candidate.approve`. */
   action: string;
-  entity: "user" | "merchant" | "product" | "identifier" | "candidate" | "invite" | "settings";
+  entity:
+    "user" | "merchant" | "product" | "identifier" | "candidate" | "invite" | "settings" | "run";
   entityId?: string | null;
   diff?: Record<string, unknown>;
 };

@@ -1,0 +1,2 @@
+CREATE INDEX `scrape_logs_pair_idx` ON `scrape_logs` (`product_id`,`merchant_id`,`id`);--> statement-breakpoint
+CREATE INDEX `scrape_logs_merchant_created_idx` ON `scrape_logs` (`merchant_id`,`created_at`);

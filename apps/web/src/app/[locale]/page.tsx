@@ -1,16 +1,11 @@
-import { Activity, Euro, PiggyBank, Store } from "lucide-react";
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
-import { EmptyState, PageHeader } from "@/components/empty-state";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 import { initLocale } from "@/i18n/server";
+import { DashboardBody } from "./dashboard-body";
 
-const kpis = [
-  { key: "buildTotal", icon: Euro },
-  { key: "savings", icon: PiggyBank },
-  { key: "merchants", icon: Store },
-  { key: "lastRun", icon: Activity },
-] as const;
-
+// No session read here: the shell is static and DashboardBody streams in.
 export default async function DashboardPage() {
   await initLocale();
   const t = await getTranslations("Dashboard");
@@ -18,23 +13,20 @@ export default async function DashboardPage() {
   return (
     <>
       <PageHeader title={t("title")} description={t("description")} />
-      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {kpis.map(({ key, icon: Icon }) => (
-          <Card key={key}>
-            <CardHeader>
-              <CardDescription className="flex items-center gap-2">
-                <Icon className="size-4 shrink-0" aria-hidden />
-                {t(`kpi.${key}`)}
-              </CardDescription>
-              <CardTitle className="text-2xl tabular-nums">—</CardTitle>
-            </CardHeader>
-            <CardContent />
-          </Card>
-        ))}
-      </div>
-      <EmptyState icon={Activity} title={t("empty.title")}>
-        {t("empty.body")}
-      </EmptyState>
+      <Suspense
+        fallback={
+          <div className="grid gap-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-28" />
+              ))}
+            </div>
+            <Skeleton className="h-96" />
+          </div>
+        }
+      >
+        <DashboardBody />
+      </Suspense>
     </>
   );
 }

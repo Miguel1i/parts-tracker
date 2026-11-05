@@ -72,6 +72,29 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  /* Data-viz palette (dataviz skill reference instance; validated adjacent-pair CVD-safe).
+     Merchant identity: categorical slots in fixed order. */
+  --chart-merchant-1: #2a78d6;
+  --chart-merchant-2: #eb6834;
+  --chart-merchant-3: #1baf7a;
+  --chart-merchant-4: #eda100;
+  --chart-merchant-5: #e87ba4;
+  --chart-merchant-6: #008300;
+  --chart-merchant-7: #6250d6;
+  --chart-merchant-8: #e34948;
+  /* Sequential (one hue, light -> dark) and diverging (blue <-> gray <-> red). */
+  --chart-seq-1: #cde2fb;
+  --chart-seq-2: #9ec5f4;
+  --chart-seq-3: #6da7ec;
+  --chart-seq-4: #3987e5;
+  --chart-seq-5: #256abf;
+  --chart-seq-6: #184f95;
+  --chart-seq-7: #0d366b;
+  --chart-div-neg: #2a78d6;
+  --chart-div-mid: #f0efec;
+  --chart-div-pos: #e34948;
+  --chart-grid: #e1e0d9;
+  --chart-axis: #898781;
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -107,6 +130,26 @@
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
+  --chart-merchant-1: #3987e5;
+  --chart-merchant-2: #d95926;
+  --chart-merchant-3: #199e70;
+  --chart-merchant-4: #c98500;
+  --chart-merchant-5: #d55181;
+  --chart-merchant-6: #008300;
+  --chart-merchant-7: #9085e9;
+  --chart-merchant-8: #e66767;
+  --chart-seq-1: #104281;
+  --chart-seq-2: #184f95;
+  --chart-seq-3: #1c5cab;
+  --chart-seq-4: #256abf;
+  --chart-seq-5: #3987e5;
+  --chart-seq-6: #6da7ec;
+  --chart-seq-7: #9ec5f4;
+  --chart-div-neg: #3987e5;
+  --chart-div-mid: #383835;
+  --chart-div-pos: #e66767;
+  --chart-grid: #2c2c2a;
+  --chart-axis: #898781;
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -118,6 +161,13 @@
 }
 
 @layer base {
+  /* Horizontal scrollers contain their absolutely positioned children (e.g. sr-only labels in
+     table headers); otherwise those escape the scroller and widen the page on phones. */
+  .overflow-x-auto,
+  .overflow-auto {
+    position: relative;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

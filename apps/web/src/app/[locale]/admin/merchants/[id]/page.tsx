@@ -7,7 +7,9 @@ import { PageHeader } from "@/components/empty-state";
 import { routing } from "@/i18n/routing";
 import { initLocale } from "@/i18n/server";
 import { splitAdapterConfig } from "@/lib/admin/adapter-schema";
+import { loadMerchantHealth } from "@/lib/admin/health-data";
 import { adminMetadata, requireAdmin } from "@/lib/auth/guard";
+import { HealthChart } from "./health-chart";
 import { MerchantForm } from "../merchant-form";
 import { TestPanel } from "../test-panel";
 
@@ -32,6 +34,7 @@ export default async function EditMerchantPage({
   const db = getDb();
   const [m] = await db.select().from(merchants).where(eq(merchants.id, id));
   if (!m) notFound();
+  const healthDays = await loadMerchantHealth(m.id);
   const testProducts = await db
     .select({ id: products.id, name: products.name })
     .from(products)
@@ -66,6 +69,7 @@ export default async function EditMerchantPage({
           }}
         />
       </div>
+      <HealthChart days={healthDays} />
       <TestPanel merchantId={m.id} products={testProducts} />
     </div>
   );
