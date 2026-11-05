@@ -2,7 +2,7 @@
 
 Track PC part prices across the shops PCPartPicker doesn't cover (mostly Portuguese, Spanish, French and UK merchants). Prices are scraped on a schedule or on demand, every observation is kept, and history is shown in interactive charts.
 
-> Status: **milestone 6 — user features**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
+> Status: **milestone 7 — views & charts**. The full plan is in [docs/BUILD_PROMPT.md](docs/BUILD_PROMPT.md).
 
 ## Stack
 
@@ -142,6 +142,15 @@ From PowerShell: `& "C:\Program Files\Git\bin\bash.exe" -lc "bash scripts/setup-
 - **Report wrong match** sends the pair's current offer to the admin review queue; only an admin's "Confirm wrong" blocklists it (and unpins the URL).
 - **Share**: a public read-only page at `/share/<token>` (random token, can be reset), showing only the owner's display name.
 - **Profile & settings** (`/account`): display name and username, email change (current password required), password change, active sessions, preferences (language, theme, default build, shipping in prices, which shops to compare), data export (JSON) and account deletion (password required; the last admin can't delete themselves).
+
+## Views & charts
+
+- **Dashboard** (`/`): KPI tiles with sparklines (build total, savings vs reference, shops compared, last run), the build total over time (stacked by category, reference-price line, cheapest anywhere vs at one shop), biggest movers (7/30 days) and a feed of best-price changes.
+- **Compare** (`/compare`): a build's parts × your shops with the cheapest in-stock cell marked, stock badges, column toggles, a cell menu (open, report, check now, view log), a price-gap heatmap, and stacked cards on phones.
+- **Product** (`/products/[id]`): price history as step lines per shop (out-of-stock dashed, gaps not bridged), lowest-price band, reference line, lows and current markers, price ± shipping, 7d–All presets with a brush, synced tooltip, legend toggles (click/hover/double-click), URL-shareable state, PNG/CSV export, current-offers bars, latest offers and the per-shop diagnostic log.
+- **Admin → Runs**: run history with logs, re-run, Check all, the scheduled interval (`scrape.yml` wakes hourly and skips until `cronIntervalHours` has passed), run-duration chart; per-merchant health chart on each merchant page.
+- Colours use the validated dataviz palette (CSS vars `--chart-merchant-1..8`, sequential and diverging ramps, light and dark); a merchant keeps its colour everywhere (slot from the admin order; past eight, hues repeat dashed). Every chart has a "View as table" toggle and an aria summary.
+- Developing charts locally: `pnpm --filter @parts/db db:seed-demo` fills a **local** database with 120 days of plausible history (refuses non-`file:` URLs; `--clear` removes it).
 
 ## Translations
 

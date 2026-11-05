@@ -1,5 +1,5 @@
 import "server-only";
-import { categories, toCategory } from "@parts/core";
+import { toCategory } from "@parts/core";
 import {
   buildItems,
   builds,
@@ -34,6 +34,13 @@ const CHUNK = 400;
  * for the merchants this user compares. With `from`, only newer points plus, when `carry`,
  * each pair's last point before `from` so the first moments of the range still have a price.
  */
+/**
+ * How far back the dashboard and build charts read. price_points is append-only and grows every
+ * run, so pages read a bounded window (the longest preset, 1y, plus margin) rather than all of it;
+ * the product page's "All" range still reads everything for one product.
+ */
+export const HISTORY_WINDOW_MS = 400 * DAY_MS;
+
 export async function loadObsByProduct(
   db: Conn,
   opts: { userId: string; productIds: string[]; from: number | null; carry?: boolean },
@@ -334,7 +341,11 @@ export async function loadDashboard(db: Conn, userId: string): Promise<Dashboard
     );
   const items = rows.filter((r) => r.buildId === build.id);
   const productIds = [...new Set(rows.map((r) => r.productId))];
-  const obs = await loadObsByProduct(db, { userId, productIds, from: null });
+  const obs = await loadObsByProduct(db, {
+    userId,
+    productIds,
+    from: Date.now() - HISTORY_WINDOW_MS,
+  });
 
   const offers = await bestOffers(
     db,
@@ -412,7 +423,11 @@ export async function loadBuildCharts(
     .innerJoin(products, eq(products.id, buildItems.productId))
     .where(eq(buildItems.buildId, buildId));
   const ids = rows.map((r) => r.productId);
-  const obs = await loadObsByProduct(db, { userId, productIds: ids, from: null });
+  const obs = await loadObsByProduct(db, {
+    userId,
+    productIds: ids,
+    from: Date.now() - HISTORY_WINDOW_MS,
+  });
   return {
     chart: buildChartData(rows, obs, withShipping),
     sparks: productSparks(obs, ids, Date.now(), withShipping),

@@ -9,7 +9,7 @@ import {
   type Db,
   type ScrapeStatus,
 } from "@parts/db";
-import { and, asc, desc, eq, inArray, isNotNull } from "@parts/db/orm";
+import { and, asc, desc, eq, inArray, isNotNull, sql } from "@parts/db/orm";
 import { shippingFor, userMerchantIds } from "@/lib/builds/queries";
 import { merchantStyles } from "./palette";
 import { safeHttpUrl } from "./product-view";
@@ -131,6 +131,15 @@ export async function loadProductDiagnostics(
 ): Promise<DiagnosticView[]> {
   const allowed = await userMerchantIds(db, userId);
   if (allowed.length === 0) return [];
+  // The newest log id per merchant (index scrape_logs_pair_idx), then only those rows: one log
+  // per merchant, however many runs there were, without reading every trace.
+  const latest = await db
+    .select({ id: sql<number>`max(${scrapeLogs.id})` })
+    .from(scrapeLogs)
+    .where(and(eq(scrapeLogs.productId, productId), inArray(scrapeLogs.merchantId, allowed)))
+    .groupBy(scrapeLogs.merchantId);
+  const ids = latest.map((r) => r.id).filter((x): x is number => x != null);
+  if (ids.length === 0) return [];
   const rows = await db
     .select({
       merchantId: scrapeLogs.merchantId,
@@ -144,9 +153,7 @@ export async function loadProductDiagnostics(
     })
     .from(scrapeLogs)
     .innerJoin(merchants, eq(merchants.id, scrapeLogs.merchantId))
-    .where(and(eq(scrapeLogs.productId, productId), inArray(scrapeLogs.merchantId, allowed)))
-    .orderBy(desc(scrapeLogs.id))
-    .limit(300);
+    .where(inArray(scrapeLogs.id, ids));
   const seen = new Map<string, DiagnosticView & { sortOrder: number }>();
   for (const r of rows) {
     if (!r.merchantId || seen.has(r.merchantId)) continue;

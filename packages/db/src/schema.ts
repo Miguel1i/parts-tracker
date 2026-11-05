@@ -537,7 +537,12 @@ export const scrapeLogs = sqliteTable(
     log: text("log"),
     createdAt: createdAt(),
   },
-  (t) => [index("scrape_logs_run_idx").on(t.runId)],
+  (t) => [
+    index("scrape_logs_run_idx").on(t.runId),
+    // Latest log per pair (product diagnostics, compare "View log") and merchant health by day.
+    index("scrape_logs_pair_idx").on(t.productId, t.merchantId, t.id),
+    index("scrape_logs_merchant_created_idx").on(t.merchantId, t.createdAt),
+  ],
 );
 
 export const fxRates = sqliteTable("fx_rates", {
