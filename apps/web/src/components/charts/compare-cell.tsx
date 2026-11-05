@@ -2,7 +2,7 @@
 
 import { MoreHorizontal } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { useState } from "react";
+import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import { useActionErrorText, useServerAction } from "@/components/admin/use-admin-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { checkNow, reportWrongMatch } from "@/app/[locale]/builds/[id]/actions";
 import { pairLog } from "@/app/[locale]/compare/actions";
+import { useSession } from "@/lib/auth/client";
 import { safeShopUrl, type CompareCellData } from "@/lib/charts/compare";
 
 export type CellTarget = {
@@ -39,38 +40,114 @@ type Entry = {
   createdAt: number | null;
 } | null;
 
-/** The "..." menu of one product x merchant cell, with its log dialog. */
-export function CellMenu({ target, url }: { target: CellTarget; url: string | null }) {
+const PairLogContext = createContext<((target: CellTarget) => void) | null>(null);
+
+/**
+ * Owns the "View log" dialog for every cell. It lives above the grid on purpose: a server
+ * action's response can refresh the page, which rebuilds the table cells, and a dialog kept in
+ * a cell would be unmounted (it flashed open and closed).
+ */
+export function PairLogProvider({ children }: { children: ReactNode }) {
   const t = useTranslations("Compare");
   const tStatus = useTranslations("Builds.check.status");
   const format = useFormatter();
-  const { run } = useServerAction();
   const errorText = useActionErrorText();
+  const [target, setTarget] = useState<CellTarget | null>(null);
   const [logOpen, setLogOpen] = useState(false);
   const [entry, setEntry] = useState<Entry | undefined>(undefined);
   const [logError, setLogError] = useState<string | null>(null);
-  const href = safeShopUrl(url);
 
-  async function openLog() {
-    setLogOpen(true);
-    setEntry(undefined);
-    setLogError(null);
-    try {
-      const res = await pairLog({
-        buildId: target.buildId,
-        productId: target.productId,
-        merchantId: target.merchantId,
-      });
-      if (res.ok) setEntry(res.data.entry);
-      else setLogError(errorText(res.error, res.meta));
-    } catch {
-      setLogError(errorText("generic"));
-    }
-  }
+  const openLog = useCallback(
+    async (next: CellTarget) => {
+      setTarget(next);
+      setLogOpen(true);
+      setEntry(undefined);
+      setLogError(null);
+      try {
+        const res = await pairLog({
+          buildId: next.buildId,
+          productId: next.productId,
+          merchantId: next.merchantId,
+        });
+        if (res.ok) setEntry(res.data.entry);
+        else setLogError(errorText(res.error, res.meta));
+      } catch {
+        setLogError(errorText("generic"));
+      }
+    },
+    [errorText],
+  );
+
+  return (
+    <PairLogContext.Provider value={(next) => void openLog(next)}>
+      {children}
+      {target && (
+        <Dialog open={logOpen} onOpenChange={setLogOpen}>
+          <DialogContent className="max-w-2xl" onCloseAutoFocus={(e) => e.preventDefault()}>
+            <DialogHeader>
+              <DialogTitle>{t("log.title", { merchant: target.merchantName })}</DialogTitle>
+              <DialogDescription>{target.productName}</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 text-sm" aria-live="polite">
+              {logError ? (
+                <p className="text-destructive">{logError}</p>
+              ) : entry === undefined ? (
+                <p className="text-muted-foreground">…</p>
+              ) : entry === null ? (
+                <p className="text-muted-foreground">{t("log.empty")}</p>
+              ) : (
+                <>
+                  <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+                    <dt className="text-muted-foreground">{t("log.status")}</dt>
+                    <dd>{tStatus(entry.status as "ok")}</dd>
+                    {entry.message && (
+                      <>
+                        <dt className="text-muted-foreground">{t("log.message")}</dt>
+                        <dd className="break-words">{entry.message}</dd>
+                      </>
+                    )}
+                    {entry.createdAt != null && (
+                      <>
+                        <dt className="text-muted-foreground">{t("log.when")}</dt>
+                        <dd>
+                          {format.dateTime(new Date(entry.createdAt), {
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                          })}
+                        </dd>
+                      </>
+                    )}
+                  </dl>
+                  <pre className="bg-muted max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-[4px] p-3 text-xs">
+                    {entry.log || t("log.noLog")}
+                  </pre>
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </PairLogContext.Provider>
+  );
+}
+
+/** The "..." menu of one product x merchant cell. */
+export function CellMenu({ target, url }: { target: CellTarget; url: string | null }) {
+  const t = useTranslations("Compare");
+  const { run } = useServerAction();
+  const openLog = useContext(PairLogContext);
+  const href = safeShopUrl(url);
+  // The raw scrape trace is an admin diagnostic.
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === "admin";
 
   return (
     <>
-      <DropdownMenu>
+      {/*
+        Non-modal: a modal menu hands focus back to its trigger as it closes, which a dialog
+        opened from one of its items reads as "focus moved outside" and closes right away.
+      */}
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
@@ -118,53 +195,11 @@ export function CellMenu({ target, url }: { target: CellTarget; url: string | nu
           >
             {t("menu.check")}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => void openLog()}>{t("menu.log")}</DropdownMenuItem>
+          {isAdmin && openLog && (
+            <DropdownMenuItem onSelect={() => openLog(target)}>{t("menu.log")}</DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <Dialog open={logOpen} onOpenChange={setLogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{t("log.title", { merchant: target.merchantName })}</DialogTitle>
-            <DialogDescription>{target.productName}</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-3 text-sm" aria-live="polite">
-            {logError ? (
-              <p className="text-destructive">{logError}</p>
-            ) : entry === undefined ? (
-              <p className="text-muted-foreground">…</p>
-            ) : entry === null ? (
-              <p className="text-muted-foreground">{t("log.empty")}</p>
-            ) : (
-              <>
-                <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
-                  <dt className="text-muted-foreground">{t("log.status")}</dt>
-                  <dd>{tStatus(entry.status as "ok")}</dd>
-                  {entry.message && (
-                    <>
-                      <dt className="text-muted-foreground">{t("log.message")}</dt>
-                      <dd className="break-words">{entry.message}</dd>
-                    </>
-                  )}
-                  {entry.createdAt != null && (
-                    <>
-                      <dt className="text-muted-foreground">{t("log.when")}</dt>
-                      <dd>
-                        {format.dateTime(new Date(entry.createdAt), {
-                          dateStyle: "medium",
-                          timeStyle: "short",
-                        })}
-                      </dd>
-                    </>
-                  )}
-                </dl>
-                <pre className="bg-muted max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-[4px] p-3 text-xs">
-                  {entry.log || t("log.noLog")}
-                </pre>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
