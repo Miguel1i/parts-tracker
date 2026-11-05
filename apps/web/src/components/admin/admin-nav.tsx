@@ -1,18 +1,27 @@
 "use client";
 
-import { ClipboardCheck, History, Package, Store, Users, type LucideIcon } from "lucide-react";
+import {
+  Activity,
+  ClipboardCheck,
+  History,
+  Package,
+  Store,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
-export type AdminSection = "users" | "merchants" | "catalog" | "review" | "audit";
+export type AdminSection = "users" | "merchants" | "catalog" | "review" | "runs" | "audit";
 
 const sections: { key: AdminSection; icon: LucideIcon }[] = [
   { key: "users", icon: Users },
   { key: "merchants", icon: Store },
   { key: "catalog", icon: Package },
   { key: "review", icon: ClipboardCheck },
+  { key: "runs", icon: Activity },
   { key: "audit", icon: History },
 ];
 

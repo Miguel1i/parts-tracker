@@ -294,7 +294,8 @@
       "catalog": "Catalog",
       "review": "Review queue",
       "audit": "Audit log",
-      "pendingCount": "{count, plural, one {# pending} other {# pending}}"
+      "pendingCount": "{count, plural, one {# pending} other {# pending}}",
+      "runs": "Runs"
     },
     "common": {
       "save": "Save",
@@ -479,6 +480,25 @@
         "outOfStock": "Out of stock",
         "vetoes": "Vetoes: {vetoes}",
         "stats": "Stats"
+      },
+      "healthChart": {
+        "title": "Check results, last 30 days",
+        "description": "Share of each day's checks by outcome. Days without checks are empty.",
+        "viewTable": "View as table",
+        "viewChart": "View as chart",
+        "tableLabel": "Daily check results table",
+        "day": "Day",
+        "legend": "Outcomes (select to show or hide)",
+        "summary": "Stacked bar chart of {total} checks over the last {days} days; {ok} succeeded.",
+        "empty": "No checks recorded for this merchant in the last 30 days.",
+        "noChecks": "No checks",
+        "status": {
+          "ok": "OK",
+          "out_of_stock": "Out of stock",
+          "not_found": "Not found",
+          "blocked": "Blocked",
+          "error": "Error"
+        }
       }
     },
     "catalog": {
@@ -567,7 +587,8 @@
         "identifier": "Identifiers",
         "candidate": "Candidates",
         "invite": "Invites",
-        "settings": "Settings"
+        "settings": "Settings",
+        "run": "Runs"
       },
       "time": "Time",
       "actor": "Actor",
@@ -697,6 +718,80 @@
         "description": "They sign in with it straight away; other devices stay signed in until you sign them out.",
         "label": "New password",
         "help": "At least 8 characters. Tell them over a safe channel."
+      }
+    },
+    "runs": {
+      "title": "Runs",
+      "description": "Every scrape run, scheduled or started by hand.",
+      "detailTitle": "Run details",
+      "back": "Back to runs",
+      "list": "All runs",
+      "empty": "No runs yet",
+      "system": "System",
+      "checkAll": "Check all",
+      "starting": "Starting…",
+      "rerun": "Re-run",
+      "dispatched": "Run started.",
+      "notDispatched": "GitHub dispatch isn't configured here. Run this in the repo to start the run:",
+      "github": "GitHub",
+      "openGithub": "Open on GitHub",
+      "logs": "Pair logs",
+      "noLogs": "No pair logs for this run.",
+      "showLog": "Show log",
+      "logsTruncated": "Showing the first {shown} of {total} logs.",
+      "columns": {
+        "started": "Started",
+        "finished": "Finished",
+        "scope": "Scope",
+        "status": "Status",
+        "trigger": "Trigger",
+        "requestedBy": "Requested by",
+        "duration": "Duration",
+        "stats": "Results",
+        "links": "Links"
+      },
+      "triggers": {
+        "cron": "Scheduled",
+        "manual": "Manual"
+      },
+      "scope": {
+        "all": "Everything",
+        "product": "Product",
+        "merchant": "Merchant",
+        "build": "Build",
+        "legacy": "Legacy import"
+      },
+      "statuses": {
+        "queued": "Queued",
+        "running": "Running",
+        "succeeded": "Succeeded",
+        "failed": "Failed",
+        "cancelled": "Cancelled"
+      },
+      "stats": {
+        "ok": "OK",
+        "blocked": "Blocked",
+        "not_found": "Not found",
+        "review": "Review",
+        "error": "Error"
+      },
+      "cron": {
+        "label": "Scheduled check interval",
+        "option": "{hours, plural, one {Every hour} other {Every # hours}}",
+        "saved": "Interval saved",
+        "hint": "The workflow wakes up hourly and skips the run until this much time has passed since the last scheduled one."
+      },
+      "chart": {
+        "title": "Run duration",
+        "description": "How long each finished run took, from start to finish.",
+        "minutes": "{value} min",
+        "started": "Started",
+        "duration": "Duration",
+        "viewTable": "View as table",
+        "viewChart": "View as chart",
+        "tableLabel": "Run duration table",
+        "summary": "Line chart of the duration of the last {count} runs; the latest took {last} and the longest {max}.",
+        "empty": "No finished runs yet."
       }
     }
   },

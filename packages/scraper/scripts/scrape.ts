@@ -16,6 +16,7 @@ import { parseArgs } from "node:util";
 import { createDb, resolveDatabaseUrl, scrapeRuns } from "@parts/db";
 import { eq } from "@parts/db/orm";
 import { createBrowserSession } from "../src/browser";
+import { decideCronRun, loadCronState } from "../src/cron";
 import { loadRates } from "../src/fx";
 import { plainTransport, SmartFetcher } from "../src/http";
 import { runScrape } from "../src/run";
@@ -70,6 +71,16 @@ if (runId && !Object.keys(scope).length) {
 }
 
 const trigger = args.trigger === "cron" ? "cron" : "manual";
+
+// The workflow fires hourly; app_settings.cronIntervalHours decides which cron runs actually scrape.
+if (trigger === "cron" && !runId) {
+  const decision = decideCronRun({ trigger, now: Date.now(), ...(await loadCronState(db)) });
+  if (decision.skip) {
+    console.log(`cron run skipped: ${decision.reason}`);
+    db.$client.close();
+    process.exit(0);
+  }
+}
 const browser = args["no-browser"] ? null : createBrowserSession({ headless: !args.headed });
 const fetcher = new SmartFetcher({ plain: plainTransport(), browser: browser?.transport ?? null });
 const debugDir = resolve(process.env.INIT_CWD ?? process.cwd(), args["debug-dir"]!);

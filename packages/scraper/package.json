@@ -11,7 +11,8 @@
     "test": "vitest run",
     "scrape": "tsx scripts/scrape.ts",
     "save-page": "tsx scripts/save-page.ts",
-    "browser:install": "playwright install chromium"
+    "browser:install": "playwright install chromium",
+    "cron-gate": "tsx scripts/cron-gate.ts"
   },
   "dependencies": {
     "@parts/core": "workspace:*",

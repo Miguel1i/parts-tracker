@@ -6,8 +6,9 @@ name: Scrape
 
 on:
   schedule:
-    # Every 6 hours, off the hour to avoid the top-of-hour Actions queue.
-    - cron: "17 */6 * * *"
+    # Hourly, off the hour to avoid the top-of-hour Actions queue. The scraper skips a scheduled
+    # run until app_settings.cronIntervalHours (Admin > Runs) has passed since the last one.
+    - cron: "17 * * * *"
   workflow_dispatch:
     inputs:
       productId:
@@ -44,7 +45,7 @@ jobs:
       TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
       TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
     steps:
-      # Until the Turso secrets exist the job is a no-op (a warning, not a failure every 6 h).
+      # Until the Turso secrets exist the job is a no-op (a warning, not a failure every hour).
       - name: Check secrets
         id: secrets
         run: |
@@ -70,24 +71,31 @@ jobs:
       - run: pnpm install --frozen-lockfile
         if: steps.secrets.outputs.ok == 'true'
 
+      # Hourly schedule; app_settings.cronIntervalHours decides which scheduled runs scrape.
+      # Checked before the Chromium install so skipped hours cost only a checkout + install.
+      - name: Cron gate
+        id: gate
+        if: steps.secrets.outputs.ok == 'true' && github.event_name == 'schedule'
+        run: pnpm --filter @parts/scraper cron-gate
+
       - name: Playwright version
         id: pw
-        if: steps.secrets.outputs.ok == 'true'
+        if: steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
         run: echo "version=$(pnpm --filter @parts/scraper exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
 
       - uses: actions/cache@v4
-        if: steps.secrets.outputs.ok == 'true'
+        if: steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
 
       # Downloads Chromium only on a cache miss; the system packages are installed every run.
       - name: Install Chromium
-        if: steps.secrets.outputs.ok == 'true'
+        if: steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
         run: pnpm --filter @parts/scraper exec playwright install --with-deps chromium
 
       - name: Scrape
-        if: steps.secrets.outputs.ok == 'true'
+        if: steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
         env:
           PRODUCT_ID: ${{ inputs.productId }}
           MERCHANT_ID: ${{ inputs.merchantId }}
@@ -107,7 +115,7 @@ jobs:
 
       # Raw HTML of failed fetches, for diagnosing blocks and broken extractors. Never in the DB.
       - uses: actions/upload-artifact@v4
-        if: always() && steps.secrets.outputs.ok == 'true'
+        if: always() && steps.secrets.outputs.ok == 'true' && steps.gate.outputs.run != 'false'
         with:
           name: scrape-debug-${{ github.run_id }}
           path: debug/

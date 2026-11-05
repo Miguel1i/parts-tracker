@@ -294,7 +294,8 @@
       "catalog": "Catálogo",
       "review": "Fila de revisão",
       "audit": "Registo de auditoria",
-      "pendingCount": "{count, plural, one {# pendente} other {# pendentes}}"
+      "pendingCount": "{count, plural, one {# pendente} other {# pendentes}}",
+      "runs": "Execuções"
     },
     "common": {
       "save": "Guardar",
@@ -479,6 +480,25 @@
         "outOfStock": "Sem stock",
         "vetoes": "Vetos: {vetoes}",
         "stats": "Estatísticas"
+      },
+      "healthChart": {
+        "title": "Resultados das verificações, últimos 30 dias",
+        "description": "Proporção das verificações de cada dia por resultado. Os dias sem verificações ficam vazios.",
+        "viewTable": "Ver como tabela",
+        "viewChart": "Ver como gráfico",
+        "tableLabel": "Tabela dos resultados diários",
+        "day": "Dia",
+        "legend": "Resultados (selecione para mostrar ou ocultar)",
+        "summary": "Gráfico de barras empilhadas de {total} verificações nos últimos {days} dias; {ok} com sucesso.",
+        "empty": "Sem verificações registadas para este comerciante nos últimos 30 dias.",
+        "noChecks": "Sem verificações",
+        "status": {
+          "ok": "OK",
+          "out_of_stock": "Sem stock",
+          "not_found": "Não encontrado",
+          "blocked": "Bloqueado",
+          "error": "Erro"
+        }
       }
     },
     "catalog": {
@@ -567,7 +587,8 @@
         "identifier": "Identificadores",
         "candidate": "Candidatos",
         "invite": "Convites",
-        "settings": "Definições"
+        "settings": "Definições",
+        "run": "Execuções"
       },
       "time": "Hora",
       "actor": "Autor",
@@ -697,6 +718,80 @@
         "description": "Pode usá-la de imediato; os outros dispositivos mantêm a sessão até a terminar.",
         "label": "Nova palavra-passe",
         "help": "Pelo menos 8 caracteres. Comunique-a por um canal seguro."
+      }
+    },
+    "runs": {
+      "title": "Execuções",
+      "description": "Todas as execuções de recolha, agendadas ou iniciadas manualmente.",
+      "detailTitle": "Detalhes da execução",
+      "back": "Voltar às execuções",
+      "list": "Todas as execuções",
+      "empty": "Ainda não há execuções",
+      "system": "Sistema",
+      "checkAll": "Verificar tudo",
+      "starting": "A iniciar…",
+      "rerun": "Executar de novo",
+      "dispatched": "Execução iniciada.",
+      "notDispatched": "O envio para o GitHub não está configurado aqui. Execute isto no repositório para iniciar a execução:",
+      "github": "GitHub",
+      "openGithub": "Abrir no GitHub",
+      "logs": "Registos por par",
+      "noLogs": "Sem registos por par nesta execução.",
+      "showLog": "Mostrar registo",
+      "logsTruncated": "A mostrar os primeiros {shown} de {total} registos.",
+      "columns": {
+        "started": "Início",
+        "finished": "Fim",
+        "scope": "Âmbito",
+        "status": "Estado",
+        "trigger": "Origem",
+        "requestedBy": "Pedida por",
+        "duration": "Duração",
+        "stats": "Resultados",
+        "links": "Ligações"
+      },
+      "triggers": {
+        "cron": "Agendada",
+        "manual": "Manual"
+      },
+      "scope": {
+        "all": "Tudo",
+        "product": "Produto",
+        "merchant": "Comerciante",
+        "build": "Montagem",
+        "legacy": "Importação antiga"
+      },
+      "statuses": {
+        "queued": "Em fila",
+        "running": "A decorrer",
+        "succeeded": "Concluída",
+        "failed": "Falhou",
+        "cancelled": "Cancelada"
+      },
+      "stats": {
+        "ok": "OK",
+        "blocked": "Bloqueado",
+        "not_found": "Não encontrado",
+        "review": "Revisão",
+        "error": "Erro"
+      },
+      "cron": {
+        "label": "Intervalo das verificações agendadas",
+        "option": "{hours, plural, one {Todas as horas} other {A cada # horas}}",
+        "saved": "Intervalo guardado",
+        "hint": "O fluxo de trabalho acorda de hora a hora e ignora a execução até ter passado este tempo desde a última agendada."
+      },
+      "chart": {
+        "title": "Duração das execuções",
+        "description": "Quanto tempo demorou cada execução concluída, do início ao fim.",
+        "minutes": "{value} min",
+        "started": "Início",
+        "duration": "Duração",
+        "viewTable": "Ver como tabela",
+        "viewChart": "Ver como gráfico",
+        "tableLabel": "Tabela da duração das execuções",
+        "summary": "Gráfico de linhas da duração das últimas {count} execuções; a mais recente demorou {last} e a mais longa {max}.",
+        "empty": "Ainda não há execuções concluídas."
       }
     }
   },

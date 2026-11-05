@@ -21,6 +21,7 @@ const ENTITIES = [
   "candidate",
   "invite",
   "settings",
+  "run",
 ] as const;
 type Entity = (typeof ENTITIES)[number];
 
