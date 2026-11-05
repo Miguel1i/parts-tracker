@@ -8,10 +8,14 @@ import { ownedBuild } from "@/lib/builds/access";
 
 const id = z.string().min(1).max(100);
 
-/** The latest scrape log of one pair of an owned build (null when it was never checked). */
+/**
+ * The latest scrape log of one pair of an owned build (null when it was never checked).
+ * Admins only: it's the scraper's raw trace, a diagnostic tool, not user-facing information.
+ */
 export const pairLog = userAction(
   z.object({ buildId: id, productId: id, merchantId: id }),
-  async (input, { actor }) => {
+  async (input, { actor, isAdmin }) => {
+    if (!isAdmin) throw new ActionError("notFound");
     const db = getDb();
     await ownedBuild(db, input.buildId, actor.id);
     const [item] = await db

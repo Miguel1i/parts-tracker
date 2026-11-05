@@ -14,7 +14,7 @@ import {
   products,
   userMerchants,
 } from "./schema";
-import { LEGACY_MERCHANTS } from "./seed-data";
+import { LEGACY_MERCHANTS, STOREFRONT_APIS } from "./seed-data";
 
 export { LEGACY_ADMIN_USER_ID } from "./admin";
 export const LEGACY_BUILD_NAME = "Legacy build";
@@ -68,6 +68,7 @@ export async function seed(db: Db) {
   return db.transaction(async (tx) => {
     await ensureSettings(tx);
     const { inserted, updated } = await upsertMerchants(tx, plan.merchants);
+    await applyStorefrontApis(tx);
     return { inserted, updated };
   });
 }
@@ -253,4 +254,30 @@ export async function countRows(db: Db) {
   const out: Record<string, number> = {};
   for (const [name, table] of Object.entries(tables)) out[name] = await db.$count(table);
   return out;
+}
+
+/** Adds the known storefront API settings to merchants that don't have one yet. */
+async function applyStorefrontApis(tx: Tx) {
+  const rows = await tx
+    .select({
+      id: merchants.id,
+      baseUrl: merchants.baseUrl,
+      adapterConfig: merchants.adapterConfig,
+    })
+    .from(merchants);
+  for (const row of rows) {
+    let host = "";
+    try {
+      host = new URL(row.baseUrl).host;
+    } catch {
+      continue;
+    }
+    const api = STOREFRONT_APIS[host];
+    const config = row.adapterConfig ?? {};
+    if (!api || config.saleor) continue;
+    await tx
+      .update(merchants)
+      .set({ adapterConfig: { ...config, ...api } })
+      .where(eq(merchants.id, row.id));
+  }
 }

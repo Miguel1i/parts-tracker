@@ -43,6 +43,13 @@
       "when": 1793892321602,
       "tag": "0005_log_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1793913037259,
+      "tag": "0006_pcdiga_saleor",
+      "breakpoints": true
     }
   ]
 }

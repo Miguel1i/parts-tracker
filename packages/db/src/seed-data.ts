@@ -79,3 +79,16 @@ export const LEGACY_MERCHANTS: Record<string, LegacyMerchant> = {
     currency: "GBP",
   },
 };
+
+/**
+ * Shops whose public storefront API the scraper uses instead of their (bot-walled) HTML,
+ * by base-URL host. Applied by `seed` and by migration 0006 (for existing databases).
+ */
+export const STOREFRONT_APIS: Record<string, { saleor: { endpoint: string; channel: string } }> = {
+  "www.pcdiga.com": {
+    saleor: {
+      endpoint: "https://pcdiga-prod.eu.saleor.cloud/graphql/",
+      channel: "default-channel",
+    },
+  },
+};

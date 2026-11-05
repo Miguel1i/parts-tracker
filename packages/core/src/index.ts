@@ -20,3 +20,12 @@ export type { HostProfile, Selectors, SellerConfig } from "./extract/hosts";
 export { catalogKey, parsePcpp, pcppQuery } from "./catalog";
 export type { PcppItem } from "./catalog";
 export { hostOf, slugText } from "./match/url";
+export {
+  saleorOffer,
+  saleorProductBody,
+  saleorProductNode,
+  saleorSearchBody,
+  saleorSearchNodes,
+  saleorSlugFromUrl,
+} from "./extract/saleor";
+export type { SaleorConfig, SaleorNode } from "./extract/saleor";

@@ -10,6 +10,12 @@ import {
   matchOffer,
   nextAutoUrlState,
   prefilterLinks,
+  saleorOffer,
+  saleorProductBody,
+  saleorProductNode,
+  saleorSearchBody,
+  saleorSearchNodes,
+  saleorSlugFromUrl,
   selectBestOffer,
   type ExtractOptions,
   type FxRates,
@@ -17,11 +23,20 @@ import {
   type MatchMerchant,
   type MatchTarget,
   type Offer,
+  type SaleorConfig,
 } from "@parts/core";
 import type { AdapterConfig, LastMatch, ScrapeStatus } from "@parts/db";
 import type { FetchResult, PageFetcher } from "./http";
 import { clampLimits } from "./limiter";
 import { amazonProductUrl, buildSearchUrl, isAmazonHost, searchQueries } from "./queries";
+
+/** A valid `adapterConfig.saleor` (https endpoint + channel), or null. */
+export function saleorConfig(adapter: AdapterConfig): SaleorConfig | null {
+  const c = adapter.saleor as Partial<SaleorConfig> | undefined;
+  if (!c || typeof c.endpoint !== "string" || typeof c.channel !== "string") return null;
+  if (!/^https:\/\//i.test(c.endpoint) || !c.channel.trim()) return null;
+  return { endpoint: c.endpoint, channel: c.channel.trim() };
+}
 
 export interface PairMerchant {
   id: string;
@@ -138,6 +153,40 @@ export async function scrapePair(
   };
   const usable = (r: FetchResult) => !r.blocked && r.status > 0 && r.status < 400;
 
+  /*
+   * Shops with a public Saleor storefront API (adapterConfig.saleor): product lookups and
+   * searches go to the API instead of the HTML pages, which may sit behind a bot wall. Same
+   * per-host throttle; a failed call counts like a failed fetch.
+   */
+  const saleor = fetcher.postJson ? saleorConfig(merchant.adapterConfig) : null;
+  const site = (() => {
+    try {
+      return new URL(merchant.baseUrl).origin;
+    } catch {
+      return merchant.baseUrl;
+    }
+  })();
+  const callApi = async (body: unknown, what: string): Promise<unknown> => {
+    const r = await fetcher.postJson!(saleor!.endpoint, body, { limits });
+    requests += r.attempts;
+    const tag = `api ${r.status || "ERR"} ${(r.ms / 1000).toFixed(1)}s`;
+    const errors = (r.json as { errors?: { message?: string }[] } | undefined)?.errors;
+    if (r.status === 0 || r.status >= 400 || r.json === undefined || errors?.length) {
+      if (r.status === 403 || r.status === 429) {
+        blockedFetches++;
+        lastBlock = `api ${r.status}`;
+      } else {
+        errorFetches++;
+        lastError = r.error ?? errors?.[0]?.message ?? `API HTTP ${r.status}`;
+      }
+      log(`  ✗ ${tag} ${lastError || lastBlock} ${what}`);
+      return undefined;
+    }
+    okFetches++;
+    log(`  · ${tag} ${what}`);
+    return r.json;
+  };
+
   const describe = (d: MatchDecision) =>
     `${d.decision} ${d.score}${d.vetoes.length ? ` veto ${d.vetoes.join(",")}` : ""} sim ${d.similarity.toFixed(2)}`;
 
@@ -147,6 +196,27 @@ export async function scrapePair(
     via: Scored["via"],
     pinned = false,
   ): Promise<Scored | null> => {
+    if (saleor) {
+      const slug = saleorSlugFromUrl(url);
+      if (!slug) {
+        log(`  ✗ no product slug in ${url}`);
+        return null;
+      }
+      const node = saleorProductNode(
+        await callApi(saleorProductBody(saleor, slug), `product ${slug}`),
+      );
+      if (node === undefined) return null;
+      if (node === null) {
+        log("  → the shop has no product with this slug any more");
+        return null;
+      }
+      const offer = saleorOffer(node, site);
+      const decision = matchOffer(target, offer, mm, { pinned });
+      const price = offer.price ? `${offer.price.eur.toFixed(2)}€` : "no price";
+      log(`  → ${describe(decision)} | ${price} ${offer.stock} | ${offer.title ?? "(no title)"}`);
+      if (decision.warning) log(`  ⚠ pinned URL: the rules say ${decision.ruleDecision}`);
+      return { offer, decision, via };
+    }
     let r = await fetchPage(url, false);
     if (!usable(r)) return null;
     let offer = extractProductPage(r.html, r.finalUrl, extractOpts);
@@ -247,7 +317,27 @@ export async function scrapePair(
   }
 
   // 4. Search: GTIN → MPN → text, stopping at the first accept.
-  for (const query of accepts.length ? [] : searchQueries(target)) {
+  if (saleor) {
+    for (const query of accepts.length ? [] : searchQueries(target)) {
+      log(`search ${query.kind} "${query.q}" (api)`);
+      const nodes = saleorSearchNodes(await callApi(saleorSearchBody(saleor, query.q), "search"));
+      if (!nodes) {
+        if (blockedFetches) break;
+        continue;
+      }
+      log(`  ${nodes.length} products`);
+      for (const node of nodes) {
+        const offer = saleorOffer(node, site);
+        if (seen.has(offer.canonicalUrl)) continue;
+        seen.add(offer.canonicalUrl);
+        const decision = matchOffer(target, offer, mm);
+        log(`  product → ${describe(decision)} | ${offer.title}`);
+        consider({ offer, decision, via: "search" });
+      }
+      if (accepts.length) break;
+    }
+  }
+  for (const query of accepts.length || saleor ? [] : searchQueries(target)) {
     const url = buildSearchUrl(merchant.searchTemplate, query.q);
     log(`search ${query.kind} "${query.q}"`);
     let r = await fetchPage(url, memo.jsSearch.has(merchant.id));

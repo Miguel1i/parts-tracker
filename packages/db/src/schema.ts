@@ -190,6 +190,8 @@ export type AdapterConfig = {
   };
   /** JSON/search API endpoint used instead of HTML search, if the shop has one. */
   apiEndpoint?: string;
+  /** Public Saleor storefront API (GraphQL) used instead of the shop's HTML pages. */
+  saleor?: { endpoint: string; channel: string };
   /** "Sold by the shop" rule, used when `ownOnly` is set (see docs/matching.md §7). */
   sellerRule?: {
     /** Seller names that mean "the shop itself", e.g. ["Worten"] or ["Amazon", "Amazon EU S.à r.l."]. */

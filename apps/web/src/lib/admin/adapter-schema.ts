@@ -14,6 +14,16 @@ export const adapterConfigSchema = z.looseObject({
     })
     .optional(),
   apiEndpoint: optStr,
+  // Public Saleor storefront API used instead of the shop's HTML (set under "Other overrides").
+  saleor: z
+    .strictObject({
+      endpoint: z
+        .string()
+        .trim()
+        .regex(/^https:\/\//, "saleor.endpoint must be an https URL"),
+      channel: z.string().trim().min(1),
+    })
+    .optional(),
   sellerRule: z
     .strictObject({
       ownNames: z.array(z.string().trim().min(1)).optional(),
