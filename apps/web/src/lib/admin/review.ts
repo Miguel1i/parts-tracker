@@ -1,4 +1,4 @@
-import { normalizeGtin } from "@parts/core";
+import { canonicalUrl, normalizeGtin } from "@parts/core";
 
 export type PageIdentifiers = {
   gtins?: string[];
@@ -43,4 +43,27 @@ export function identifiersToConfirm(
 /** The shop-side ID stored on a blocklist row: ASIN first, then SKU. */
 export function blocklistExternalId(page: PageIdentifiers | null | undefined): string | null {
   return page?.asin?.trim() || page?.sku?.trim() || null;
+}
+
+function sameUrl(a: string | null | undefined, b: string): boolean {
+  if (!a) return false;
+  return a === b || canonicalUrl(a) === canonicalUrl(b);
+}
+
+/**
+ * Which pinned URLs of a (product, merchant) pair a rejected candidate invalidates: those equal
+ * to the candidate URL after canonical normalisation. Returns null when nothing changes.
+ */
+export function urlsToClear(
+  pair: { manualUrl: string | null; autoUrl: string | null },
+  candidateUrl: string,
+): { manualUrl?: null; autoUrl?: null } | null {
+  const patch: { manualUrl?: null; autoUrl?: null } = {};
+  if (sameUrl(pair.manualUrl, candidateUrl)) patch.manualUrl = null;
+  if (sameUrl(pair.autoUrl, candidateUrl)) patch.autoUrl = null;
+  return Object.keys(patch).length ? patch : null;
+}
+
+export function isReport(signals: { stage?: string } | null | undefined): boolean {
+  return signals?.stage === "report";
 }

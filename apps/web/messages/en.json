@@ -26,7 +26,87 @@
     "profile": "Profile & settings",
     "admin": "Admin",
     "signOut": "Sign out",
-    "pending": "Awaiting approval"
+    "pending": "Awaiting approval",
+    "settings": {
+      "title": "Profile & settings",
+      "description": "Your profile, security, preferences and data.",
+      "profile": {
+        "title": "Profile",
+        "description": "How you appear in Parts Tracker.",
+        "name": "Display name",
+        "username": "Username",
+        "usernameHint": "3 to 30 characters: letters, numbers, underscore and dot.",
+        "save": "Save profile",
+        "saved": "Profile saved."
+      },
+      "email": {
+        "title": "Email",
+        "description": "Your email is {email}. Enter your password to change it.",
+        "newEmail": "New email",
+        "currentPassword": "Current password",
+        "save": "Change email",
+        "saved": "Email changed."
+      },
+      "password": {
+        "title": "Password",
+        "description": "Choose a new password for signing in.",
+        "current": "Current password",
+        "new": "New password",
+        "hint": "At least 8 characters.",
+        "confirm": "Confirm new password",
+        "mismatch": "The passwords don't match.",
+        "revokeOthers": "Sign out of my other devices",
+        "save": "Change password",
+        "saved": "Password changed."
+      },
+      "sessions": {
+        "title": "Sessions",
+        "description": "Devices where you're signed in.",
+        "unknownDevice": "Unknown device",
+        "thisDevice": "This device",
+        "created": "signed in {date}",
+        "lastActive": "active {date}",
+        "revoke": "Sign out",
+        "revoked": "Device signed out.",
+        "revokeOthers": "Sign out everywhere else",
+        "revokedOthers": "Signed out of your other devices."
+      },
+      "preferences": {
+        "title": "Preferences",
+        "description": "Language, appearance and prices.",
+        "language": "Language",
+        "theme": "Theme",
+        "themeLight": "Light",
+        "themeDark": "Dark",
+        "themeSystem": "System",
+        "defaultBuild": "Default build",
+        "noDefaultBuild": "None",
+        "withShipping": "Show prices with shipping",
+        "withShippingHint": "Add each merchant's shipping cost to the price.",
+        "save": "Save preferences",
+        "saved": "Preferences saved.",
+        "merchants": "Merchants to compare",
+        "merchantsHint": "Untick the shops you don't want in your comparisons.",
+        "noMerchants": "No merchants available.",
+        "saveMerchants": "Save merchants",
+        "merchantsSaved": "Merchants saved."
+      },
+      "privacy": {
+        "title": "Privacy",
+        "description": "Your data is yours.",
+        "exportTitle": "Export my data",
+        "exportBody": "Download your profile, preferences, merchant choices and builds as a JSON file.",
+        "export": "Export data",
+        "deleteTitle": "Delete account",
+        "deleteBody": "Permanently removes your account, builds and preferences. Shared catalog data stays.",
+        "delete": "Delete account",
+        "confirmTitle": "Delete your account?",
+        "confirmBody": "This can't be undone. Enter your password to confirm.",
+        "password": "Password",
+        "cancel": "Cancel",
+        "confirm": "Delete permanently"
+      }
+    }
   },
   "Locale": {
     "change": "Change language"
@@ -54,12 +134,155 @@
     }
   },
   "Builds": {
-    "title": "Builds",
-    "description": "Your part lists and their total over time.",
+    "title": "My builds",
+    "description": "Your part lists, with the current best price for each part.",
     "empty": {
       "title": "No builds yet",
-      "body": "Creating builds needs an account; sign-in arrives with the auth milestone."
-    }
+      "body": "Create a build, then add parts from the catalog, a shop link or a PCPartPicker list."
+    },
+    "new": "New build",
+    "back": "All builds",
+    "items": {
+      "part": "Part",
+      "quantity": "Qty",
+      "quantityOf": "Quantity of {name}",
+      "bestPrice": "Best price",
+      "lineTotal": "Total",
+      "actions": "Actions",
+      "total": "Build total",
+      "missing": "{count, plural, one {# part has no price} other {# parts have no price}}",
+      "noPrice": "No price yet",
+      "withShipping": "incl. {amount} shipping",
+      "checked": "checked {when}",
+      "bought": "Bought",
+      "menu": "Actions for {name}",
+      "markBought": "Mark as bought",
+      "editBought": "Edit purchase",
+      "clearBought": "Mark as not bought",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "remove": "Remove from build",
+      "removed": "Part removed.",
+      "boughtDialog": {
+        "title": "Bought",
+        "price": "Price paid (EUR)",
+        "merchant": "Shop",
+        "noMerchant": "Not specified",
+        "date": "Date",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saved": "Purchase saved."
+      },
+      "report": {
+        "action": "Report wrong match",
+        "title": "Report a wrong match",
+        "body": "Tell us that the offer shown for \"{name}\" at {merchant} is a different product. An admin will review it.",
+        "reason": "What's wrong? (optional)",
+        "reasonPlaceholder": "e.g. this is the OEM tray version",
+        "cancel": "Cancel",
+        "submit": "Send report",
+        "sent": "Thanks, the report was sent."
+      }
+    },
+    "public": "Public",
+    "missing": "{count, plural, one {# part has no price yet} other {# parts have no price yet}}",
+    "menu": "Actions for {name}",
+    "create": {
+      "title": "New build",
+      "description": "Give your build a name. You can change it later.",
+      "submit": "Create"
+    },
+    "rename": {
+      "menu": "Rename",
+      "title": "Rename build",
+      "submit": "Save",
+      "done": "Build renamed."
+    },
+    "delete": {
+      "menu": "Delete",
+      "title": "Delete \"{name}\"?",
+      "body": "The build and its parts list are removed for good. Catalog products and their prices stay.",
+      "confirm": "Delete build",
+      "done": "Build deleted."
+    },
+    "nameDialog": {
+      "name": "Name",
+      "placeholder": "e.g. Gaming PC 2026",
+      "cancel": "Cancel"
+    },
+    "detail": {
+      "withShipping": "Cheapest in-stock prices, shipping included",
+      "withoutShipping": "Cheapest in-stock prices, shipping not included",
+      "empty": {
+        "title": "No parts yet",
+        "body": "Use the panel below to add parts."
+      }
+    },
+    "check": {
+      "button": "Check now",
+      "running": "Checking…",
+      "queued": "Queued. Waiting for the checker to start…",
+      "progress": "{count, plural, =0 {Checking prices…} one {# offer checked so far…} other {# offers checked so far…}}",
+      "summary": "{count, plural, one {Done. # offer checked.} other {Done. # offers checked.}}",
+      "failed": "The check failed. Try again later.",
+      "cancelled": "The check was cancelled.",
+      "done": "Prices updated.",
+      "error": "Couldn't start the check.",
+      "gaveUp": "Still waiting after 15 minutes. Reload the page later to see new prices.",
+      "localCommand": "Not dispatched; run locally:",
+      "details": "Results per shop",
+      "status": {
+        "ok": "price found",
+        "out_of_stock": "out of stock",
+        "not_found": "not found",
+        "blocked": "blocked by the shop",
+        "error": "error"
+      }
+    },
+    "add": {
+      "title": "Add parts",
+      "description": "Search the catalog, paste a shop link, or import a PCPartPicker list.",
+      "search": {
+        "tab": "Catalog",
+        "label": "Search the catalog",
+        "placeholder": "Search by name, e.g. Ryzen 7 9800X3D",
+        "none": "Nothing in the catalog matches. Try a shop link instead.",
+        "add": "Add",
+        "addNamed": "Add {name}",
+        "added": "Part added."
+      },
+      "url": {
+        "tab": "Shop link",
+        "url": "Link to the product page",
+        "name": "Product name",
+        "nameHint": "We don't open the link. Type the real product name so it can be matched.",
+        "gtin": "Barcode (EAN/GTIN, optional)",
+        "submit": "Add to build",
+        "created": "New product added to the catalog and the build.",
+        "existing": "Matched a product already in the catalog and added it."
+      },
+      "import": {
+        "tab": "PCPartPicker",
+        "label": "Pasted list",
+        "placeholder": "CPU  AMD Ryzen 7 9800X3D  €449,00",
+        "hint": "Paste the parts list from PCPartPicker (Markdown or the plain table).",
+        "replace": "Replace the parts not yet bought",
+        "submit": "Import",
+        "done": "{added, plural, =0 {No new products} one {# new product} other {# new products}} created, {matched, plural, =0 {none} one {# part} other {# parts}} matched in the catalog."
+      }
+    },
+    "share": {
+      "title": "Share",
+      "description": "Anyone with the link can see this build read-only. It never shows your account.",
+      "public": "Anyone with the link can view",
+      "link": "Share link",
+      "copy": "Copy link",
+      "copied": "Link copied.",
+      "reset": "Create a new link",
+      "resetDone": "New link created. The old one no longer works.",
+      "resetHint": "Creating a new link stops the old one from working."
+    },
+    "count": "{count, plural, one {# part} other {# parts}}"
   },
   "Admin": {
     "title": "Admin",
@@ -318,7 +541,19 @@
       "approve": "Approve",
       "reject": "Reject",
       "approved": "Candidate approved",
-      "rejected": "Candidate rejected and blocklisted"
+      "rejected": "Candidate rejected and blocklisted",
+      "candidates": "Match candidates",
+      "reports": {
+        "heading": "Reported by users",
+        "by": "Reported by {name}",
+        "unknownUser": "a user",
+        "noReason": "No reason given.",
+        "reportedOffer": "Reported offer",
+        "confirm": "Confirm wrong",
+        "dismiss": "Dismiss",
+        "confirmed": "Confirmed as wrong match and blocklisted",
+        "dismissed": "Report dismissed"
+      }
     },
     "audit": {
       "title": "Audit log",
@@ -463,21 +698,6 @@
         "label": "New password",
         "help": "At least 8 characters. Tell them over a safe channel."
       }
-    },
-    "errors": {
-      "generic": "Something went wrong. Try again.",
-      "invalid": "Some values aren't valid.",
-      "notFound": "It no longer exists. Reload the page.",
-      "self": "You can't do that to your own account.",
-      "emailMismatch": "The email doesn't match.",
-      "userExists": "A user with that email already exists.",
-      "slugTaken": "That slug is already used.",
-      "nameTaken": "That name is already used.",
-      "duplicate": "A merchant with that name or slug already exists.",
-      "invalidAdapter": "The adapter settings aren't valid.",
-      "hasHistory": "This merchant has price history, which is kept for good. Disable it instead.",
-      "alreadyDecided": "Someone already decided on this candidate.",
-      "dispatchFailed": "GitHub didn't accept the run. Check GH_DISPATCH_TOKEN and GH_REPO."
     }
   },
   "NotFound": {
@@ -527,5 +747,45 @@
       "cta": "Create your account",
       "footer": "If you weren't expecting this, you can ignore this email."
     }
+  },
+  "Errors": {
+    "generic": "Something went wrong. Try again.",
+    "invalid": "Some values aren't valid.",
+    "notFound": "It no longer exists. Reload the page.",
+    "self": "You can't do that to your own account.",
+    "emailMismatch": "The email doesn't match.",
+    "userExists": "A user with that email already exists.",
+    "slugTaken": "That slug is already used.",
+    "nameTaken": "That name is already used.",
+    "duplicate": "A merchant with that name or slug already exists.",
+    "invalidAdapter": "The adapter settings aren't valid.",
+    "hasHistory": "This merchant has price history, which is kept for good. Disable it instead.",
+    "alreadyDecided": "Someone already decided on this candidate.",
+    "dispatchFailed": "GitHub didn't accept the run. Check GH_DISPATCH_TOKEN and GH_REPO.",
+    "rateLimited": "You checked recently. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
+    "unknownMerchant": "That shop isn't one of the tracked merchants.",
+    "badUrl": "That isn't a valid shop link (http or https).",
+    "wrongPassword": "Wrong password.",
+    "emailTaken": "Another account already uses that email.",
+    "usernameTaken": "That username is taken.",
+    "lastAdmin": "You're the only admin; make someone else an admin first.",
+    "alreadyReported": "This offer was already reported and is waiting for review.",
+    "nothingToCheck": "Prices were checked moments ago, so there's nothing to refresh yet.",
+    "importEmpty": "No parts found in the pasted list.",
+    "importTooLarge": "That list is too long: import at most {max} parts at a time.",
+    "emptyBuild": "This build has no parts to check yet.",
+    "noMerchants": "You haven't selected any shops to compare. Choose some in Profile & settings."
+  },
+  "Share": {
+    "sharedBy": "Shared by {name}",
+    "empty": "This build has no parts yet.",
+    "product": "Part",
+    "quantity": "Qty",
+    "price": "Best price",
+    "lineTotal": "Total",
+    "total": "Total",
+    "partial": "(some parts have no price)",
+    "noPrice": "No price",
+    "bought": "Bought"
   }
 }

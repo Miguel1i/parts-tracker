@@ -56,11 +56,15 @@ export class ForbiddenError extends Error {
 }
 
 /**
- * An expected failure an admin can act on. `code` is a key under `Admin.errors` in the
- * messages, so the client shows it translated; anything else becomes `generic`.
+ * An expected failure the caller can act on. `code` is a key under `Errors` in the messages,
+ * so the client shows it translated; anything else becomes `generic`. `meta` carries values
+ * for the message (e.g. `retryAfterSec`).
  */
 export class ActionError extends Error {
-  constructor(readonly code: ActionErrorCode) {
+  constructor(
+    readonly code: ActionErrorCode,
+    readonly meta?: Record<string, string | number>,
+  ) {
     super(code);
     this.name = "ActionError";
   }
@@ -79,33 +83,73 @@ export type ActionErrorCode =
   | "invalidAdapter"
   | "hasHistory"
   | "alreadyDecided"
-  | "dispatchFailed";
+  | "dispatchFailed"
+  | "rateLimited"
+  | "unknownMerchant"
+  | "badUrl"
+  | "wrongPassword"
+  | "emailTaken"
+  | "usernameTaken"
+  | "lastAdmin"
+  | "alreadyReported"
+  | "nothingToCheck"
+  | "importEmpty"
+  | "importTooLarge"
+  | "emptyBuild"
+  | "noMerchants";
 
-export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: ActionErrorCode };
+export type ActionResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: ActionErrorCode; meta?: Record<string, string | number> };
+
+type Handler<S extends z.ZodType, R, C> = (input: z.infer<S>, ctx: C) => Promise<R>;
 
 /**
- * The only way to build an admin Server Action. It re-checks the session on every call
- * (a Server Action is a public POST endpoint, whatever the UI shows) and throws before
- * reading the input when the caller isn't an active admin. Invalid input returns
- * `{ ok: false }` instead of throwing, so forms can show it.
+ * Re-checks the session on every call (a Server Action is a public POST endpoint, whatever
+ * the UI shows) and throws before reading the input when the caller lacks `need`. Invalid
+ * input returns `{ ok: false }` instead of throwing, so forms can show it.
  */
-export function adminAction<S extends z.ZodType, R>(
+function guardedAction<S extends z.ZodType, R>(
+  need: "user" | "admin",
   schema: S,
-  handler: (input: z.infer<S>, ctx: { actor: SessionUser }) => Promise<R>,
+  handler: Handler<S, R, { actor: SessionUser; isAdmin: boolean }>,
 ): (input: z.input<S>) => Promise<ActionResult<R>> {
   return async (input) => {
     const session = await getSession();
-    if (evaluateAccess(session?.user, "admin") !== "ok") throw new ForbiddenError();
+    if (evaluateAccess(session?.user, need) !== "ok") throw new ForbiddenError();
+    const actor = session!.user;
     const parsed = schema.safeParse(input);
     if (!parsed.success) return { ok: false, error: "invalid" };
     try {
-      return { ok: true, data: await handler(parsed.data, { actor: session!.user }) };
+      const isAdmin = evaluateAccess(actor, "admin") === "ok";
+      return { ok: true, data: await handler(parsed.data, { actor, isAdmin }) };
     } catch (e) {
       if (e instanceof ForbiddenError) throw e;
-      if (e instanceof ActionError) return { ok: false, error: e.code };
+      if (e instanceof ActionError) {
+        return { ok: false, error: e.code, ...(e.meta ? { meta: e.meta } : {}) };
+      }
       // Unexpected (DB, network...): log it, but keep internals out of the browser.
-      console.error("[admin action]", e);
+      console.error(`[${need} action]`, e);
       return { ok: false, error: "generic" };
     }
   };
+}
+
+/** The only way to build an admin Server Action: active, unbanned admins only. */
+export function adminAction<S extends z.ZodType, R>(
+  schema: S,
+  handler: Handler<S, R, { actor: SessionUser }>,
+): (input: z.input<S>) => Promise<ActionResult<R>> {
+  return guardedAction("admin", schema, handler);
+}
+
+/**
+ * The only way to build a signed-in user's Server Action: active, unbanned users. The handler
+ * still has to check ownership of whatever it touches (see lib/builds/access.ts).
+ */
+export function userAction<S extends z.ZodType, R>(
+  schema: S,
+  handler: Handler<S, R, { actor: SessionUser; isAdmin: boolean }>,
+): (input: z.input<S>) => Promise<ActionResult<R>> {
+  return guardedAction("user", schema, handler);
 }

@@ -1,10 +1,11 @@
 import "server-only";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin, username } from "better-auth/plugins";
 import { account, appSettings, getDb, invites, session, user, verification } from "@parts/db";
-import { and, eq, gt, isNull } from "@parts/db/orm";
+import { and, eq, gt, isNull, ne } from "@parts/db/orm";
 import { siteUrl } from "@/lib/site-url";
 import { decideSignup, normalizeEmail, usableInvite } from "./signup";
 
@@ -54,6 +55,21 @@ export const auth = betterAuth({
     autoSignIn: true,
   },
   user: {
+    // Account deletion from /account; Better Auth asks for the password. Builds, preferences and
+    // sessions cascade; the shared catalog stays (products.created_by is set to null).
+    deleteUser: {
+      enabled: true,
+      async beforeDelete(deleted) {
+        const u = deleted as typeof deleted & { role?: string };
+        if (u.role !== "admin") return;
+        const others = await getDb().$count(
+          user,
+          and(eq(user.role, "admin"), eq(user.status, "active"), ne(user.id, u.id)),
+        );
+        if (others === 0)
+          throw new APIError("BAD_REQUEST", { message: "lastAdmin", code: "LAST_ADMIN" });
+      },
+    },
     additionalFields: {
       // Set only by the signup hook and admins, never from client input.
       status: { type: "string", input: false, required: false, defaultValue: "pending" },
@@ -102,6 +118,19 @@ export const auth = betterAuth({
         },
       },
     },
+  },
+  hooks: {
+    // Avatars are initials only: nobody sets an image URL (it would be loaded by every viewer).
+    before: createAuthMiddleware(async (ctx) => {
+      if (
+        ctx.path === "/update-user" &&
+        ctx.body &&
+        typeof ctx.body === "object" &&
+        "image" in ctx.body
+      ) {
+        throw new APIError("BAD_REQUEST", { message: "image is not allowed" });
+      }
+    }),
   },
   plugins: [
     admin({ defaultRole: "user", adminRoles: ["admin"] }),

@@ -82,10 +82,11 @@ export function AccountMenu({ side = "bottom" }: { side?: "top" | "bottom" | "ri
             </Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem disabled>
-          <Settings className="size-4" />
-          {t("profile")}
-          <span className="text-muted-foreground ml-auto text-xs">{t("soon")}</span>
+        <DropdownMenuItem asChild>
+          <Link href="/account">
+            <Settings className="size-4" />
+            {t("profile")}
+          </Link>
         </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem asChild>

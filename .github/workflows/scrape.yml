@@ -18,6 +18,10 @@ on:
         description: Merchant id, slug or name (empty = all enabled merchants)
         required: false
         default: ""
+      buildId:
+        description: Build id (empty = not limited to a build)
+        required: false
+        default: ""
       runId:
         description: scrape_runs id created by the web app (empty = create one)
         required: false
@@ -25,7 +29,7 @@ on:
 
 concurrency:
   # One scrape at a time per scope; a queued cron run waits instead of overlapping.
-  group: scrape-${{ inputs.productId || 'all' }}-${{ inputs.merchantId || 'all' }}
+  group: scrape-${{ inputs.productId || 'all' }}-${{ inputs.merchantId || 'all' }}-${{ inputs.buildId || 'all' }}
   cancel-in-progress: false
 
 permissions:
@@ -87,6 +91,7 @@ jobs:
         env:
           PRODUCT_ID: ${{ inputs.productId }}
           MERCHANT_ID: ${{ inputs.merchantId }}
+          BUILD_ID: ${{ inputs.buildId }}
           RUN_ID: ${{ inputs.runId }}
           TRIGGER: ${{ github.event_name == 'schedule' && 'cron' || 'manual' }}
           GH_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -95,6 +100,7 @@ jobs:
           --trigger "$TRIGGER"
           --product "$PRODUCT_ID"
           --merchant "$MERCHANT_ID"
+          --build "$BUILD_ID"
           --run-id "$RUN_ID"
           --gh-run-url "$GH_RUN_URL"
           --debug-dir debug

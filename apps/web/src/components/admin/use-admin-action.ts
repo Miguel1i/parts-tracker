@@ -6,10 +6,17 @@ import { toast } from "sonner";
 import { useRouter } from "@/i18n/navigation";
 import type { ActionErrorCode, ActionResult } from "@/lib/auth/guard";
 
-/** Translates an admin action's error code (Admin.errors.*). */
+/** Translates a Server Action's error code (Errors.*), with its `meta` values. */
 export function useActionErrorText() {
-  const t = useTranslations("Admin.errors");
-  return (code: ActionErrorCode) => (t.has(code) ? t(code) : t("generic"));
+  const t = useTranslations("Errors");
+  return (code: ActionErrorCode, meta?: Record<string, string | number>) => {
+    if (code === "rateLimited") {
+      const minutes = Math.max(1, Math.ceil(Number(meta?.retryAfterSec ?? 60) / 60));
+      return t("rateLimited", { minutes });
+    }
+    if (code === "importTooLarge") return t("importTooLarge", { max: Number(meta?.max ?? 40) });
+    return t.has(code) ? t(code as "generic") : t("generic");
+  };
 }
 
 /**
@@ -30,7 +37,7 @@ export function useAdminAction() {
       try {
         const result = await action();
         if (!result.ok) {
-          toast.error(errorText(result.error));
+          toast.error(errorText(result.error, result.meta));
           return;
         }
         if (opts.success) toast.success(opts.success);
@@ -44,3 +51,6 @@ export function useAdminAction() {
 
   return { pending, run };
 }
+
+/** The same runner for signed-in users' actions. */
+export const useServerAction = useAdminAction;

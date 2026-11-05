@@ -2,6 +2,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  buildItems,
+  builds,
   createDb,
   matchCandidates,
   merchants,
@@ -11,6 +13,7 @@ import {
   products,
   scrapeLogs,
   scrapeRuns,
+  user,
   type Db,
 } from "@parts/db";
 import { runMigrations } from "@parts/db/migrate";
@@ -46,7 +49,7 @@ beforeEach(async () => {
     .returning();
   productId = p!.id;
   await db.insert(productIdentifiers).values(
-    cpu.identifiers.map((i) => ({
+    cpu!.identifiers.map((i) => ({
       productId,
       kind: i.kind,
       value: i.value,
@@ -182,6 +185,48 @@ describe("runScrape", () => {
       status: "succeeded",
       ghRunUrl: "https://github.com/x/y/actions/runs/1",
     });
+  });
+
+  it("scopes a run to the products in a build", async () => {
+    const [other] = await db
+      .insert(products)
+      .values({ name: "Other part", query: "other part", category: "CPU" })
+      .returning();
+    const [u] = await db
+      .insert(user)
+      .values({ id: "u1", name: "U", email: "u@x.test", username: "u1" })
+      .returning();
+    const [b, empty] = await db
+      .insert(builds)
+      .values([
+        { userId: u!.id, name: "B" },
+        { userId: u!.id, name: "Empty" },
+      ])
+      .returning();
+    await db.insert(buildItems).values({ buildId: b!.id, productId });
+
+    const result = await runScrape({
+      db,
+      fetcher: fetcher(),
+      rates: { EUR: 1 },
+      trigger: "cron",
+      scope: { buildId: b!.id },
+    });
+    expect(result.stats).toMatchObject({ pairs: 2 });
+    const logs = await db.select().from(scrapeLogs);
+    expect(logs.every((l) => l.productId === productId)).toBe(true);
+
+    // Intersection with a product outside the build, and a build with no items: nothing runs.
+    for (const scope of [{ buildId: b!.id, productId: other!.id }, { buildId: empty!.id }]) {
+      const r = await runScrape({
+        db,
+        fetcher: fetcher(),
+        rates: { EUR: 1 },
+        trigger: "cron",
+        scope,
+      });
+      expect(r.stats).toMatchObject({ pairs: 0 });
+    }
   });
 
   it("skips disabled pairs and pairs checked recently on manual runs", async () => {

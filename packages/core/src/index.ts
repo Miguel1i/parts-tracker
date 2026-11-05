@@ -17,3 +17,6 @@ export { detectCurrency, readPrice, toEur } from "./extract/price";
 export type { FxRates } from "./extract/price";
 export { HOST_PROFILES } from "./extract/hosts";
 export type { HostProfile, Selectors, SellerConfig } from "./extract/hosts";
+export { catalogKey, parsePcpp, pcppQuery } from "./catalog";
+export type { PcppItem } from "./catalog";
+export { hostOf, slugText } from "./match/url";

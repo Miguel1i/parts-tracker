@@ -318,9 +318,18 @@ export const builds = sqliteTable(
     name: text("name").notNull(),
     notes: text("notes"),
     isPublic: integer("is_public", { mode: "boolean" }).notNull().default(false),
+    /** Unguessable id for the read-only link (/share/<token>); set when first shared. */
+    shareToken: text("share_token"),
     createdAt: createdAt(),
+    // Filled by the app (SQLite can't add a column with an expression default).
+    updatedAt: timestamp("updated_at")
+      .$defaultFn(() => new Date())
+      .$onUpdate(() => new Date()),
   },
-  (t) => [index("builds_user_idx").on(t.userId)],
+  (t) => [
+    index("builds_user_idx").on(t.userId),
+    uniqueIndex("builds_share_token_uq").on(t.shareToken),
+  ],
 );
 
 export const buildItems = sqliteTable(
@@ -340,9 +349,30 @@ export const buildItems = sqliteTable(
       onDelete: "set null",
     }),
   },
-  (t) => [primaryKey({ columns: [t.buildId, t.productId] })],
+  (t) => [
+    primaryKey({ columns: [t.buildId, t.productId] }),
+    index("build_items_product_idx").on(t.productId),
+  ],
 );
 
+export const themes = ["light", "dark", "system"] as const;
+
+/** Per-user settings (1:1 with user). A missing row means the defaults. */
+export const userPreferences = sqliteTable("user_preferences", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  defaultBuildId: text("default_build_id").references(() => builds.id, { onDelete: "set null" }),
+  /** Show prices including the merchant's shipping cost. */
+  priceWithShipping: integer("price_with_shipping", { mode: "boolean" }).notNull().default(true),
+  locale: text("locale"),
+  theme: text("theme", { enum: themes }),
+  updatedAt: updatedAt(),
+});
+
+export type UserPreferences = typeof userPreferences.$inferSelect;
+
+/** Which visible merchants a user compares. A missing row means enabled. */
 export const userMerchants = sqliteTable(
   "user_merchants",
   {
@@ -423,7 +453,10 @@ export const scrapeRuns = sqliteTable(
     ghRunUrl: text("gh_run_url"),
     createdAt: createdAt(),
   },
-  (t) => [index("scrape_runs_created_idx").on(t.createdAt)],
+  (t) => [
+    index("scrape_runs_created_idx").on(t.createdAt),
+    index("scrape_runs_requested_idx").on(t.requestedBy, t.createdAt),
+  ],
 );
 
 /** Append-only price history. Never update or delete rows. */
@@ -459,6 +492,8 @@ export type CandidateSignals = {
   stage?: string;
   /** Identifiers read from the candidate page; Approve confirms them (docs/matching.md §6). */
   page?: { gtins: string[]; mpn?: string; asin?: string; sku?: string; brand?: string };
+  /** Set when a user reported the pair's current offer as a wrong match (stage "report"). */
+  report?: { userId: string; reason?: string; at: number };
   [key: string]: unknown;
 };
 

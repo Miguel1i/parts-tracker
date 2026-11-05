@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { blocklistExternalId, identifiersToConfirm, isHttpUrl } from "./review";
+import {
+  blocklistExternalId,
+  identifiersToConfirm,
+  isHttpUrl,
+  isReport,
+  urlsToClear,
+} from "./review";
 
 describe("isHttpUrl", () => {
   it("accepts only http(s)", () => {
@@ -39,5 +45,29 @@ describe("blocklistExternalId", () => {
     expect(blocklistExternalId({ gtins: [], sku: "S1" })).toBe("S1");
     expect(blocklistExternalId({ gtins: [] })).toBeNull();
     expect(blocklistExternalId(null)).toBeNull();
+  });
+});
+
+describe("urlsToClear", () => {
+  const u = "https://shop.pt/p/1";
+  it("clears the URLs equal to the candidate after normalisation", () => {
+    expect(urlsToClear({ manualUrl: u, autoUrl: null }, u)).toEqual({ manualUrl: null });
+    expect(urlsToClear({ manualUrl: null, autoUrl: u + "#x" }, u)).toEqual({ autoUrl: null });
+    expect(urlsToClear({ manualUrl: u, autoUrl: u }, u)).toEqual({
+      manualUrl: null,
+      autoUrl: null,
+    });
+  });
+  it("leaves different URLs alone", () => {
+    expect(urlsToClear({ manualUrl: "https://shop.pt/p/2", autoUrl: null }, u)).toBeNull();
+    expect(urlsToClear({ manualUrl: null, autoUrl: null }, u)).toBeNull();
+  });
+});
+
+describe("isReport", () => {
+  it("detects report rows", () => {
+    expect(isReport({ stage: "report" })).toBe(true);
+    expect(isReport({ stage: "search" })).toBe(false);
+    expect(isReport(null)).toBe(false);
   });
 });
