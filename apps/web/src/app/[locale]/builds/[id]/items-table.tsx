@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
+import { Link } from "@/i18n/navigation";
 import { useServerAction } from "@/components/admin/use-admin-action";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { Sparkline, sparkLabel } from "@/components/charts/dash-sparkline";
 import type { BuildItemView } from "@/lib/builds/queries";
 import {
   clearBought,
@@ -61,6 +63,17 @@ import {
 } from "./actions";
 
 type Merchant = { id: string; name: string };
+
+function ProductLink({ id, name }: { id: string; name: string }) {
+  return (
+    <Link
+      href={`/products/${id}`}
+      className="break-words font-medium underline-offset-2 hover:underline"
+    >
+      {name}
+    </Link>
+  );
+}
 type Run = ReturnType<typeof useServerAction>["run"];
 
 function Quantity({ buildId, item, run }: { buildId: string; item: BuildItemView; run: Run }) {
@@ -444,14 +457,26 @@ export function ItemsTable({
   merchants,
   total,
   missingPrice,
+  sparks = {},
 }: {
   buildId: string;
   items: BuildItemView[];
   merchants: Merchant[];
   total: number;
   missingPrice: number;
+  /** 30-day best-price trend per product id. */
+  sparks?: Record<string, (number | null)[]>;
 }) {
   const t = useTranslations("Builds.items");
+  const ts = useTranslations("Charts.spark");
+  const trend = (item: BuildItemView) => (
+    <Sparkline
+      values={sparks[item.productId] ?? []}
+      label={`${item.name}. ${sparkLabel(ts, sparks[item.productId] ?? [])}`}
+      width={72}
+      height={22}
+    />
+  );
   const format = useFormatter();
   const { pending, run } = useServerAction();
   const [boughtFor, setBoughtFor] = useState<BuildItemView | null>(null);
@@ -481,13 +506,16 @@ export function ItemsTable({
           <li key={item.productId} className="grid gap-3 rounded-lg border p-3">
             <div className="flex items-start gap-2">
               <div className="min-w-0 flex-1">
-                <p className="break-words font-medium">{item.name}</p>
+                <ProductLink id={item.productId} name={item.name} />
                 <BoughtBadge item={item} merchants={merchants} />
               </div>
               {menu(item, index)}
             </div>
             <div className="flex items-end justify-between gap-3">
-              <Offer item={item} onReport={() => setReporting(item)} />
+              <div className="grid gap-1">
+                <Offer item={item} onReport={() => setReporting(item)} />
+                {trend(item)}
+              </div>
               <div className="grid justify-items-end gap-1">
                 <Quantity buildId={buildId} item={item} run={run} />
                 <span className="text-sm font-medium tabular-nums">{lineTotal(item)}</span>
@@ -519,7 +547,7 @@ export function ItemsTable({
             {items.map((item, index) => (
               <TableRow key={item.productId}>
                 <TableCell className="max-w-72 whitespace-normal align-top">
-                  <span className="break-words font-medium">{item.name}</span>
+                  <ProductLink id={item.productId} name={item.name} />
                   <BoughtBadge item={item} merchants={merchants} />
                 </TableCell>
                 <TableCell className="align-top">
@@ -527,6 +555,7 @@ export function ItemsTable({
                 </TableCell>
                 <TableCell className="align-top">
                   <Offer item={item} onReport={() => setReporting(item)} />
+                  {trend(item)}
                 </TableCell>
                 <TableCell className="text-right align-top tabular-nums">
                   {lineTotal(item)}
