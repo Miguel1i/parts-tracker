@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
+import { ProductThumb } from "@/components/product-thumb";
 import { Link } from "@/i18n/navigation";
 import { cardOrder, type CompareRow } from "@/lib/charts/compare";
 import type { CompareMerchant } from "@/lib/charts/compare-data";
@@ -26,12 +27,15 @@ export function CompareCards({
         <li key={row.productId}>
           <Card>
             <CardContent className="grid gap-2">
-              <Link
-                href={`/products/${row.productId}`}
-                className="break-words font-medium hover:underline"
-              >
-                {row.name}
-              </Link>
+              <div className="flex items-center gap-3">
+                <ProductThumb src={row.image} />
+                <Link
+                  href={`/products/${row.productId}`}
+                  className="break-words font-medium hover:underline"
+                >
+                  {row.name}
+                </Link>
+              </div>
               <ul aria-label={t("cards.label", { product: row.name })} className="grid gap-1">
                 {cardOrder(row, ids).map((id) => {
                   const m = merchants.find((x) => x.id === id)!;

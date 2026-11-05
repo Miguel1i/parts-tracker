@@ -1,10 +1,13 @@
 import { cn } from "@/lib/utils";
 
-/**
- * The Parts Tracker mark: a shop price tag (cut top-left corner) whose punched hole is a square
- * IC pad with two pins, carrying a stepped price trace that steps down — a tag, a chip and a
- * price drop in one glyph. Ink follows `currentColor`; the trace uses the signal colour.
+/*
+ * The Parts Tracker mark: a solid chip (die with three pins top and bottom) carrying a falling
+ * price line that ends in a dot: "parts, watched for price drops". Built on a 32px grid so
+ * it stays crisp as a 16px favicon. Ink follows `currentColor`; the line uses the signal colour.
  */
+const PINS = "M10 2.5v3M16 2.5v3M22 2.5v3M10 26.5v3M16 26.5v3M22 26.5v3";
+const TRACE = "M8.5 11h5l3.5 5h3.5l3 4.5";
+
 export function LogoMark({ className, title }: { className?: string; title?: string }) {
   return (
     <svg
@@ -14,40 +17,34 @@ export function LogoMark({ className, title }: { className?: string; title?: str
       aria-hidden={title ? undefined : true}
       aria-label={title}
     >
-      {/* tag body */}
-      <path d="M11 3h17a1 1 0 0 1 1 1v24a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V11Z" fill="currentColor" />
-      {/* chip pad hole with pins */}
-      <rect x="8" y="8" width="5" height="5" rx="0.6" fill="var(--background)" />
+      <path d={PINS} stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+      <rect x="3.5" y="5.5" width="25" height="21" rx="4.5" fill="currentColor" />
       <path
-        d="M9.5 8V6.4M11.5 8V6.4M8 9.5H6.4M8 11.5H6.4"
-        stroke="var(--background)"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-      />
-      {/* price trace: steps down */}
-      <path
-        d="M8 18.5h6v3.5h5v3h5.5"
+        d={TRACE}
         fill="none"
         stroke="var(--primary)"
-        strokeWidth="2.2"
-        strokeLinecap="square"
-        strokeLinejoin="miter"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <circle cx="24.5" cy="25" r="1.6" fill="var(--primary)" />
+      <circle cx="23.5" cy="20.5" r="2.2" fill="var(--primary)" />
     </svg>
   );
 }
 
-/** Mark + wordmark. `compact` hides the wordmark (collapsed rail). */
+/** Mark + wordmark ("parts" heavy, "tracker" light). `compact` hides the wordmark. */
 export function Logo({ compact = false, className }: { compact?: boolean; className?: string }) {
   return (
     <span className={cn("text-foreground inline-flex items-center gap-2.5", className)}>
       <LogoMark className="size-7" />
       {!compact && (
-        <span className="leading-none">
-          <span className="block text-[15px] font-extrabold tracking-[-0.02em]">Parts Tracker</span>
-          <span className="text-muted-foreground mt-0.5 block font-mono text-[10px] uppercase tracking-[0.12em]">
-            price watch
+        <span className="text-[17px] leading-none tracking-[-0.03em]">
+          <span className="sr-only">Parts Tracker</span>
+          <span aria-hidden className="font-extrabold">
+            parts
+          </span>
+          <span aria-hidden className="text-muted-foreground font-medium">
+            tracker
           </span>
         </span>
       )}

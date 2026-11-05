@@ -11,6 +11,7 @@ import {
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+import { ProductThumb } from "@/components/product-thumb";
 import { Link } from "@/i18n/navigation";
 import type { CompareRow } from "@/lib/charts/compare";
 import type { CompareMerchant } from "@/lib/charts/compare-data";
@@ -53,12 +54,15 @@ export function CompareGrid({
         accessorFn: (r) => r.name,
         sortingFn: "alphanumeric",
         cell: ({ row }) => (
-          <Link
-            href={`/products/${row.original.productId}`}
-            className="font-medium hover:underline"
-          >
-            {row.original.name}
-          </Link>
+          <div className="flex items-center gap-3">
+            <ProductThumb src={row.original.image} />
+            <Link
+              href={`/products/${row.original.productId}`}
+              className="font-medium hover:underline"
+            >
+              {row.original.name}
+            </Link>
+          </div>
         ),
       },
       ...merchants.map((m): ColumnDef<CompareRow> => ({

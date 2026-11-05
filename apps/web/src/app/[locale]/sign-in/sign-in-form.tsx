@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { signIn, signUp, useSession } from "@/lib/auth/client";
 import { safeNextPath } from "@/lib/auth/redirect";
 import { cn } from "@/lib/utils";
@@ -212,7 +212,14 @@ export function SignInForm() {
           {busy && <Loader2 className="size-4 animate-spin" />}
           {mode === "signIn" ? t("submitSignIn") : t("submitSignUp")}
         </Button>
-        {mode === "signIn" && <p className="text-muted-foreground text-xs">{t("forgot")}</p>}
+        {mode === "signIn" && (
+          <Link
+            href="/forgot-password"
+            className="text-muted-foreground hover:text-foreground justify-self-start text-sm underline underline-offset-2"
+          >
+            {t("forgot")}
+          </Link>
+        )}
       </form>
     </div>
   );

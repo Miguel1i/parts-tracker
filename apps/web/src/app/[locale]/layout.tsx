@@ -76,7 +76,7 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
                   <main
                     id="main"
                     tabIndex={-1}
-                    className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 outline-none sm:px-6 md:py-10 lg:px-10"
+                    className="w-full min-w-0 flex-1 px-4 py-8 outline-none sm:px-6 md:py-10 lg:px-10 2xl:px-14"
                   >
                     {children}
                   </main>
