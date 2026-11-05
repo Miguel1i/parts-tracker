@@ -26,7 +26,87 @@
     "profile": "Perfil e definições",
     "admin": "Administração",
     "signOut": "Terminar sessão",
-    "pending": "A aguardar aprovação"
+    "pending": "A aguardar aprovação",
+    "settings": {
+      "title": "Perfil e definições",
+      "description": "O seu perfil, segurança, preferências e dados.",
+      "profile": {
+        "title": "Perfil",
+        "description": "Como aparece no Parts Tracker.",
+        "name": "Nome a mostrar",
+        "username": "Nome de utilizador",
+        "usernameHint": "3 a 30 caracteres: letras, números, sublinhado e ponto.",
+        "save": "Guardar perfil",
+        "saved": "Perfil guardado."
+      },
+      "email": {
+        "title": "Email",
+        "description": "O seu email é {email}. Introduza a palavra-passe para o alterar.",
+        "newEmail": "Novo email",
+        "currentPassword": "Palavra-passe atual",
+        "save": "Alterar email",
+        "saved": "Email alterado."
+      },
+      "password": {
+        "title": "Palavra-passe",
+        "description": "Escolha uma nova palavra-passe para iniciar sessão.",
+        "current": "Palavra-passe atual",
+        "new": "Nova palavra-passe",
+        "hint": "Pelo menos 8 caracteres.",
+        "confirm": "Confirmar nova palavra-passe",
+        "mismatch": "As palavras-passe não coincidem.",
+        "revokeOthers": "Terminar sessão nos meus outros dispositivos",
+        "save": "Alterar palavra-passe",
+        "saved": "Palavra-passe alterada."
+      },
+      "sessions": {
+        "title": "Sessões",
+        "description": "Dispositivos onde tem sessão iniciada.",
+        "unknownDevice": "Dispositivo desconhecido",
+        "thisDevice": "Este dispositivo",
+        "created": "iniciada em {date}",
+        "lastActive": "ativa em {date}",
+        "revoke": "Terminar sessão",
+        "revoked": "Sessão do dispositivo terminada.",
+        "revokeOthers": "Terminar sessão em todos os outros",
+        "revokedOthers": "Sessão terminada nos seus outros dispositivos."
+      },
+      "preferences": {
+        "title": "Preferências",
+        "description": "Idioma, aspeto e preços.",
+        "language": "Idioma",
+        "theme": "Tema",
+        "themeLight": "Claro",
+        "themeDark": "Escuro",
+        "themeSystem": "Sistema",
+        "defaultBuild": "Montagem predefinida",
+        "noDefaultBuild": "Nenhuma",
+        "withShipping": "Mostrar preços com portes",
+        "withShippingHint": "Soma os portes de cada comerciante ao preço.",
+        "save": "Guardar preferências",
+        "saved": "Preferências guardadas.",
+        "merchants": "Comerciantes a comparar",
+        "merchantsHint": "Desmarque as lojas que não quer nas comparações.",
+        "noMerchants": "Não há comerciantes disponíveis.",
+        "saveMerchants": "Guardar comerciantes",
+        "merchantsSaved": "Comerciantes guardados."
+      },
+      "privacy": {
+        "title": "Privacidade",
+        "description": "Os seus dados são seus.",
+        "exportTitle": "Exportar os meus dados",
+        "exportBody": "Descarregue o seu perfil, preferências, escolha de comerciantes e montagens num ficheiro JSON.",
+        "export": "Exportar dados",
+        "deleteTitle": "Eliminar conta",
+        "deleteBody": "Remove definitivamente a sua conta, montagens e preferências. Os dados partilhados do catálogo mantêm-se.",
+        "delete": "Eliminar conta",
+        "confirmTitle": "Eliminar a sua conta?",
+        "confirmBody": "Não é possível anular. Introduza a palavra-passe para confirmar.",
+        "password": "Palavra-passe",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar definitivamente"
+      }
+    }
   },
   "Locale": {
     "change": "Mudar idioma"
@@ -54,12 +134,155 @@
     }
   },
   "Builds": {
-    "title": "Configurações",
-    "description": "As suas listas de componentes e o total ao longo do tempo.",
+    "title": "As minhas builds",
+    "description": "As suas listas de peças, com o melhor preço atual de cada uma.",
     "empty": {
-      "title": "Ainda sem configurações",
-      "body": "Criar configurações requer uma conta; o início de sessão chega com a etapa de autenticação."
-    }
+      "title": "Ainda sem builds",
+      "body": "Crie uma build e adicione peças do catálogo, de uma ligação de loja ou de uma lista do PCPartPicker."
+    },
+    "new": "Nova build",
+    "back": "Todas as builds",
+    "items": {
+      "part": "Peça",
+      "quantity": "Qtd.",
+      "quantityOf": "Quantidade de {name}",
+      "bestPrice": "Melhor preço",
+      "lineTotal": "Total",
+      "actions": "Ações",
+      "total": "Total da build",
+      "missing": "{count, plural, one {# peça sem preço} other {# peças sem preço}}",
+      "noPrice": "Ainda sem preço",
+      "withShipping": "com {amount} de portes",
+      "checked": "verificado {when}",
+      "bought": "Comprada",
+      "menu": "Ações de {name}",
+      "markBought": "Marcar como comprada",
+      "editBought": "Editar compra",
+      "clearBought": "Marcar como não comprada",
+      "moveUp": "Subir",
+      "moveDown": "Descer",
+      "remove": "Remover da build",
+      "removed": "Peça removida.",
+      "boughtDialog": {
+        "title": "Comprada",
+        "price": "Preço pago (EUR)",
+        "merchant": "Loja",
+        "noMerchant": "Não indicada",
+        "date": "Data",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saved": "Compra guardada."
+      },
+      "report": {
+        "action": "Comunicar correspondência errada",
+        "title": "Comunicar uma correspondência errada",
+        "body": "Indique que a oferta mostrada para \"{name}\" na loja {merchant} é outro produto. Um administrador vai analisar.",
+        "reason": "O que está errado? (opcional)",
+        "reasonPlaceholder": "p. ex. esta é a versão OEM em bandeja",
+        "cancel": "Cancelar",
+        "submit": "Enviar comunicação",
+        "sent": "Obrigado, a comunicação foi enviada."
+      }
+    },
+    "public": "Pública",
+    "missing": "{count, plural, one {# peça ainda sem preço} other {# peças ainda sem preço}}",
+    "menu": "Ações de {name}",
+    "create": {
+      "title": "Nova build",
+      "description": "Dê um nome à build. Pode alterá-lo mais tarde.",
+      "submit": "Criar"
+    },
+    "rename": {
+      "menu": "Mudar o nome",
+      "title": "Mudar o nome da build",
+      "submit": "Guardar",
+      "done": "Nome alterado."
+    },
+    "delete": {
+      "menu": "Eliminar",
+      "title": "Eliminar \"{name}\"?",
+      "body": "A build e a respetiva lista de peças são removidas de forma definitiva. Os produtos do catálogo e os preços mantêm-se.",
+      "confirm": "Eliminar build",
+      "done": "Build eliminada."
+    },
+    "nameDialog": {
+      "name": "Nome",
+      "placeholder": "p. ex. PC de jogos 2026",
+      "cancel": "Cancelar"
+    },
+    "detail": {
+      "withShipping": "Preços mais baixos em stock, com portes",
+      "withoutShipping": "Preços mais baixos em stock, sem portes",
+      "empty": {
+        "title": "Ainda sem peças",
+        "body": "Use o painel abaixo para adicionar peças."
+      }
+    },
+    "check": {
+      "button": "Verificar agora",
+      "running": "A verificar…",
+      "queued": "Em fila. A aguardar o início da verificação…",
+      "progress": "{count, plural, =0 {A verificar preços…} one {# oferta verificada até agora…} other {# ofertas verificadas até agora…}}",
+      "summary": "{count, plural, one {Concluído. # oferta verificada.} other {Concluído. # ofertas verificadas.}}",
+      "failed": "A verificação falhou. Tente novamente mais tarde.",
+      "cancelled": "A verificação foi cancelada.",
+      "done": "Preços atualizados.",
+      "error": "Não foi possível iniciar a verificação.",
+      "gaveUp": "Ainda sem resposta passados 15 minutos. Volte a carregar a página mais tarde para ver os novos preços.",
+      "localCommand": "Não enviada; execute localmente:",
+      "details": "Resultados por loja",
+      "status": {
+        "ok": "preço encontrado",
+        "out_of_stock": "sem stock",
+        "not_found": "não encontrado",
+        "blocked": "bloqueado pela loja",
+        "error": "erro"
+      }
+    },
+    "add": {
+      "title": "Adicionar peças",
+      "description": "Pesquise no catálogo, cole uma ligação de loja ou importe uma lista do PCPartPicker.",
+      "search": {
+        "tab": "Catálogo",
+        "label": "Pesquisar no catálogo",
+        "placeholder": "Pesquise pelo nome, p. ex. Ryzen 7 9800X3D",
+        "none": "Nada no catálogo corresponde. Experimente uma ligação de loja.",
+        "add": "Adicionar",
+        "addNamed": "Adicionar {name}",
+        "added": "Peça adicionada."
+      },
+      "url": {
+        "tab": "Ligação de loja",
+        "url": "Ligação da página do produto",
+        "name": "Nome do produto",
+        "nameHint": "Não abrimos a ligação. Escreva o nome real do produto para o podermos associar.",
+        "gtin": "Código de barras (EAN/GTIN, opcional)",
+        "submit": "Adicionar à build",
+        "created": "Novo produto adicionado ao catálogo e à build.",
+        "existing": "Encontrámos um produto já existente no catálogo e adicionámo-lo."
+      },
+      "import": {
+        "tab": "PCPartPicker",
+        "label": "Lista colada",
+        "placeholder": "CPU  AMD Ryzen 7 9800X3D  €449,00",
+        "hint": "Cole a lista de peças do PCPartPicker (Markdown ou a tabela em texto simples).",
+        "replace": "Substituir as peças ainda não compradas",
+        "submit": "Importar",
+        "done": "{added, plural, =0 {Nenhum produto novo} one {# produto novo} other {# produtos novos}} criado(s); {matched, plural, =0 {nenhuma peça} one {# peça} other {# peças}} associada(s) ao catálogo."
+      }
+    },
+    "share": {
+      "title": "Partilhar",
+      "description": "Qualquer pessoa com a ligação vê esta build só em leitura. A sua conta nunca é mostrada.",
+      "public": "Qualquer pessoa com a ligação pode ver",
+      "link": "Ligação de partilha",
+      "copy": "Copiar ligação",
+      "copied": "Ligação copiada.",
+      "reset": "Criar nova ligação",
+      "resetDone": "Nova ligação criada. A anterior deixou de funcionar.",
+      "resetHint": "Criar uma nova ligação faz com que a anterior deixe de funcionar."
+    },
+    "count": "{count, plural, one {# peça} other {# peças}}"
   },
   "Admin": {
     "title": "Administração",
@@ -318,7 +541,19 @@
       "approve": "Aprovar",
       "reject": "Rejeitar",
       "approved": "Candidato aprovado",
-      "rejected": "Candidato rejeitado e bloqueado"
+      "rejected": "Candidato rejeitado e bloqueado",
+      "candidates": "Candidatos de correspondência",
+      "reports": {
+        "heading": "Reportado por utilizadores",
+        "by": "Reportado por {name}",
+        "unknownUser": "um utilizador",
+        "noReason": "Sem motivo indicado.",
+        "reportedOffer": "Oferta reportada",
+        "confirm": "Confirmar erro",
+        "dismiss": "Dispensar",
+        "confirmed": "Confirmada como correspondência errada e bloqueada",
+        "dismissed": "Reporte dispensado"
+      }
     },
     "audit": {
       "title": "Registo de auditoria",
@@ -537,5 +772,17 @@
     "alreadyReported": "Esta oferta já foi reportada e aguarda revisão.",
     "nothingToCheck": "Os preços foram verificados há instantes; ainda não há nada para atualizar.",
     "importEmpty": "Não foram encontradas peças na lista colada."
+  },
+  "Share": {
+    "sharedBy": "Partilhado por {name}",
+    "empty": "Esta configuração ainda não tem componentes.",
+    "product": "Componente",
+    "quantity": "Qtd.",
+    "price": "Melhor preço",
+    "lineTotal": "Total",
+    "total": "Total",
+    "partial": "(alguns componentes não têm preço)",
+    "noPrice": "Sem preço",
+    "bought": "Comprado"
   }
 }
